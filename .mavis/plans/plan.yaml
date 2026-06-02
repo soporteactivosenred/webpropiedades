@@ -1,0 +1,248 @@
+﻿version: 1
+plan:
+  name: "Plataforma Inmobiliaria Propiedades Merino"
+  max_concurrency: 3
+  max_consecutive_failures: 2
+  max_cycles: 15
+
+tasks:
+  - id: config-base
+    title: "Configurar proyecto Next.js con TypeScript y Tailwind"
+    prompt: |
+      Crear estructura inicial del proyecto inmobiliario para Paula Merino / Propiedades Merino.
+      
+      1. Inicializar proyecto Next.js 14+ con App Router, TypeScript, Tailwind CSS
+      2. Crear estructura de carpetas según App Router:
+         - src/app/ (rutas públicas y admin)
+         - src/components/ (ui, layout, properties, forms, admin, seo)
+         - src/lib/ (supabase, utils, validations, seo)
+         - src/types/ (database.ts, property.ts, lead.ts)
+         - src/actions/ (properties.ts, leads.ts, blog.ts)
+         - src/styles/ (globals.css)
+      3. Crear archivo .env.example con todas las variables necesarias
+      4. Configurar tailwind.config.js con paleta de colores profesional (azules, grises, blancos)
+      5. Crear componentes base: Button, Card, Input, Select, TextArea
+      6. Crear layout principal: Navbar y Footer con enlaces reales
+      7. Crear tipos TypeScript para properties, leads, blog_posts, profiles, site_settings
+      8. NO crear páginas aún - solo la estructura y componentes base
+      
+      Importante: Usar código limpio, TypeScript strict, diseño responsive mobile-first
+    assigned_to: coder
+    verified_by: verifier
+    verify_prompt: "Verificar que la estructura de carpetas existe, TypeScript compila sin errores, componentes base funcionan. Revisar que todos los imports sean correctos."
+    timeout_ms: 1200000
+
+  - id: db-migrations
+    title: "Crear migraciones SQL para Supabase"
+    prompt: |
+      Crear archivo de migraciones SQL para Supabase con el modelo de datos completo.
+      
+      Tablas a crear:
+      1. profiles (id uuid PK, email text, name text, role text default 'admin', created_at timestamp)
+      2. properties (id uuid PK, title text, slug text unique, operation_type text, property_type text, price numeric, currency text default 'CLP', commune text, sector text, region text, address text, bedrooms int, bathrooms int, parking int, built_area numeric, total_area numeric, description text, short_description text, status text default 'disponible', is_featured boolean default false, published boolean default false, latitude numeric, longitude numeric, video_url text, seo_title text, seo_description text, og_image text, created_at timestamp, updated_at timestamp)
+      3. property_media (id uuid PK, property_id uuid FK, file_url text, file_path text, media_type text, alt_text text, sort_order int, created_at timestamp)
+      4. property_features (id uuid PK, property_id uuid FK, feature_name text)
+      5. leads (id uuid PK, property_id uuid FK nullable, name text, email text, phone text, message text, source text, status text default 'nuevo', created_at timestamp)
+      6. blog_posts (id uuid PK, title text, slug text unique, excerpt text, content text, featured_image text, seo_title text, seo_description text, published boolean default false, created_at timestamp, updated_at timestamp)
+      7. site_settings (id uuid PK, site_name text, whatsapp_number text, contact_email text, facebook_url text, instagram_url text, logo_url text, seo_title text, seo_description text, updated_at timestamp)
+      8. social_publications (id uuid PK, property_id uuid FK, platform text, content text, image_url text, status text default 'pendiente', response jsonb, created_at timestamp, published_at timestamp)
+      
+      Políticas RLS a configurar:
+      - properties: lectura pública solo para published=true, escritura solo admin
+      - property_media: lectura pública, escritura solo admin
+      - leads: lectura/escritura pública para insert, lectura solo admin
+      - blog_posts: lectura pública para published=true, escritura solo admin
+      - site_settings: lectura pública, escritura solo admin
+      - profiles: lectura/escritura solo admin
+      - social_publications: lectura/escritura solo admin
+      
+      Crear funciones trigger para:
+      - Auto-generar slug desde title en properties
+      - Auto-generar slug desde title en blog_posts
+      - Actualizar updated_at en properties y blog_posts
+      
+      Guardar en: supabase/migrations/001_initial_schema.sql
+    assigned_to: general
+    verified_by: verifier
+    verify_prompt: "Verificar SQL syntax, que todas las tablas tengan los campos correctos, RLS policies sean seguras (no abrir todo), triggers funcionen correctamente."
+    timeout_ms: 900000
+
+  - id: supabase-client
+    title: "Configurar cliente Supabase para frontend y server"
+    prompt: |
+      Crear configuración de cliente Supabase.
+      
+      1. Crear src/lib/supabase/client.ts - Cliente público para browser (usar createBrowserClient)
+      2. Crear src/lib/supabase/server.ts - Cliente de servidor para Next.js server components y API routes (usar createServerClient con cookies)
+      3. Crear src/lib/supabase/middleware.ts - Cliente para Next.js middleware
+      4. Crear src/lib/supabase/types.ts - Tipos generados de la base de datos
+      5. Crear helper functions en src/lib/supabase/:
+         - properties.ts (getProperties, getPropertyBySlug, createProperty, updateProperty, deleteProperty)
+         - leads.ts (createLead, getLeads, updateLeadStatus)
+         - blog.ts (getBlogPosts, getBlogPostBySlug, createBlogPost, updateBlogPost)
+         - settings.ts (getSiteSettings, updateSiteSettings)
+      6. Crear src/lib/utils/slugify.ts - función para generar slugs URL-friendly
+      7. Crear src/lib/utils/format.ts - formateo de precios CLP, superficies, etc.
+      
+      Usar environment variables: NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
+    assigned_to: coder
+    depends_on: [config-base]
+    verified_by: verifier
+    verify_prompt: "Verificar que los clientes se crean correctamente, tiposson correctos, helper functions ejecutan queries apropiadas."
+    timeout_ms: 900000
+
+  - id: pages-public
+    title: "Crear sitio público: Home, Propiedades, Ficha, Blog, Contacto"
+    prompt: |
+      Crear todas las páginas públicas del sitio.
+      
+      1. src/app/page.tsx - Home con:
+         - Hero con título, buscador rápido, CTAs
+         - Propiedades destacadas (cards)
+         - Búsqueda por tipo (casas, deptos, parcelas, etc.)
+         - Sección de confianza
+         - CTA para vender propiedad
+         - Blog/Consejos
+         - CTA final WhatsApp
+      
+      2. src/app/propiedades/page.tsx - Listado con:
+         - Filtros: operación, tipo, comuna, sector, precio min/max, dormitorios, baños
+         - Orden: recientes, menor precio, mayor precio, destacadas
+         - Cards de propiedades con imagen, precio, ubicación, características
+         - Paginación
+      
+      3. src/app/propiedades/[slug]/page.tsx - Ficha con:
+         - Galería de imágenes (carousel)
+         - Video si existe
+         - Título, precio, ubicación
+         - Características principales
+         - Descripción completa
+         - Lista de atributos
+         - Mapa (opcional)
+         - Formulario de contacto
+         - Botón WhatsApp con mensaje predefinido
+         - Propiedades relacionadas
+      
+      4. src/app/blog/page.tsx - Listado de artículos
+      5. src/app/blog/[slug]/page.tsx - Artículo individual
+      6. src/app/contacto/page.tsx - Formulario general
+      7. src/app/vender-mi-propiedad/page.tsx - Landing de captación
+      8. src/app/nosotros/page.tsx - Página institucional
+      
+      Usar componentes de UI ya creados, integrar con Supabase para datos reales.
+      Implementar loading states y error handling.
+    assigned_to: coder
+    depends_on: [config-base, supabase-client]
+    verified_by: verifier
+    verify_prompt: "Verificar todas las páginas cargan correctamente, filtros funcionan, datos vienen de Supabase, responsive mobile, SEO metadata en cada página."
+    timeout_ms: 1800000
+
+  - id: pages-admin
+    title: "Crear panel administrador completo"
+    prompt: |
+      Crear panel de administración protegido con Supabase Auth.
+      
+      1. src/app/admin/login/page.tsx - Login con email/password
+      2. src/app/admin/page.tsx - Dashboard general con:
+         - Resumen de propiedades
+         - Leads recientes
+         - Accesos rápidos
+      
+      3. src/app/admin/propiedades/page.tsx - Listado con:
+         - Tabla de propiedades
+         - Filtros por estado
+         - Acciones: editar, eliminar, publicar/ocultar, marcar destacada
+      
+      4. src/app/admin/propiedades/nueva/page.tsx - Formulario crear propiedad:
+         - Título, operación, tipo
+         - Precio y ubicación
+         - Características (dormitorios, baños, etc.)
+         - Descripción
+         - Subir múltiples imágenes
+         - Agregar video
+         - Características adicionales
+         - SEO fields
+      
+      5. src/app/admin/propiedades/[id]/page.tsx - Editar propiedad (mismo form)
+      6. src/app/admin/leads/page.tsx - Ver contactos con:
+         - Listado de leads
+         - Filtrar por fuente y estado
+         - Ver detalle
+         - Cambiar estado
+      
+      7. src/app/admin/blog/page.tsx - Gestión de artículos
+      8. src/app/admin/configuracion/page.tsx - Configurar:
+         - WhatsApp, email, redes sociales
+         - Logo, datos SEO globales
+      
+      Proteger todas las rutas admin con middleware. Solo usuarios autenticados.
+      Diseño simple y funcional para persona no técnica.
+    assigned_to: coder
+    depends_on: [config-base, supabase-client]
+    verified_by: verifier
+    verify_prompt: "Verificar login funciona, rutas protegidas, CRUD completo de propiedades, subida de imágenes funciona, leads se guardan correctamente."
+    timeout_ms: 1800000
+
+  - id: seo-tech
+    title: "Implementar SEO técnico completo"
+    prompt: |
+      Implementar SEO técnico avanzado para el sitio.
+      
+      1. src/app/api/sitemap/route.ts - Sitemap dinámico con:
+         - Propiedades publicadas
+         - Artículos de blog
+         - Páginas estáticas
+      
+      2. src/app/robots.ts - Archivo robots.txt
+      3. src/components/seo/Metadata.tsx - Componente para metadata dinámica
+      4. src/components/seo/SchemaOrg.tsx - Schema.org para:
+         - Organization (Propiedades Merino)
+         - RealEstateListing para propiedades
+         - BreadcrumbList
+      
+      5. src/app/propiedades/[slug]/page.tsx - Agregar:
+         - generateMetadata con title, description, og:image
+         - Open Graph tags
+         - Schema RealEstateListing
+      
+      6. Optimizar imágenes con next/image
+      7. URLs amigables con slugs descriptivos
+      
+      Estructura de metadata por página:
+      - Home: Propiedades Merino | Corredora de propiedades en Temuco
+      - Propiedades: Propiedades en venta y arriendo | Propiedades Merino
+      - Ficha: [Título] | Propiedades Merino
+    assigned_to: coder
+    depends_on: [pages-public]
+    verified_by: verifier
+    verify_prompt: "Verificar sitemap.xml funciona, robots.txt existe, metadata correcta en cada página, schema.org válido, Open Graph tags presentes."
+    timeout_ms: 900000
+
+  - id: vercel-deploy
+    title: "Preparar despliegue en Vercel"
+    prompt: |
+      Preparar configuración para Vercel.
+      
+      1. Crear src/app/sitemap.ts - Sitemap principal de Next.js 14
+      2. Crear vercel.json si es necesario
+      3. Crear .gitignore con archivos de Node, Next.js
+      4. Crear README.md con:
+         - Instrucciones de setup
+         - Variables de entorno requeridas
+         - Scripts disponibles
+         - Links útiles
+      
+      5. Crear package.json con scripts:
+         - dev (next dev)
+         - build (next build)
+         - start (next start)
+         - lint (next lint)
+      
+      6. Preparar para GitHub:
+         - Instrucciones para conectar repo con Vercel
+         - Variables de entorno a configurar en Vercel
+    assigned_to: general
+    depends_on: [pages-public, pages-admin]
+    verified_by: verifier
+    verify_prompt: "Verificar configuración correcta, build pasa sin errores, todo listo para deploy."
+    timeout_ms: 600000

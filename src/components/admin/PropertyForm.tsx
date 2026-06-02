@@ -1,0 +1,512 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
+import { Input } from '@/components/ui';
+import { Select } from '@/components/ui';
+import { TextArea } from '@/components/ui';
+import { Button } from '@/components/ui';
+import type { Database } from '@/types';
+
+type Property = Database['public']['Tables']['properties']['Row'];
+
+interface PropertyFormProps {
+  property?: Property;
+  isEditing?: boolean;
+}
+
+const PROPERTY_TYPES = [
+  { value: 'house', label: 'Casa' },
+  { value: 'apartment', label: 'Departamento' },
+  { value: 'land', label: 'Terreno' },
+  { value: 'commercial', label: 'Comercial' },
+  { value: 'office', label: 'Oficina' },
+  { value: 'industrial', label: 'Industrial' },
+];
+
+const PRICE_TYPES = [
+  { value: 'sale', label: 'Venta' },
+  { value: 'rent', label: 'Arriendo' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'draft', label: 'Borrador' },
+  { value: 'active', label: 'Activo' },
+  { value: 'sold', label: 'Vendido' },
+  { value: 'rented', label: 'Arrendado' },
+];
+
+const PROPERTY_FEATURES = [
+  'Piscina',
+  'Jardín',
+  'Estacionamiento',
+  'Bodega',
+  'Terraza',
+  'Quincho',
+  'Sala de cine',
+  'Gimnasio',
+  'Seguridad 24/7',
+  'Acceso controlado',
+  'Calefacción',
+  'Aire acondicionado',
+  'Amoblado',
+  'Pet friendly',
+  'Vista a la ciudad',
+  'Balcón',
+];
+
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 100);
+}
+
+export function PropertyForm({ property, isEditing = false }: PropertyFormProps) {
+  const router = useRouter();
+  
+  const [formData, setFormData] = useState({
+    title: property?.title || '',
+    price: property?.price?.toString() || '',
+    price_type: property?.price_type || 'sale',
+    property_type: property?.property_type || 'house',
+    status: property?.status || 'draft',
+    address: property?.address || '',
+    city: property?.city || '',
+    region: property?.region || '',
+    bedrooms: property?.bedrooms?.toString() || '',
+    bathrooms: property?.bathrooms?.toString() || '',
+    area: property?.area?.toString() || '',
+    parking_spaces: property?.parking_spaces?.toString() || '',
+    year_built: property?.year_built?.toString() || '',
+    description: property?.description || '',
+    features: (property?.features as string[]) || [],
+    images: (property?.images as string[]) || [],
+    video_url: '',
+    // SEO fields
+    meta_title: '',
+    meta_description: '',
+    seo_keywords: '',
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [newImageUrl, setNewImageUrl] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFeatureToggle = (feature: string) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.includes(feature)
+        ? prev.features.filter(f => f !== feature)
+        : [...prev.features, feature],
+    }));
+  };
+
+  const handleAddImage = () => {
+    if (newImageUrl.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, newImageUrl.trim()],
+      }));
+      setNewImageUrl('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent, publishNow = false) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      const supabase = createAdminBrowserClient();
+      const slug = generateSlug(formData.title);
+
+      const propertyData = {
+        title: formData.title,
+        slug,
+        price: parseFloat(formData.price) || 0,
+        price_type: formData.price_type as 'sale' | 'rent',
+        property_type: formData.property_type as 'house' | 'apartment' | 'land' | 'commercial' | 'office' | 'industrial',
+        status: publishNow ? 'active' : (formData.status as 'draft' | 'active' | 'sold' | 'rented'),
+        address: formData.address,
+        city: formData.city,
+        region: formData.region,
+        bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
+        bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
+        area: formData.area ? parseFloat(formData.area) : null,
+        parking_spaces: formData.parking_spaces ? parseInt(formData.parking_spaces) : null,
+        year_built: formData.year_built ? parseInt(formData.year_built) : null,
+        description: formData.description,
+        features: formData.features,
+        images: formData.images,
+      };
+
+      let result;
+      if (isEditing && property) {
+        result = await supabase
+          .from('properties')
+          .update(propertyData)
+          .eq('id', property.id)
+          .select();
+      } else {
+        result = await supabase
+          .from('properties')
+          .insert([propertyData])
+          .select();
+      }
+
+      if (result.error) {
+        setError(result.error.message);
+        return;
+      }
+
+      router.push('/admin/propiedades');
+      router.refresh();
+    } catch (err) {
+      setError('Ocurrió un error inesperado. Por favor intenta de nuevo.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
+
+      {/* Basic Info Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2">
+            <Input
+              label="Título de la Propiedad"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              placeholder="Ej: Hermosa casa en Las Condes"
+              required
+            />
+          </div>
+
+          <Select
+            label="Tipo de Operación"
+            name="price_type"
+            value={formData.price_type}
+            onChange={handleChange}
+            options={PRICE_TYPES}
+            required
+          />
+
+          <Select
+            label="Tipo de Propiedad"
+            name="property_type"
+            value={formData.property_type}
+            onChange={handleChange}
+            options={PROPERTY_TYPES}
+            required
+          />
+
+          <Input
+            label="Precio"
+            name="price"
+            type="number"
+            value={formData.price}
+            onChange={handleChange}
+            placeholder="Ej: 150000000"
+            required
+          />
+
+          <Select
+            label="Estado"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            options={STATUS_OPTIONS}
+          />
+        </div>
+      </div>
+
+      {/* Location Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Ubicación</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="md:col-span-2">
+            <Input
+              label="Dirección"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              placeholder="Ej: Av. Apoquindo 3000"
+              required
+            />
+          </div>
+
+          <Input
+            label="Ciudad"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            placeholder="Ej: Santiago"
+            required
+          />
+
+          <Input
+            label="Región"
+            name="region"
+            value={formData.region}
+            onChange={handleChange}
+            placeholder="Ej: Metropolitana"
+            required
+          />
+        </div>
+      </div>
+
+      {/* Features Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Características</h2>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <Input
+            label="Dormitorios"
+            name="bedrooms"
+            type="number"
+            value={formData.bedrooms}
+            onChange={handleChange}
+            placeholder="Ej: 3"
+          />
+
+          <Input
+            label="Baños"
+            name="bathrooms"
+            type="number"
+            value={formData.bathrooms}
+            onChange={handleChange}
+            placeholder="Ej: 2"
+          />
+
+          <Input
+            label="Superficie (m²)"
+            name="area"
+            type="number"
+            value={formData.area}
+            onChange={handleChange}
+            placeholder="Ej: 120"
+          />
+
+          <Input
+            label="Estacionamientos"
+            name="parking_spaces"
+            type="number"
+            value={formData.parking_spaces}
+            onChange={handleChange}
+            placeholder="Ej: 2"
+          />
+
+          <Input
+            label="Año de Construcción"
+            name="year_built"
+            type="number"
+            value={formData.year_built}
+            onChange={handleChange}
+            placeholder="Ej: 2020"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Características Adicionales
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {PROPERTY_FEATURES.map((feature) => (
+              <label key={feature} className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.features.includes(feature)}
+                  onChange={() => handleFeatureToggle(feature)}
+                  className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                />
+                <span className="text-sm text-gray-700">{feature}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Description Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Descripción</h2>
+        
+        <TextArea
+          label="Descripción Detallada"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="Describe las características, ventajas y detalles importantes de la propiedad..."
+          rows={6}
+        />
+      </div>
+
+      {/* Images Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Imágenes</h2>
+        
+        <div className="mb-4">
+          <div className="flex gap-2">
+            <Input
+              label="Agregar Imagen (URL)"
+              name="newImageUrl"
+              value={newImageUrl}
+              onChange={(e) => setNewImageUrl(e.target.value)}
+              placeholder="https://example.com/imagen.jpg"
+            />
+            <div className="flex items-end">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleAddImage}
+              >
+                Agregar
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {formData.images.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {formData.images.map((url, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={url}
+                  alt={`Imagen ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-lg"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x150?text=Error';
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ×
+                </button>
+                {index === 0 && (
+                  <span className="absolute bottom-2 left-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
+                    Portada
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {formData.images.length === 0 && (
+          <p className="text-gray-500 text-center py-4">
+            No hay imágenes. Agrega URLs de imágenes para la propiedad.
+          </p>
+        )}
+      </div>
+
+      {/* Video Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Video (Opcional)</h2>
+        
+        <Input
+          label="URL del Video de YouTube o Vimeo"
+          name="video_url"
+          value={formData.video_url}
+          onChange={handleChange}
+          placeholder="https://www.youtube.com/watch?v=..."
+          hint="Pega el enlace de un video de YouTube o Vimeo para mostrar un recorrido de la propiedad."
+        />
+      </div>
+
+      {/* SEO Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">SEO (Opcional)</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Si no completas estos campos, se usarán los valores predeterminados del sitio.
+        </p>
+        
+        <div className="space-y-4">
+          <Input
+            label="Título Meta"
+            name="meta_title"
+            value={formData.meta_title}
+            onChange={handleChange}
+            placeholder="Título para SEO (máximo 60 caracteres)"
+            hint="Títulos más largos serán truncados en los resultados de búsqueda."
+          />
+
+          <TextArea
+            label="Descripción Meta"
+            name="meta_description"
+            value={formData.meta_description}
+            onChange={handleChange}
+            placeholder="Descripción para SEO (máximo 160 caracteres)"
+            rows={3}
+            hint="Una buena descripción mejora el CTR en los resultados de búsqueda."
+          />
+
+          <Input
+            label="Palabras Clave SEO"
+            name="seo_keywords"
+            value={formData.seo_keywords}
+            onChange={handleChange}
+            placeholder="casa, venta, santiago, las condes"
+            hint="Separadas por comas. Ej: casa, venta, santiago, departamento"
+          />
+        </div>
+      </div>
+
+      {/* Submit Buttons */}
+      <div className="flex justify-end gap-4">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => router.push('/admin/propiedades')}
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={(e) => handleSubmit(e as unknown as React.FormEvent, false)}
+          isLoading={isSubmitting}
+        >
+          Guardar como Borrador
+        </Button>
+        <Button
+          type="button"
+          onClick={(e) => handleSubmit(e as unknown as React.FormEvent, true)}
+          isLoading={isSubmitting}
+        >
+          {isEditing ? 'Actualizar y Publicar' : 'Guardar y Publicar'}
+        </Button>
+      </div>
+    </form>
+  );
+}

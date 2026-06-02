@@ -1,0 +1,43 @@
+export interface SiteSettings {
+  site_name: string;
+  site_tagline: string;
+  site_description: string;
+  contact_email: string;
+  contact_phone: string;
+  contact_whatsapp: string;
+  contact_address: string;
+  social_media: {
+    facebook?: string;
+    instagram?: string;
+    linkedin?: string;
+    twitter?: string;
+    youtube?: string;
+  };
+  seo: {
+    default_title: string;
+    default_description: string;
+    default_keywords: string;
+    og_image: string;
+  };
+}
+
+export const DEFAULT_SETTINGS: SiteSettings = {
+  site_name: 'Propiedades Merino',
+  site_tagline: 'Tu hogar, nuestra pasión',
+  site_description: 'Encuentra tu próxima propiedad con Propiedades Merino. Casas, departamentos, terrenos y más.',
+  contact_email: 'contacto@propiedadesmerino.cl',
+  contact_phone: '+56 9 1234 5678',
+  contact_whatsapp: '+56912345678',
+  contact_address: 'Av. Principal 1234, Santiago, Chile',
+  social_media: {
+    facebook: 'https://facebook.com/propiedadesmerino',
+    instagram: 'https://instagram.com/propiedadesmerino',
+    linkedin: 'https://linkedin.com/company/propiedadesmerino',
+  },
+  seo: {
+    default_title: 'Propiedades Merino - Tu hogar, nuestra pasión',
+    default_description: 'Encuentra tu próxima propiedad con Propiedades Merino. Casas, departamentos, terrenos y más.',
+    default_keywords: 'inmuebles, propiedades, casas, departamentos, arriendo, venta, Chile',
+    og_image: '/images/og-default.jpg',
+  },
+};
