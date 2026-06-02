@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createSupabaseServerClient as createSupabaseServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from '@/types';
 
@@ -7,15 +7,15 @@ import type { Database } from '@/types';
  * This client can access cookies and uses the anon key.
  * 
  * Usage in Server Components:
- *   const supabase = await createServerClient()
+ *   const supabase = await createSupabaseServerClient()
  * 
  * Usage in Route Handlers/Actions:
- *   const supabase = createServerClient(cookies())
+ *   const supabase = createSupabaseServerClient(cookies())
  */
-export async function createServerClient() {
+export async function createSupabaseServerClient() {
   const cookieStore = await cookies();
   
-  return createServerClient<Database>(
+  return createSupabaseServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -46,8 +46,8 @@ export async function createServerClient() {
  * Create a Supabase client for use in Server Components with async cookie access.
  * Use this variant when you need to await the cookies() promise.
  */
-export function createServerClientFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  return createServerClient<Database>(
+export function createSupabaseServerClientFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
+  return createSupabaseServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -82,7 +82,7 @@ export function createServerClientFromCookies(cookieStore: Awaited<ReturnType<ty
  *   const supabase = createAdminClient()
  */
 export function createAdminClient() {
-  return createServerClient<Database>(
+  return createSupabaseServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
