@@ -2,6 +2,12 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import type { Database } from '@/types';
 
+export const config = {
+  matcher: [
+    '/admin/:path*'
+  ],
+};
+
 /**
  * Admin middleware to protect admin routes.
  * Only authenticated users can access /admin/* (except /admin/login)
