@@ -1,5 +1,4 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createServerClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import type { Database } from '@/types';
 
@@ -9,17 +8,7 @@ export const metadata = {
 };
 
 async function getAdminData() {
-  const supabase = await createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookies().then(c => c.get(name)?.value);
-        },
-      },
-    }
-  );
+  const supabase = await createServerClient<Database>();
 
   // Get property stats
   const { count: totalProperties } = await supabase

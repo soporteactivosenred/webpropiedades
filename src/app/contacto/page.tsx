@@ -5,6 +5,7 @@ import { Button, Input, TextArea } from '@/components/ui';
 import { validateForm, contactFormSchema } from '@/lib';
 import { Send, Mail, Phone, MapPin, Clock } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '@/types';
+import { createClientComponentClient } from '@/lib/supabase/client';
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,8 +32,24 @@ export default function ContactPage() {
       return;
     }
 
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const supabase = createClientComponentClient();
+    
+    const { error } = await supabase.from('leads').insert({
+      name: data.name,
+      email: data.email,
+      phone: data.phone || null,
+      message: data.message,
+      source: 'contact_form',
+      status: 'new'
+    });
+
+    if (error) {
+      console.error('Error saving lead:', error);
+      setErrors({ form: 'Hubo un error al enviar tu mensaje. Intenta nuevamente.' });
+      setIsSubmitting(false);
+      return;
+    }
+
     setSuccess(true);
     setIsSubmitting(false);
   };
@@ -80,6 +97,11 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {errors.form && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    {errors.form}
+                  </div>
+                )}
                 <Input
                   name="name"
                   label="Nombre completo"
