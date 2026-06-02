@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Input, TextArea } from '@/components/ui';
 import { validateForm, contactFormSchema } from '@/lib';
 import { Mail, Send } from 'lucide-react';
+import { createClientComponentClient } from '@/lib/supabase/client';
 
 interface Props {
   propertyId: string;
@@ -35,8 +36,24 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
       return;
     }
 
-    // Simulate submission (replace with actual API call)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    const supabase = createClientComponentClient();
+    
+    const { error } = await supabase.from('leads').insert({
+      name: data.name,
+      email: data.email,
+      phone: data.phone || null,
+      message: `Propiedad: ${propertyTitle} (ID: ${propertyId})\n\n${data.message}`,
+      source: 'property_inquiry',
+      status: 'new'
+    });
+
+    if (error) {
+      console.error('Error saving lead:', error);
+      setErrors({ form: 'Hubo un error al enviar tu mensaje. Intenta nuevamente.' });
+      setIsSubmitting(false);
+      return;
+    }
+
     setSuccess(true);
     setIsSubmitting(false);
   };
@@ -57,6 +74,11 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {errors.form && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          {errors.form}
+        </div>
+      )}
       <Input
         name="name"
         label="Nombre completo"
