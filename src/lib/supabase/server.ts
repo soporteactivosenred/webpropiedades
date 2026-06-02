@@ -1,4 +1,4 @@
-import { createSupabaseServerClient as createSupabaseServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient as createSupabaseSSRClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from '@/types';
 
@@ -7,15 +7,15 @@ import type { Database } from '@/types';
  * This client can access cookies and uses the anon key.
  * 
  * Usage in Server Components:
- *   const supabase = await createSupabaseServerClient()
+ *   const supabase = await createSupabaseSSRClient()
  * 
  * Usage in Route Handlers/Actions:
- *   const supabase = createSupabaseServerClient(cookies())
+ *   const supabase = createSupabaseSSRClient(cookies())
  */
-export async function createSupabaseServerClient() {
+export async function createSupabaseSSRClient() {
   const cookieStore = await cookies();
   
-  return createSupabaseServerClient<Database>(
+  return createSupabaseSSRClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -46,8 +46,8 @@ export async function createSupabaseServerClient() {
  * Create a Supabase client for use in Server Components with async cookie access.
  * Use this variant when you need to await the cookies() promise.
  */
-export function createSupabaseServerClientFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  return createSupabaseServerClient<Database>(
+export function createSupabaseSSRClientFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
+  return createSupabaseSSRClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -82,7 +82,7 @@ export function createSupabaseServerClientFromCookies(cookieStore: Awaited<Retur
  *   const supabase = createAdminClient()
  */
 export function createAdminClient() {
-  return createSupabaseServerClient<Database>(
+  return createSupabaseSSRClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {

@@ -2,7 +2,7 @@
 // Re-exports all supabase-related utilities
 
 export { createClient, getSupabaseClient } from './client';
-export { createServerClient, createServerClientFromCookies, createAdminClient } from './server';
+export { createSupabaseSSRClient as createServerClient, createServerClientFromCookies, createAdminClient } from './server';
 export { createMiddlewareClient, updateSession, getUser, requireAuth } from './middleware';
 
 export * from './types';
