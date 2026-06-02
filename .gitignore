@@ -44,3 +44,7 @@ Thumbs.db
 
 # Misc
 *.log
+
+# Mavis and Opencode
+.mavis/
+.opencode/
