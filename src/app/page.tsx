@@ -6,6 +6,8 @@ import { Button } from '@/components/ui';
 import { createServerClient } from '@/lib/supabase/server';
 import { getFeaturedProperties, getRecentProperties } from '@/lib/supabase';
 
+export const revalidate = 60;
+
 async function FeaturedProperties() {
   const supabase: any = await createServerClient();
   const { data: properties } = await getFeaturedProperties(supabase, 6);
