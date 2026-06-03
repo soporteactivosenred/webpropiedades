@@ -195,8 +195,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       )}
 
       {/* Basic Info Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Información Básica</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Información Básica</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
@@ -249,8 +249,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       </div>
 
       {/* Location Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Ubicación</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Ubicación</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
@@ -285,8 +285,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       </div>
 
       {/* Features Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Características</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Características</h2>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <Input
@@ -336,7 +336,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             Características Adicionales
           </label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -348,7 +348,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
                   onChange={() => handleFeatureToggle(feature)}
                   className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
                 />
-                <span className="text-sm text-gray-700">{feature}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
               </label>
             ))}
           </div>
@@ -356,8 +356,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       </div>
 
       {/* Description Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Descripción</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Descripción</h2>
         
         <TextArea
           label="Descripción Detallada"
@@ -370,8 +370,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       </div>
 
       {/* Images Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Imágenes</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Imágenes</h2>
         
         <div className="mb-4">
           <div className="flex gap-2">
@@ -431,8 +431,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       </div>
 
       {/* Video Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Video (Opcional)</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Video (Opcional)</h2>
         
         <Input
           label="URL del Video de YouTube o Vimeo"
@@ -445,8 +445,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       </div>
 
       {/* SEO Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">SEO (Opcional)</h2>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">SEO (Opcional)</h2>
         <p className="text-sm text-gray-500 mb-4">
           Si no completas estos campos, se usarán los valores predeterminados del sitio.
         </p>
