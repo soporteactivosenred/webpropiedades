@@ -10,17 +10,17 @@ module.exports = {
       colors: {
         // Primary palette - Professional blues
         primary: {
-          50: '#f0f7ff',
-          100: '#e0effe',
-          200: '#bae0fd',
-          300: '#7cc8fb',
-          400: '#36aaf5',
-          500: '#0c8de6',
-          600: '#0070cc',
-          700: '#01589f',
-          800: '#064b85',
-          900: '#0b3f6e',
-          950: '#062847',
+          50: '#E5F5FA',
+          100: '#CBEBF4',
+          200: '#97D6E9',
+          300: '#64C2DF',
+          400: '#30ADD4',
+          500: '#08A2D6', // accent
+          600: '#043F83', // primary
+          700: '#203F60', // secondary
+          800: '#1A324D',
+          900: '#2E363D', // text
+          950: '#111827',
         },
         // Neutral grayscale palette
         gray: {

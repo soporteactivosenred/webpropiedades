@@ -6,9 +6,14 @@
 
 @layer base {
   :root {
-    --color-primary: 0 112 204;
-    --color-primary-light: 54 170 245;
-    --color-primary-dark: 1 88 159;
+    --color-primary: #043F83;
+    --color-secondary: #203F60;
+    --color-accent: #08A2D6;
+    --color-soft-blue: #E5F5FA;
+    --color-gray-blue: #A5B9CD;
+    --color-background: #F8FAFC;
+    --color-gold: #C9A46A;
+    --color-text: #2E363D;
   }
 
   * {
@@ -20,8 +25,21 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+    background-color: var(--color-background);
+    color: var(--color-text);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-secondary);
+  }
+
+  a {
+    color: var(--color-primary);
+  }
+  
+  a:hover {
+    color: var(--color-accent);
   }
 
   /* Custom scrollbar */
@@ -81,6 +99,28 @@
   /* Gradient text */
   .gradient-text {
     @apply bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent;
+  }
+
+  /* Custom Color Classes from User */
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--color-accent);
+  }
+
+  .section-soft {
+    background-color: var(--color-soft-blue);
+  }
+
+  .badge-premium,
+  .destacado {
+    color: var(--color-gold);
+    font-weight: 600;
   }
 
   /* Badge styles */
