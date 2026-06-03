@@ -177,7 +177,7 @@ export function Hero() {
       {/* ── Search card ── */}
       <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-1/2">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-0">
-          <div className="bg-white rounded-3xl shadow-2xl px-8 pt-8 pb-10">
+          <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl px-8 pt-8 pb-10">
             {/* Title */}
             <div className="mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -193,7 +193,7 @@ export function Hero() {
             </div>
 
             {/* Filters row */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4 md:gap-0 bg-gray-50 rounded-2xl px-6 py-5">
+            <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4 md:gap-0 bg-white rounded-2xl px-6 py-5 shadow-sm border border-gray-100">
               {/* Operation */}
               <div className="flex-1 md:pr-6 md:border-r border-gray-200">
                 <CustomSelect
