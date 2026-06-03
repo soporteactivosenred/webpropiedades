@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Home, Building2, FileText, Info, Phone, Mail, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '@/types';
 
@@ -27,12 +28,13 @@ function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                <Home className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold text-white">
-                Activos en <span className="text-primary-400">Red</span>
-              </span>
+              <Image 
+                src="/logo.png" 
+                alt="Activos en Red" 
+                width={200} 
+                height={50} 
+                className="h-10 w-auto object-contain brightness-0 invert"
+              />
             </Link>
             <p className="text-sm text-gray-400 mb-4">
               {DEFAULT_SETTINGS.site_tagline}. Expertos en bienes raíces con años de experiencia en el mercado chileno.

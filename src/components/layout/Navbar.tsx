@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X, Phone } from 'lucide-react';
 import { cn } from '@/lib';
@@ -65,11 +66,15 @@ function Navbar() {
             )}
           >
             {/* Logo */}
-            <Link href="/" className="shrink-0">
-              <span className="text-xl font-extrabold tracking-tight">
-                <span className="text-gray-900">Activos en</span>
-                <span className="text-primary-600"> Red</span>
-              </span>
+            <Link href="/" className="shrink-0 flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Activos en Red" 
+                width={200} 
+                height={50} 
+                className="h-10 w-auto object-contain"
+                priority
+              />
             </Link>
 
             {/* Desktop links */}
