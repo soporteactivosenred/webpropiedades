@@ -86,7 +86,7 @@ function Footer() {
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="flex items-center gap-2 text-sm hover:text-primary-400 transition-colors"
+                      className="flex items-center gap-2 text-sm text-gray-400 hover:text-accent-500 transition-colors"
                     >
                       <Icon className="w-4 h-4" />
                       {link.name}
@@ -105,7 +105,7 @@ function Footer() {
                 <li key={type.name}>
                   <Link
                     href={type.href}
-                    className="text-sm hover:text-primary-400 transition-colors"
+                    className="text-sm text-gray-400 hover:text-accent-500 transition-colors"
                   >
                     {type.name}
                   </Link>
@@ -119,18 +119,18 @@ function Footer() {
             <h3 className="text-white font-semibold mb-4">Contacto</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-primary-400 flex-shrink-0 mt-0.5" />
+                <MapPin className="w-5 h-5 text-accent-500 flex-shrink-0 mt-0.5" />
                 <span className="text-sm">{DEFAULT_SETTINGS.contact_address}</span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                <a href={`tel:${DEFAULT_SETTINGS.contact_phone}`} className="text-sm hover:text-primary-400">
+                <Phone className="w-5 h-5 text-accent-500 flex-shrink-0" />
+                <a href={`tel:${DEFAULT_SETTINGS.contact_phone}`} className="text-sm text-gray-400 hover:text-accent-500 transition-colors">
                   {DEFAULT_SETTINGS.contact_phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-primary-400 flex-shrink-0" />
-                <a href={`mailto:${DEFAULT_SETTINGS.contact_email}`} className="text-sm hover:text-primary-400">
+                <Mail className="w-5 h-5 text-accent-500 flex-shrink-0" />
+                <a href={`mailto:${DEFAULT_SETTINGS.contact_email}`} className="text-sm text-gray-400 hover:text-accent-500 transition-colors">
                   {DEFAULT_SETTINGS.contact_email}
                 </a>
               </li>
@@ -144,10 +144,10 @@ function Footer() {
             © {currentYear} {DEFAULT_SETTINGS.site_name}. Todos los derechos reservados.
           </p>
           <div className="flex gap-6 text-sm">
-            <Link href="/privacidad" className="hover:text-primary-400 transition-colors">
+            <Link href="/privacidad" className="text-gray-400 hover:text-accent-500 transition-colors">
               Política de Privacidad
             </Link>
-            <Link href="/terminos" className="hover:text-primary-400 transition-colors">
+            <Link href="/terminos" className="text-gray-400 hover:text-accent-500 transition-colors">
               Términos de Servicio
             </Link>
           </div>
