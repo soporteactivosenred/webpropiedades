@@ -163,13 +163,6 @@ export function Hero() {
               Con espacios bien ubicados, pensados para que vivas o inviertas
               con total confianza en Chile.
             </p>
-            <a
-              href="/propiedades"
-              className="mt-8 inline-flex items-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-bold px-8 py-4 rounded-full text-base uppercase tracking-wide transition-all hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
-            >
-              Ver propiedades
-              <span className="text-lg">→</span>
-            </a>
           </div>
         </div>
       </div>
