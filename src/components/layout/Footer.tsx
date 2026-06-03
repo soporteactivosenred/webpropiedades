@@ -22,7 +22,7 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="bg-primary-950 text-gray-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
@@ -45,7 +45,7 @@ function Footer() {
                   href={DEFAULT_SETTINGS.social_media.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-gray-800 hover:bg-primary-600 transition-colors"
+                  className="p-2 rounded-lg bg-primary-900 hover:bg-accent-500 transition-colors"
                   aria-label="Facebook"
                 >
                   <Facebook className="w-5 h-5" />
@@ -56,7 +56,7 @@ function Footer() {
                   href={DEFAULT_SETTINGS.social_media.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-gray-800 hover:bg-primary-600 transition-colors"
+                  className="p-2 rounded-lg bg-primary-900 hover:bg-accent-500 transition-colors"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-5 h-5" />
@@ -67,7 +67,7 @@ function Footer() {
                   href={DEFAULT_SETTINGS.social_media.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-gray-800 hover:bg-primary-600 transition-colors"
+                  className="p-2 rounded-lg bg-primary-900 hover:bg-accent-500 transition-colors"
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="w-5 h-5" />
@@ -139,7 +139,7 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-12 pt-8 border-t border-primary-900 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400">
             © {currentYear} {DEFAULT_SETTINGS.site_name}. Todos los derechos reservados.
           </p>

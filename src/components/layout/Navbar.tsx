@@ -23,7 +23,7 @@ function Navbar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
       {/* ── Top utility bar ── */}
-      <div className="bg-gray-900 text-gray-400 text-xs h-8 flex items-center">
+      <div className="bg-primary-900 text-gray-300 text-xs h-8 flex items-center">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex items-center justify-between">
           <span className="hidden sm:block">
             Activos en Red &mdash; Expertos inmobiliarios en Chile
@@ -79,7 +79,7 @@ function Navbar() {
             {/* CTA button */}
             <Link
               href="/contacto"
-              className="hidden md:inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:shadow-lg shrink-0"
+              className="hidden md:inline-flex items-center bg-primary-600 hover:bg-accent-500 text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:shadow-lg shrink-0"
             >
               Contáctanos
             </Link>

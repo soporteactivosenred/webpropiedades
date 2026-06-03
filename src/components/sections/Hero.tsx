@@ -91,8 +91,8 @@ export function Hero() {
             "url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1920&q=80')",
         }}
       />
-      {/* Dark overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-black/20" />
+      {/* Dark overlay with corporate blue tint */}
+      <div className="absolute inset-0 bg-gradient-to-r from-primary-950/90 via-primary-900/60 to-primary-900/30" />
 
       {/* ── Hero content ── */}
       <div className="relative flex-1 flex items-center mt-16 md:mt-24">
@@ -111,7 +111,7 @@ export function Hero() {
             </p>
             <a
               href="/propiedades"
-              className="mt-8 inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-bold px-8 py-4 rounded-full text-base uppercase tracking-wide transition-all hover:shadow-xl hover:scale-105 active:scale-100"
+              className="mt-8 inline-flex items-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-bold px-8 py-4 rounded-full text-base uppercase tracking-wide transition-all hover:shadow-xl hover:scale-105 active:scale-100"
             >
               Ver propiedades
               <span className="text-lg">→</span>
@@ -174,7 +174,7 @@ export function Hero() {
               <div className="md:ml-4 flex items-end">
                 <button
                   onClick={handleSearch}
-                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold px-6 py-3.5 rounded-full transition-all hover:shadow-lg active:scale-95"
+                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-semibold px-6 py-3.5 rounded-full transition-all hover:shadow-lg active:scale-95"
                   aria-label="Buscar propiedades"
                 >
                   <Search className="w-5 h-5" />
