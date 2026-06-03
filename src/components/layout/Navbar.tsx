@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -18,17 +18,7 @@ const navigation = [
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const isHome = pathname === '/';
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const floating = isHome && !scrolled;
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50">
@@ -51,20 +41,11 @@ function Navbar() {
       {/* ── Main nav ── */}
       <div
         className={cn(
-          'transition-all duration-300',
-          floating ? 'bg-transparent' : 'bg-white shadow-md'
+          'bg-white shadow-md transition-all duration-300'
         )}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
-          {/* Pill container */}
-          <div
-            className={cn(
-              'flex items-center justify-between px-6 py-3 transition-all duration-300',
-              floating
-                ? 'bg-white/95 backdrop-blur-md rounded-full shadow-xl'
-                : 'bg-transparent'
-            )}
-          >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image 
@@ -98,7 +79,7 @@ function Navbar() {
             {/* CTA button */}
             <Link
               href="/contacto"
-              className="hidden md:inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all hover:shadow-lg shrink-0"
+              className="hidden md:inline-flex items-center bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:shadow-lg shrink-0"
             >
               Contáctanos
             </Link>
@@ -109,7 +90,7 @@ function Navbar() {
               onClick={() => setIsOpen(!isOpen)}
               aria-label="Abrir menú"
             >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
