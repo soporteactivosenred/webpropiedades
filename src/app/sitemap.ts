@@ -52,7 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .order('updated_at', { ascending: false })
     .limit(1000);
 
-  const propertyUrls: MetadataRoute.Sitemap = (properties || []).map((property) => ({
+  const propertyUrls: MetadataRoute.Sitemap = (properties || []).map((property: { slug: string; updated_at: string }) => ({
     url: `${baseUrl}/propiedades/${property.slug}`,
     lastModified: new Date(property.updated_at),
     changeFrequency: 'weekly',
@@ -67,7 +67,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .order('updated_at', { ascending: false })
     .limit(500);
 
-  const blogUrls: MetadataRoute.Sitemap = (blogPosts || []).map((post) => ({
+  const blogUrls: MetadataRoute.Sitemap = (blogPosts || []).map((post: { slug: string; updated_at: string }) => ({
     url: `${baseUrl}/blog/${post.slug}`,
     lastModified: new Date(post.updated_at),
     changeFrequency: 'monthly',
