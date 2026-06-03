@@ -101,9 +101,7 @@ export function Hero() {
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight uppercase tracking-tight">
               Encontramos
               <br />
-              <span className="text-primary-400">tu hogar</span>
-              <br />
-              ideal
+              <span className="text-primary-400">tu propiedad</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed">
               Con espacios bien ubicados, pensados para que vivas o inviertas
