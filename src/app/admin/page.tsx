@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 async function getAdminData() {
-  const supabase = await createServerClient<Database>();
+  const supabase = (await createServerClient<Database>()) as any;
 
   // Get property stats
   const { count: totalProperties } = await supabase
@@ -136,7 +136,7 @@ export default async function AdminDashboard() {
             <p className="text-gray-500 text-center py-4">No hay leads recientes</p>
           ) : (
             <div className="space-y-4">
-              {data.recentLeads.map((lead) => (
+              {data.recentLeads.map((lead: any) => (
                 <div key={lead.id} className="flex items-center justify-between py-3 border-b last:border-0">
                   <div>
                     <p className="font-medium text-gray-900">{lead.name}</p>

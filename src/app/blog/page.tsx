@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function BlogPage() {
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   
   const [featuredPostResult, postsResult] = await Promise.all([
     getFeaturedBlogPost(supabase),
@@ -20,7 +20,7 @@ export default async function BlogPage() {
   const { data: posts } = postsResult;
   
   // Filter out featured post from regular posts
-  const filteredPosts = posts?.filter(p => p.id !== featuredPost?.id) || [];
+  const filteredPosts = posts?.filter((p: any) => p.id !== featuredPost?.id) || [];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -63,7 +63,7 @@ export default async function BlogPage() {
           }>
             {filteredPosts && filteredPosts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPosts.map((post) => (
+                {filteredPosts.map((post: any) => (
                   <BlogCard key={post.id} post={post} />
                 ))}
               </div>

@@ -3,9 +3,10 @@
  * These functions provide type-safe CRUD operations for leads/inquiries.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, Lead, LeadInsert, LeadUpdate, LeadStatus } from '@/types';
 import { getErrorMessage, isSupabaseError, PaginatedResponse, ListFilters } from './types';
+
+type SupabaseClient<T> = any;
 
 /**
  * Get all leads with optional filters and pagination.

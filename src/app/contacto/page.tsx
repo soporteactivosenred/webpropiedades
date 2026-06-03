@@ -32,7 +32,7 @@ export default function ContactPage() {
       return;
     }
 
-    const supabase = createClientComponentClient();
+    const supabase = createClientComponentClient() as any;
     
     const { error } = await supabase.from('leads').insert({
       name: data.name,

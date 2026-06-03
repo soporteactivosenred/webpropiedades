@@ -19,7 +19,7 @@ const SITE_NAME = 'Propiedades Merino';
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   const { data: property } = await getPropertyBySlug(supabase, slug);
 
   if (!property) {
@@ -66,7 +66,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function PropertyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   
   const [propertyResult, incrementResult] = await Promise.all([
     getPropertyBySlug(supabase, slug),
@@ -82,9 +82,9 @@ export default async function PropertyDetailPage({ params }: Props) {
   // Increment views (fire and forget)
   incrementPropertyViews(supabase, property.id);
 
-  const typeLabel = PROPERTY_TYPES_LABELS[property.property_type];
-  const priceLabel = PRICE_TYPE_LABELS[property.price_type];
-  const statusLabel = STATUS_LABELS[property.status];
+  const typeLabel = PROPERTY_TYPES_LABELS[property.property_type as keyof typeof PROPERTY_TYPES_LABELS];
+  const priceLabel = PRICE_TYPE_LABELS[property.price_type as keyof typeof PRICE_TYPE_LABELS];
+  const statusLabel = STATUS_LABELS[property.status as keyof typeof STATUS_LABELS];
 
   return (
     <>
@@ -138,7 +138,7 @@ export default async function PropertyDetailPage({ params }: Props) {
               </div>
               {property.images.length > 1 && (
                 <div className="grid grid-cols-2 gap-4">
-                  {property.images.slice(1, 5).map((img, i) => (
+                  {property.images.slice(1, 5).map((img: any, i: any) => (
                     <div key={i} className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200">
                       <Image src={img} alt={`${property.title} - ${i + 2}`} fill className="object-cover" />
                     </div>
@@ -256,7 +256,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   Amenidades
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {property.features.map((feature) => (
+                  {property.features.map((feature: any) => (
                     <div key={feature} className="flex items-center gap-2">
                       <Check className="w-5 h-5 text-green-500" />
                       <span className="text-gray-700 dark:text-gray-300">{feature}</span>
@@ -293,6 +293,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             </Card>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

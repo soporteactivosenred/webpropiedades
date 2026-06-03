@@ -27,3 +27,5 @@ export function getSupabaseClient() {
   }
   return browserClient;
 }
+
+export { createClient as createClientComponentClient };

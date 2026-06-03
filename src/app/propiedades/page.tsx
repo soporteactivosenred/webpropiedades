@@ -23,7 +23,7 @@ export const metadata = {
 
 export default async function PropertiesPage({ searchParams }: Props) {
   const params = await searchParams;
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   
   // Build filters
   const filters: FilterType = {};
@@ -40,6 +40,15 @@ export default async function PropertiesPage({ searchParams }: Props) {
 
   const currentPage = parseInt(params.page || '1');
   const totalPages = Math.ceil((count || 0) / 12);
+
+  const getPageUrl = (page: number) => {
+    const urlParams = new URLSearchParams();
+    if (params.q) urlParams.set('q', params.q);
+    if (params.type) urlParams.set('type', params.type);
+    if (params.property_type) urlParams.set('property_type', params.property_type);
+    urlParams.set('page', String(page));
+    return `/propiedades?${urlParams.toString()}`;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -76,46 +85,29 @@ export default async function PropertiesPage({ searchParams }: Props) {
             {properties && properties.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {properties.map((property) => (
+                  {properties.map((property: any) => (
                     <PropertyCard key={property.id} property={property} />
                   ))}
                 </div>
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="mt-12 flex items-center justify-center gap-2">
                     {currentPage > 1 && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const params = new URLSearchParams();
-                          if (params.q) params.set('q', params.q);
-                          if (params.type) params.set('type', params.type);
-                          if (params.property_type) params.set('property_type', params.property_type);
-                          params.set('page', String(currentPage - 1));
-                        }}
-                      >
-                        Anterior
-                      </Button>
+                      <a href={getPageUrl(currentPage - 1)}>
+                        <Button variant="outline" size="sm">
+                          Anterior
+                        </Button>
+                      </a>
                     )}
                     <span className="px-4 py-2 text-gray-600 dark:text-gray-400">
                       Página {currentPage} de {totalPages}
                     </span>
                     {currentPage < totalPages && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const params = new URLSearchParams();
-                          if (params.q) params.set('q', params.q);
-                          if (params.type) params.set('type', params.type);
-                          if (params.property_type) params.set('property_type', params.property_type);
-                          params.set('page', String(currentPage + 1));
-                        }}
-                      >
-                        Siguiente
-                      </Button>
+                      <a href={getPageUrl(currentPage + 1)}>
+                        <Button variant="outline" size="sm">
+                          Siguiente
+                        </Button>
+                      </a>
                     )}
                   </div>
                 )}

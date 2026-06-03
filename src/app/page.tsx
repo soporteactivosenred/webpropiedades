@@ -7,7 +7,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { getFeaturedProperties, getRecentProperties } from '@/lib/supabase';
 
 async function FeaturedProperties() {
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   const { data: properties } = await getFeaturedProperties(supabase, 6);
 
   if (!properties || properties.length === 0) {
@@ -22,7 +22,7 @@ async function FeaturedProperties() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {properties.slice(0, 6).map((property) => (
+      {properties.slice(0, 6).map((property: any) => (
         <PropertyCard key={property.id} property={property} />
       ))}
     </div>
@@ -30,7 +30,7 @@ async function FeaturedProperties() {
 }
 
 async function RecentProperties() {
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   const { data: properties } = await getRecentProperties(supabase, 3);
 
   if (!properties || properties.length === 0) {
@@ -39,7 +39,7 @@ async function RecentProperties() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {properties.map((property) => (
+      {properties.map((property: any) => (
         <PropertyCard key={property.id} property={property} compact />
       ))}
     </div>

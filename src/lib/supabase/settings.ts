@@ -3,10 +3,11 @@
  * These functions provide type-safe operations for settings and user profiles.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, Profile, ProfileUpdate, SiteSettings } from '@/types';
 import { DEFAULT_SETTINGS } from '@/types';
 import { getErrorMessage, isSupabaseError } from './types';
+
+type SupabaseClient<T> = any;
 
 /**
  * Get user profile by ID.

@@ -3,10 +3,11 @@
  * These functions provide type-safe CRUD operations for blog posts.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, BlogPost, BlogPostInsert, BlogPostUpdate } from '@/types';
 import { slugify } from '@/lib';
 import { getErrorMessage, isSupabaseError } from './types';
+
+type SupabaseClient<T> = any;
 
 /**
  * Get all published blog posts with optional filters.

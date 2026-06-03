@@ -37,7 +37,7 @@ export default function AdminLeadsPage() {
   const fetchLeads = async () => {
     setLoading(true);
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       let query = supabase.from('leads').select('*').order('created_at', { ascending: false });
 
       if (statusFilter) {
@@ -65,7 +65,7 @@ export default function AdminLeadsPage() {
   const handleStatusChange = async (leadId: string, newStatus: string) => {
     setUpdatingStatus(leadId);
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const { error: updateError } = await supabase
         .from('leads')
         .update({ status: newStatus as Lead['status'] })

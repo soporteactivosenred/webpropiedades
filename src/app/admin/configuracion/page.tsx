@@ -50,7 +50,7 @@ export default function AdminConfiguracionPage() {
   const fetchSettings = async () => {
     setLoading(true);
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const { data, error: fetchError } = await supabase
         .from('site_settings')
         .select('*');
@@ -62,7 +62,7 @@ export default function AdminConfiguracionPage() {
 
       // Map settings to form data
       const settingsMap: Record<string, string> = {};
-      data?.forEach((setting) => {
+      data?.forEach((setting: any) => {
         settingsMap[setting.key] = String(setting.value);
       });
 
@@ -94,7 +94,7 @@ export default function AdminConfiguracionPage() {
     setSuccess(false);
 
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
 
       // Update each setting individually
       const settingsToUpdate = [

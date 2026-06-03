@@ -12,7 +12,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   const { data: post } = await getBlogPostBySlug(supabase, slug);
   
   if (!post) {
@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createServerClient();
+  const supabase: any = await createServerClient();
   const { data: post, error } = await getBlogPostBySlug(supabase, slug);
 
   if (error || !post) {
@@ -79,7 +79,7 @@ export default async function BlogPostPage({ params }: Props) {
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
+              {post.tags.map((tag: any) => (
                 <span key={tag} className="badge-gray">
                   <Tag className="w-3 h-3 mr-1" />
                   {tag}

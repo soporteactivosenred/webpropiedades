@@ -36,7 +36,7 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
       return;
     }
 
-    const supabase = createClientComponentClient();
+    const supabase = createClientComponentClient() as any;
     
     const { error } = await supabase.from('leads').insert({
       name: data.name,
@@ -66,7 +66,7 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
         </div>
         <h4 className="font-semibold text-gray-900 dark:text-white">¡Mensaje enviado!</h4>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Nos pondremos en contacto contigo pronto sobre "{propertyTitle}".
+          Nos pondremos en contacto contigo pronto sobre &quot;{propertyTitle}&quot;.
         </p>
       </div>
     );

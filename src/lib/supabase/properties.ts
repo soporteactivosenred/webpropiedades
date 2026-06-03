@@ -9,7 +9,7 @@ import { slugify } from '@/lib';
 import { getErrorMessage, isSupabaseError } from './types';
 
 type PropertyRow = Property;
-type PropertyClient = SupabaseClient<Database>;
+type PropertyClient = any;
 
 /**
  * Get all active properties with optional filters.

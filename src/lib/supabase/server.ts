@@ -1,4 +1,4 @@
-import { createServerClient as createSupabaseSSRClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient as supabaseCreateServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from '@/types';
 
@@ -7,15 +7,15 @@ import type { Database } from '@/types';
  * This client can access cookies and uses the anon key.
  * 
  * Usage in Server Components:
- *   const supabase = await createSupabaseSSRClient()
+ *   const supabase = await createServerClient()
  * 
  * Usage in Route Handlers/Actions:
- *   const supabase = createSupabaseSSRClient(cookies())
+ *   const supabase = createServerClient()
  */
-export async function createSupabaseSSRClient() {
+export async function createServerClient<T = Database>() {
   const cookieStore = await cookies();
   
-  return createSupabaseSSRClient<Database>(
+  return supabaseCreateServerClient<T>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -46,8 +46,8 @@ export async function createSupabaseSSRClient() {
  * Create a Supabase client for use in Server Components with async cookie access.
  * Use this variant when you need to await the cookies() promise.
  */
-export function createSupabaseSSRClientFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  return createSupabaseSSRClient<Database>(
+export function createServerClientFromCookies<T = Database>(cookieStore: Awaited<ReturnType<typeof cookies>>) {
+  return supabaseCreateServerClient<T>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -81,8 +81,8 @@ export function createSupabaseSSRClientFromCookies(cookieStore: Awaited<ReturnTy
  * Usage:
  *   const supabase = createAdminClient()
  */
-export function createAdminClient() {
-  return createSupabaseSSRClient<Database>(
+export function createAdminClient<T = Database>() {
+  return supabaseCreateServerClient<T>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {

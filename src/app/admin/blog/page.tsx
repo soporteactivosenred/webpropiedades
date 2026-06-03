@@ -32,7 +32,7 @@ export default function AdminBlogPage() {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const { data, error: fetchError } = await supabase
         .from('blog_posts')
         .select('*')
@@ -56,7 +56,7 @@ export default function AdminBlogPage() {
     setCreating(true);
 
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const slug = newPost.title
         .toLowerCase()
         .normalize('NFD')
@@ -94,7 +94,7 @@ export default function AdminBlogPage() {
 
   const handleTogglePublish = async (post: BlogPost) => {
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const newPublished = !post.published;
       
       const { error: updateError } = await supabase
@@ -124,7 +124,7 @@ export default function AdminBlogPage() {
     }
 
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const { error: deleteError } = await supabase
         .from('blog_posts')
         .delete()

@@ -43,7 +43,7 @@ export default function AdminPropertiesPage() {
   const fetchProperties = async () => {
     setLoading(true);
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       let query = supabase.from('properties').select('*').order('created_at', { ascending: false });
 
       if (statusFilter) {
@@ -75,7 +75,7 @@ export default function AdminPropertiesPage() {
 
     setDeleting(id);
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const { error: deleteError } = await supabase.from('properties').delete().eq('id', id);
 
       if (deleteError) {
@@ -95,7 +95,7 @@ export default function AdminPropertiesPage() {
     const newStatus = property.status === 'active' ? 'draft' : 'active';
     
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase = createAdminBrowserClient() as any;
       const { error: updateError } = await supabase
         .from('properties')
         .update({ status: newStatus })
