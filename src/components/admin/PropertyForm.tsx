@@ -135,7 +135,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     setIsSubmitting(true);
 
     try {
-      const supabase = createAdminBrowserClient();
+      const supabase: any = createAdminBrowserClient();
       const slug = generateSlug(formData.title);
 
       const propertyData = {
