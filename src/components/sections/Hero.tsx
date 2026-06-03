@@ -99,10 +99,10 @@ export function Hero() {
   };
 
   return (
-    <section className="-mt-[96px] md:-mt-[112px] relative min-h-[600px] lg:min-h-[700px] flex flex-col bg-primary-950 overflow-hidden">
+    <section className="-mt-[96px] md:-mt-[112px] mb-16 md:mb-24 relative min-h-[600px] lg:min-h-[700px] flex flex-col bg-primary-950">
       
       {/* ── 2-Column Split Background ── */}
-      <div className="absolute inset-0 flex flex-col lg:flex-row">
+      <div className="absolute inset-0 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Side: Solid Dark Blue */}
         <div className="w-full lg:w-1/2 bg-primary-950 relative">
            {/* Subtle pattern or gradient on the left side */}
@@ -168,9 +168,9 @@ export function Hero() {
       </div>
 
       {/* ── Search card ── */}
-      <div className="relative w-full z-20">
+      <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-1/2">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-0">
-          <div className="bg-white rounded-t-3xl shadow-2xl px-8 pt-8 pb-10 transform -translate-y-12">
+          <div className="bg-white rounded-3xl shadow-2xl px-8 pt-8 pb-10">
             {/* Title */}
             <div className="mb-6">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
