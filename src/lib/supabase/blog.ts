@@ -39,7 +39,7 @@ export async function getBlogPosts(
     query = query.limit(options.limit);
   }
 
-  const result = await query.returns<BlogPost[]>();
+  const result = await query;
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -72,7 +72,7 @@ export async function getFeaturedBlogPost(
     .not('featured_image', 'is', null)
     .order('published_at', { ascending: false })
     .limit(1)
-    .returns<BlogPost[]>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -92,8 +92,7 @@ export async function getBlogPostById(
     .from('blog_posts')
     .select('*')
     .eq('id', id)
-    .single()
-    .returns<BlogPost>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -113,8 +112,7 @@ export async function getBlogPostBySlug(
     .from('blog_posts')
     .select('*')
     .eq('slug', slug)
-    .single()
-    .returns<BlogPost>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -137,8 +135,7 @@ export async function searchBlogPosts(
     .eq('published', true)
     .or(`title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%`)
     .order('published_at', { ascending: false })
-    .limit(limit)
-    .returns<BlogPost[]>();
+    .limit(limit);
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -173,7 +170,7 @@ export async function getAllBlogPosts(
     query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
   }
 
-  const result = await query.returns<BlogPost[]>();
+  const result = await query;
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -203,8 +200,7 @@ export async function createBlogPost(
     .from('blog_posts')
     .insert(insertData as BlogPostInsert)
     .select()
-    .single()
-    .returns<BlogPost>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -231,8 +227,7 @@ export async function updateBlogPost(
     .update(data)
     .eq('id', id)
     .select()
-    .single()
-    .returns<BlogPost>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -255,8 +250,7 @@ export async function publishBlogPost(
     .update({ published: true, published_at: now } as BlogPostUpdate)
     .eq('id', id)
     .select()
-    .single()
-    .returns<BlogPost>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -277,8 +271,7 @@ export async function unpublishBlogPost(
     .update({ published: false } as BlogPostUpdate)
     .eq('id', id)
     .select()
-    .single()
-    .returns<BlogPost>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -297,8 +290,7 @@ export async function deleteBlogPost(
   const result = await client
     .from('blog_posts')
     .delete()
-    .eq('id', id)
-    .returns<BlogPost>();
+    .eq('id', id);
 
   if (isSupabaseError(result)) {
     return { success: false, error: getErrorMessage(result) };
@@ -375,8 +367,7 @@ export async function getAllBlogSlugs(
     .from('blog_posts')
     .select('slug, updated_at')
     .eq('published', true)
-    .order('updated_at', { ascending: false })
-    .returns<{ slug: string; updated_at: string }[]>();
+    .order('updated_at', { ascending: false });
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };

@@ -20,8 +20,7 @@ export async function getProfileById(
     .from('profiles')
     .select('*')
     .eq('id', id)
-    .single()
-    .returns<Profile>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -41,8 +40,7 @@ export async function getProfileByEmail(
     .from('profiles')
     .select('*')
     .eq('email', email)
-    .single()
-    .returns<Profile>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -64,8 +62,7 @@ export async function updateProfile(
     .update(data)
     .eq('id', id)
     .select()
-    .single()
-    .returns<Profile>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -95,8 +92,7 @@ export async function upsertProfile(
       role: data.role || 'user',
     })
     .select()
-    .single()
-    .returns<Profile>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -150,7 +146,7 @@ export async function getAllProfiles(
     query = query.range(options.offset, options.offset + (options.limit || 10) - 1);
   }
 
-  const result = await query.returns<Profile[]>();
+  const result = await query;
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };

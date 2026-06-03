@@ -34,7 +34,7 @@ export async function getLeads(
   const orderDirection = filters?.orderDirection || 'desc';
   query = query.order(orderBy, { ascending: orderDirection === 'asc' });
 
-  const result = await query.returns<Lead[]>();
+  const result = await query;
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -82,8 +82,7 @@ export async function getLeadById(
     .from('leads')
     .select('*')
     .eq('id', id)
-    .single()
-    .returns<Lead>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -103,8 +102,7 @@ export async function createLead(
     .from('leads')
     .insert({ ...data, status: 'new' } as LeadInsert)
     .select()
-    .single()
-    .returns<Lead>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -150,8 +148,7 @@ export async function updateLeadStatus(
     .update({ status } as LeadUpdate)
     .eq('id', id)
     .select()
-    .single()
-    .returns<Lead>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -173,8 +170,7 @@ export async function updateLead(
     .update(data)
     .eq('id', id)
     .select()
-    .single()
-    .returns<Lead>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -193,8 +189,7 @@ export async function deleteLead(
   const result = await client
     .from('leads')
     .delete()
-    .eq('id', id)
-    .returns<Lead>();
+    .eq('id', id);
 
   if (isSupabaseError(result)) {
     return { success: false, error: getErrorMessage(result) };
@@ -214,8 +209,7 @@ export async function getLeadsBySource(
     .from('leads')
     .select('*')
     .eq('source', source)
-    .order('created_at', { ascending: false })
-    .returns<Lead[]>();
+    .order('created_at', { ascending: false });
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -270,8 +264,7 @@ export async function getLeadsWithProperty(
       property:properties(id, title, slug)
     `)
     .range(offset, offset + pageSize - 1)
-    .order('created_at', { ascending: false })
-    .returns<(Lead & { property?: { title: string; slug: string } | null })[]>();
+    .order('created_at', { ascending: false });
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };

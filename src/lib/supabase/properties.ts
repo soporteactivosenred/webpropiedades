@@ -63,7 +63,7 @@ export async function getProperties(
     query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1);
   }
 
-  const result = await query.returns<PropertyRow[]>();
+  const result = await query;
   
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result), count: 0 };
@@ -80,8 +80,7 @@ export async function getPropertyById(client: PropertyClient, id: string) {
     .from('properties')
     .select('*')
     .eq('id', id)
-    .single()
-    .returns<PropertyRow>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -98,8 +97,7 @@ export async function getPropertyBySlug(client: PropertyClient, slug: string) {
     .from('properties')
     .select('*')
     .eq('slug', slug)
-    .single()
-    .returns<PropertyRow>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -117,8 +115,7 @@ export async function getFeaturedProperties(client: PropertyClient, limit = 6) {
     .select('*')
     .eq('status', 'active')
     .order('views', { ascending: false })
-    .limit(limit)
-    .returns<PropertyRow[]>();
+    .limit(limit);
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -136,8 +133,7 @@ export async function getRecentProperties(client: PropertyClient, limit = 6) {
     .select('*')
     .eq('status', 'active')
     .order('created_at', { ascending: false })
-    .limit(limit)
-    .returns<PropertyRow[]>();
+    .limit(limit);
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -160,8 +156,7 @@ export async function searchProperties(
     .eq('status', 'active')
     .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
     .order('created_at', { ascending: false })
-    .limit(limit)
-    .returns<PropertyRow[]>();
+    .limit(limit);
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -184,8 +179,7 @@ export async function createProperty(
     .from('properties')
     .insert({ ...data, slug } as PropertyInsert)
     .select()
-    .single()
-    .returns<PropertyRow>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -212,8 +206,7 @@ export async function updateProperty(
     .update(data)
     .eq('id', id)
     .select()
-    .single()
-    .returns<PropertyRow>();
+    .single();
 
   if (isSupabaseError(result)) {
     return { data: null, error: getErrorMessage(result) };
@@ -229,8 +222,7 @@ export async function deleteProperty(client: PropertyClient, id: string) {
   const result = await client
     .from('properties')
     .delete()
-    .eq('id', id)
-    .returns<PropertyRow>();
+    .eq('id', id);
 
   if (isSupabaseError(result)) {
     return { success: false, error: getErrorMessage(result) };
@@ -271,7 +263,7 @@ export async function getPropertiesByAgent(
 
   query = query.order('created_at', { ascending: false });
 
-  const result = await query.returns<PropertyRow[]>();
+  const result = await query;
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
@@ -340,8 +332,7 @@ export async function getAllPropertiesSlugs(client: PropertyClient) {
     .from('properties')
     .select('slug, updated_at, is_featured')
     .eq('status', 'active')
-    .order('updated_at', { ascending: false })
-    .returns<{ slug: string; updated_at: string; is_featured: boolean }[]>();
+    .order('updated_at', { ascending: false });
 
   if (isSupabaseError(result)) {
     return { data: [], error: getErrorMessage(result) };
