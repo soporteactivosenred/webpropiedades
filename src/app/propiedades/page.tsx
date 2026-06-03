@@ -66,7 +66,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
 
       {/* Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
-        <PropertyFilters cities={cities || []} />
+        <PropertyFilters cities={(cities as string[]) || []} />
       </div>
 
       {/* Results */}
