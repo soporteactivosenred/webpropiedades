@@ -150,19 +150,26 @@ export function Hero() {
                  style={{ backgroundImage: `url('${src}')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
                />
             ))}
-            <div className="absolute inset-0 bg-primary-950/80"></div>
+            <div className="absolute inset-0 bg-primary-950/85"></div>
           </div>
 
-          <div className="max-w-xl text-center md:text-left mx-auto lg:mx-0">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight uppercase tracking-tight">
+          <div className="max-w-xl text-center md:text-left mx-auto lg:mx-0 relative z-10">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight uppercase tracking-tight shadow-sm">
               Encontramos
               <br />
-              <span className="text-accent-500">tu propiedad</span>
+              <span className="text-accent-500 drop-shadow-md">tu propiedad</span>
             </h1>
-            <p className="mt-6 text-lg md:text-xl text-gray-300 leading-relaxed">
+            <p className="mt-6 text-lg md:text-xl text-gray-200 leading-relaxed drop-shadow-md">
               Con espacios bien ubicados, pensados para que vivas o inviertas
               con total confianza en Chile.
             </p>
+            <a
+              href="/propiedades"
+              className="lg:hidden mt-8 inline-flex items-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-bold px-8 py-4 rounded-full text-base uppercase tracking-wide transition-all shadow-xl active:scale-95"
+            >
+              Ver propiedades
+              <span className="text-lg">→</span>
+            </a>
           </div>
         </div>
       </div>
