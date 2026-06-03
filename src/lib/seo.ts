@@ -217,6 +217,7 @@ export function generateSEOScripts(data: SEOData) {
   if (data.type === 'article' && data.publishedTime) {
     scripts.push(JSON.stringify(generateBlogPostSchema({
       title: data.title || '',
+      content: '',
       publishedTime: data.publishedTime,
       modifiedTime: data.modifiedTime,
       author: data.author,
