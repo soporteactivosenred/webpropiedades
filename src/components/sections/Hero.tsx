@@ -82,7 +82,7 @@ export function Hero() {
   };
 
   return (
-    <section className="-mt-[104px] relative min-h-screen flex flex-col">
+    <section className="-mt-[104px] relative min-h-[600px] lg:min-h-[700px] flex flex-col">
       {/* ── Background image ── */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -95,8 +95,8 @@ export function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/40 to-black/20" />
 
       {/* ── Hero content ── */}
-      <div className="relative flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[104px] pb-48 md:pb-56">
+      <div className="relative flex-1 flex items-center mt-16 md:mt-24">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[104px] pb-16">
           <div className="max-w-2xl">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight uppercase tracking-tight">
               Encontramos
