@@ -1,4 +1,4 @@
-# Propiedades Merino
+# Activos en Red
 
 Inmuebles en Chile - Plataforma de publicación y gestión de propiedades.
 
@@ -12,7 +12,7 @@ Inmuebles en Chile - Plataforma de publicación y gestión de propiedades.
 ```bash
 # Clonar el repositorio
 git clone <repository-url>
-cd propiedades-merino
+cd activos-en-red
 
 # Instalar dependencias
 npm install

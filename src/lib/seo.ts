@@ -13,7 +13,7 @@ export interface SEOData {
   locale?: string;
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl';
 const DEFAULT_OG_IMAGE = `${SITE_URL}${DEFAULT_SETTINGS.seo.og_image}`;
 
 /**

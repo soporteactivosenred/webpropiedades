@@ -43,7 +43,7 @@ export function WhyChooseUs() {
             ¿Por qué elegirnos?
           </h2>
           <p className="mt-4 text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            En Propiedades Merino nos esforzamos por brindarte la mejor experiencia en el mercado inmobiliario.
+            En Activos en Red nos esforzamos por brindarte la mejor experiencia en el mercado inmobiliario.
           </p>
         </div>
 

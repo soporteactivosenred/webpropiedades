@@ -22,21 +22,21 @@ export interface SiteSettings {
 }
 
 export const DEFAULT_SETTINGS: SiteSettings = {
-  site_name: 'Propiedades Merino',
+  site_name: 'Activos en Red',
   site_tagline: 'Tu hogar, nuestra pasión',
-  site_description: 'Encuentra tu próxima propiedad con Propiedades Merino. Casas, departamentos, terrenos y más.',
-  contact_email: 'contacto@propiedadesmerino.cl',
+  site_description: 'Encuentra tu próxima propiedad con Activos en Red. Casas, departamentos, terrenos y más.',
+  contact_email: 'contacto@activosenred.cl',
   contact_phone: '+56 9 1234 5678',
   contact_whatsapp: '+56912345678',
   contact_address: 'Av. Principal 1234, Santiago, Chile',
   social_media: {
-    facebook: 'https://facebook.com/propiedadesmerino',
-    instagram: 'https://instagram.com/propiedadesmerino',
-    linkedin: 'https://linkedin.com/company/propiedadesmerino',
+    facebook: 'https://facebook.com/activosenred',
+    instagram: 'https://instagram.com/activosenred',
+    linkedin: 'https://linkedin.com/company/activosenred',
   },
   seo: {
-    default_title: 'Propiedades Merino - Tu hogar, nuestra pasión',
-    default_description: 'Encuentra tu próxima propiedad con Propiedades Merino. Casas, departamentos, terrenos y más.',
+    default_title: 'Activos en Red - Tu hogar, nuestra pasión',
+    default_description: 'Encuentra tu próxima propiedad con Activos en Red. Casas, departamentos, terrenos y más.',
     default_keywords: 'inmuebles, propiedades, casas, departamentos, arriendo, venta, Chile',
     og_image: '/images/og-default.jpg',
   },

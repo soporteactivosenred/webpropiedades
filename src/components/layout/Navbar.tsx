@@ -9,6 +9,7 @@ import { cn } from '@/lib';
 const navigation = [
   { name: 'Propiedades', href: '/propiedades' },
   { name: 'Nosotros', href: '/nosotros' },
+  { name: 'Acceso a créditos', href: '/creditos' },
   { name: 'Blog', href: '/blog' },
   { name: 'Vender', href: '/vender-mi-propiedad' },
   { name: 'Contacto', href: '/contacto' },
@@ -34,7 +35,7 @@ function Navbar() {
       <div className="bg-gray-900 text-gray-400 text-xs h-8 flex items-center">
         <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 flex items-center justify-between">
           <span className="hidden sm:block">
-            Propiedades Merino &mdash; Expertos inmobiliarios en Chile
+            Activos en Red &mdash; Expertos inmobiliarios en Chile
           </span>
           <a
             href="tel:+56912345678"
@@ -66,8 +67,8 @@ function Navbar() {
             {/* Logo */}
             <Link href="/" className="shrink-0">
               <span className="text-xl font-extrabold tracking-tight">
-                <span className="text-gray-900">Propiedades</span>
-                <span className="text-primary-600"> Merino</span>
+                <span className="text-gray-900">Activos en</span>
+                <span className="text-primary-600"> Red</span>
               </span>
             </Link>
 

@@ -3,7 +3,7 @@ import { createServerClient } from '@/lib/supabase/server';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase: any = await createServerClient();
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl';
 
   const staticPages: MetadataRoute.Sitemap = [
     {

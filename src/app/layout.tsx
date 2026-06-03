@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   description: DEFAULT_SETTINGS.seo.default_description,
   keywords: DEFAULT_SETTINGS.seo.default_keywords.split(', '),
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl'),
   openGraph: {
     type: 'website',
     siteName: DEFAULT_SETTINGS.site_name,

@@ -15,7 +15,7 @@ interface Props {
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
-const SITE_NAME = 'Propiedades Merino';
+const SITE_NAME = 'Activos en Red';
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: Props) {
   return {
     title: `${property.title} | ${SITE_NAME}`,
     description,
-    keywords: `${property.title}, ${property.property_type}, ${property.city}, propiedades en venta, Propiedades Merino`,
+    keywords: `${property.title}, ${property.property_type}, ${property.city}, propiedades en venta, Activos en Red`,
     openGraph: {
       title: property.title,
       description,

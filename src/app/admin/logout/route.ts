@@ -7,7 +7,7 @@ export async function POST() {
   
   await supabase.auth.signOut();
   
-  const url = new URL('/admin/login', process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl');
+  const url = new URL('/admin/login', process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl');
   
   return NextResponse.redirect(url);
 }

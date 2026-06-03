@@ -31,7 +31,7 @@ function Footer() {
                 <Home className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-white">
-                Propiedades <span className="text-primary-400">Merino</span>
+                Activos en <span className="text-primary-400">Red</span>
               </span>
             </Link>
             <p className="text-sm text-gray-400 mb-4">

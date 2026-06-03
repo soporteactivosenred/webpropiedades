@@ -55,7 +55,7 @@ const team = [
 
 export const metadata = {
   title: 'Nosotros',
-  description: 'Conoce al equipo de Propiedades Merino. Más de 15 años ayudando a familias a encontrar su hogar ideal en Chile.',
+  description: 'Conoce al equipo de Activos en Red. Más de 15 años ayudando a familias a encontrar su hogar ideal en Chile.',
 };
 
 export default function AboutPage() {
@@ -69,7 +69,7 @@ export default function AboutPage() {
               Tu hogar, nuestra pasión
             </h1>
             <p className="mt-6 text-xl text-primary-100">
-              En Propiedades Merino llevamos más de 15 años ayudando a familias a encontrar 
+              En Activos en Red llevamos más de 15 años ayudando a familias a encontrar 
               su lugar perfecto. Somos una inmobiliaria comprometida con la excelencia y 
               el bienestar de nuestros clientes.
             </p>
@@ -110,7 +110,7 @@ export default function AboutPage() {
             <div className="relative aspect-square md:aspect-[4/3] rounded-2xl overflow-hidden">
               <Image
                 src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop"
-                alt="Propiedades Merino"
+                alt="Activos en Red"
                 fill
                 className="object-cover"
               />
@@ -205,7 +205,7 @@ export default function AboutPage() {
               Llamar ahora
             </a>
             <a
-              href="mailto:contacto@propiedadesmerino.cl"
+              href="mailto:contacto@activosenred.cl"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
             >
               <Mail className="w-5 h-5" />

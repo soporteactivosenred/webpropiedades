@@ -27,8 +27,8 @@ export function Metadata({
   noIndex = false,
 }: MetadataProps) {
   const pathname = usePathname();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
-  const siteName = 'Propiedades Merino';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl';
+  const siteName = 'Activos en Red';
 
   const fullTitle = title ? `${title} | ${siteName}` : `${siteName} | Tu hogar, nuestra pasión`;
   const fullUrl = `${siteUrl}${pathname}`;

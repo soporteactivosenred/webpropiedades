@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl';
 
 export default function robots(): MetadataRoute.Robots {
   return {

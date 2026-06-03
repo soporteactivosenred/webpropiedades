@@ -46,11 +46,11 @@ interface BreadcrumbSchemaProps {
  * Renders JSON-LD schema for the real estate company
  */
 export function OrganizationSchema({
-  name = 'Propiedades Merino',
-  description = 'Encuentra tu próxima propiedad con Propiedades Merino. Casas, departamentos, terrenos y más.',
-  url = 'https://propiedadesmerino.cl',
+  name = 'Activos en Red',
+  description = 'Encuentra tu próxima propiedad con Activos en Red. Casas, departamentos, terrenos y más.',
+  url = 'https://activosenred.cl',
   logo = '/images/logo.png',
-  email = 'contacto@propiedadesmerino.cl',
+  email = 'contacto@activosenred.cl',
   phone = '+56 9 1234 5678',
   address = 'Av. Principal 1234, Santiago, Chile',
   socialLinks = {},
@@ -61,8 +61,8 @@ export function OrganizationSchema({
     name,
     description,
     url,
-    logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl'}${logo}`,
-    image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl'}/images/og-default.jpg`,
+    logo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl'}${logo}`,
+    image: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl'}/images/og-default.jpg`,
     email,
     telephone: phone,
     address: {
@@ -100,7 +100,7 @@ export function RealEstateListingSchema({
   image,
   url,
 }: PropertySchemaProps) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl';
   const offerType = priceType === 'sale' ? 'ForSaleOffer' : 'RentOffer';
 
   const schema = {
@@ -147,7 +147,7 @@ export function RealEstateListingSchema({
  * Renders JSON-LD schema for breadcrumb navigation
  */
 export function BreadcrumbListSchema({ items }: BreadcrumbSchemaProps) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://activosenred.cl';
 
   const schema = {
     '@context': 'https://schema.org',
