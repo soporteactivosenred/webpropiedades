@@ -320,7 +320,7 @@ export async function getPropertyCities(client: PropertyClient) {
     return { data: [], error: getErrorMessage(result) };
   }
 
-  const cities = [...new Set(result.data?.map((p) => p.city) || [])];
+  const cities = Array.from(new Set(result.data?.map((p) => p.city) || []));
   return { data: cities, error: null };
 }
 

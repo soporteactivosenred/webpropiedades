@@ -315,7 +315,7 @@ export async function getBlogCategories(
     return { data: [], error: getErrorMessage(result) };
   }
 
-  const categories = [...new Set(result.data?.map((p) => p.category).filter(Boolean) as string[])];
+  const categories = Array.from(new Set(result.data?.map((p) => p.category).filter(Boolean) as string[]));
   return { data: categories, error: null };
 }
 
@@ -335,7 +335,7 @@ export async function getBlogTags(
   }
 
   const allTags = result.data?.flatMap((p) => p.tags || []) || [];
-  const uniqueTags = [...new Set(allTags)];
+  const uniqueTags = Array.from(new Set(allTags));
   return { data: uniqueTags, error: null };
 }
 
