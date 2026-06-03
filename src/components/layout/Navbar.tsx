@@ -41,11 +41,11 @@ function Navbar() {
       {/* ── Main nav ── */}
       <div
         className={cn(
-          'bg-white shadow-md transition-all duration-300'
+          'relative bg-white shadow-md transition-all duration-300'
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-20">
+          <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="shrink-0 flex items-center">
               <Image 
@@ -53,7 +53,7 @@ function Navbar() {
                 alt="Activos en Red" 
                 width={200} 
                 height={50} 
-                className="h-10 w-auto object-contain"
+                className="h-8 md:h-10 w-auto object-contain"
                 priority
               />
             </Link>
@@ -96,7 +96,7 @@ function Navbar() {
 
           {/* Mobile dropdown */}
           {isOpen && (
-            <div className="md:hidden mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-fade-in">
+            <div className="md:hidden absolute left-0 right-0 top-full bg-white border-t border-gray-100 shadow-2xl animate-fade-in flex flex-col max-h-[calc(100vh-6rem)] overflow-y-auto">
               {navigation.map((item, i) => (
                 <Link
                   key={item.name}

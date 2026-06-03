@@ -82,7 +82,7 @@ export function Hero() {
   };
 
   return (
-    <section className="-mt-[104px] relative min-h-[600px] lg:min-h-[700px] flex flex-col">
+    <section className="-mt-[96px] md:-mt-[112px] relative min-h-[600px] lg:min-h-[700px] flex flex-col">
       {/* ── Background image ── */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -96,9 +96,9 @@ export function Hero() {
 
       {/* ── Hero content ── */}
       <div className="relative flex-1 flex items-center mt-16 md:mt-24">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[104px] pb-16">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight uppercase tracking-tight">
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-[96px] md:pt-[112px] pb-16">
+          <div className="max-w-2xl text-center md:text-left mx-auto md:mx-0">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white leading-tight uppercase tracking-tight">
               Encontramos
               <br />
               <span className="text-primary-400">tu hogar</span>
