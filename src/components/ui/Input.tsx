@@ -41,8 +41,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               'disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed',
               'dark:focus:ring-primary-400 dark:focus:border-primary-400',
               error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
-              leftIcon && 'pl-10',
-              rightIcon && 'pr-10',
+              !!leftIcon && 'pl-10',
+              !!rightIcon && 'pr-10',
               className
             )}
             {...props}
