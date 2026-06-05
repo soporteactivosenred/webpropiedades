@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Navbar, Footer } from '@/components/layout';
+import { WhatsAppButton } from '@/components/ui';
 import { DEFAULT_SETTINGS } from '@/types';
 import '@/styles/globals.css';
 
@@ -58,6 +59,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-grow pt-[96px] md:pt-[112px]">{children}</main>
         <Footer />
+        <WhatsAppButton />
       </body>
     </html>
   );
