@@ -1,16 +1,15 @@
 /**
- * Format a price with Chilean peso currency
+ * Format a price in UF (Unidad de Fomento) — Chilean real estate standard
  */
 export function formatPrice(price: number, priceType: 'sale' | 'rent'): string {
   const formatted = new Intl.NumberFormat('es-CL', {
-    style: 'currency',
-    currency: 'CLP',
     maximumFractionDigits: 0,
   }).format(price);
 
-  const suffix = priceType === 'rent' ? '/mes' : '';
+  const suffix = priceType === 'rent' ? ' UF/mes' : ' UF';
   return `${formatted}${suffix}`;
 }
+
 
 /**
  * Format a price without currency symbol
