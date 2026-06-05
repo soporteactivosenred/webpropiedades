@@ -111,7 +111,7 @@ export function WhatsAppButton() {
               src="/ejecutiva-whatsapp.png"
               alt="Ejecutiva Activos en Red"
               fill
-              className="object-cover object-top"
+              className="object-cover object-[center_10%] scale-125"
             />
           </div>
 
@@ -142,7 +142,7 @@ export function WhatsAppButton() {
                     alt="Ejecutiva"
                     width={56}
                     height={56}
-                    className="object-cover object-top w-full h-full"
+                    className="object-cover object-[center_10%] scale-125 w-full h-full"
                   />
                 </div>
                 <div>
