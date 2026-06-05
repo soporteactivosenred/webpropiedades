@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { Hero, WhyChooseUs, PropertyTypesSection, CTASection, FinancingSection } from '@/components/sections';
+import { Hero, WhyChooseUs, PropertyTypesSection, CTASection, FinancingSection, MapShowcase } from '@/components/sections';
 import { PropertyCard } from '@/components/properties';
 import { Button } from '@/components/ui';
 import { createServerClient } from '@/lib/supabase/server';
@@ -48,10 +48,17 @@ async function RecentProperties() {
   );
 }
 
+async function MapShowcaseSection() {
+  const supabase: any = await createServerClient();
+  const { data: properties } = await getRecentProperties(supabase, 5);
+  return <MapShowcase properties={properties || []} />;
+}
+
 export default function HomePage() {
   return (
     <>
       <Hero />
+      <FinancingSection />
 
       {/* Featured Properties */}
       <section className="py-16 md:py-24">
@@ -75,9 +82,12 @@ export default function HomePage() {
         </div>
       </section>
 
+      <Suspense fallback={<div className="animate-pulse"><div className="h-[500px] bg-gray-100 dark:bg-gray-900 rounded-xl" /></div>}>
+        <MapShowcaseSection />
+      </Suspense>
+
       <PropertyTypesSection />
       <WhyChooseUs />
-      <FinancingSection />
 
       {/* Recent Properties */}
       <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-900">
