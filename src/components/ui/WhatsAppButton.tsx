@@ -50,6 +50,14 @@ export function WhatsAppButton() {
     };
 
     fetchSettings();
+
+    // Listen for custom event to open the modal from other buttons
+    const handleOpenModal = () => setIsOpen(true);
+    window.addEventListener('open-whatsapp-modal', handleOpenModal);
+
+    return () => {
+      window.removeEventListener('open-whatsapp-modal', handleOpenModal);
+    };
   }, []);
 
   const validate = () => {
