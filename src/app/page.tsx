@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { Hero, WhyChooseUs, PropertyTypesSection, CTASection } from '@/components/sections';
+import { Hero, WhyChooseUs, PropertyTypesSection, CTASection, FinancingSection } from '@/components/sections';
 import { PropertyCard } from '@/components/properties';
 import { Button } from '@/components/ui';
 import { createServerClient } from '@/lib/supabase/server';
@@ -77,6 +77,7 @@ export default function HomePage() {
 
       <PropertyTypesSection />
       <WhyChooseUs />
+      <FinancingSection />
 
       {/* Recent Properties */}
       <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-900">
