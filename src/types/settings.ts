@@ -5,6 +5,7 @@ export interface SiteSettings {
   contact_email: string;
   contact_phone: string;
   contact_whatsapp: string;
+  whatsapp_avatar: string;
   contact_address: string;
   social_media: {
     facebook?: string;
@@ -28,6 +29,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   contact_email: 'contacto@activosenred.cl',
   contact_phone: '+56 9 1234 5678',
   contact_whatsapp: '+56912345678',
+  whatsapp_avatar: '/ejecutiva.png',
   contact_address: 'Av. Principal 1234, Santiago, Chile',
   social_media: {
     facebook: 'https://facebook.com/activosenred',

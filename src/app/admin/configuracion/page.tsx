@@ -12,6 +12,7 @@ interface SettingsFormData {
   site_name: string;
   site_description: string;
   whatsapp_number: string;
+  whatsapp_avatar: string;
   contact_email: string;
   facebook_url: string;
   instagram_url: string;
@@ -28,6 +29,7 @@ export default function AdminConfiguracionPage() {
     site_name: 'Activos en Red',
     site_description: '',
     whatsapp_number: '',
+    whatsapp_avatar: '',
     contact_email: '',
     facebook_url: '',
     instagram_url: '',
@@ -70,6 +72,7 @@ export default function AdminConfiguracionPage() {
         site_name: settingsMap.site_name || 'Activos en Red',
         site_description: settingsMap.site_description || '',
         whatsapp_number: settingsMap.whatsapp_number || '',
+        whatsapp_avatar: settingsMap.whatsapp_avatar || '/ejecutiva.png',
         contact_email: settingsMap.contact_email || '',
         facebook_url: settingsMap.facebook_url || '',
         instagram_url: settingsMap.instagram_url || '',
@@ -101,6 +104,7 @@ export default function AdminConfiguracionPage() {
         { key: 'site_name', value: settings.site_name },
         { key: 'site_description', value: settings.site_description },
         { key: 'whatsapp_number', value: settings.whatsapp_number },
+        { key: 'whatsapp_avatar', value: settings.whatsapp_avatar },
         { key: 'contact_email', value: settings.contact_email },
         { key: 'facebook_url', value: settings.facebook_url },
         { key: 'instagram_url', value: settings.instagram_url },
@@ -207,6 +211,15 @@ export default function AdminConfiguracionPage() {
               onChange={handleChange}
               placeholder="+56912345678"
               hint="Número con código de país, sin espacios ni guiones"
+            />
+
+            <Input
+              label="Avatar WhatsApp (URL)"
+              name="whatsapp_avatar"
+              value={settings.whatsapp_avatar}
+              onChange={handleChange}
+              placeholder="https://ejemplo.com/ejecutiva.png"
+              hint="URL de la imagen o ruta local (ej. /ejecutiva.png)"
             />
 
             <Input

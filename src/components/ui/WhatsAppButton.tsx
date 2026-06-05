@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { X, MessageCircle, User, Phone, Home, Loader2, CheckCircle2 } from 'lucide-react';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
@@ -15,10 +15,10 @@ const SERVICES = [
   'Asesoría general',
 ];
 
-const WHATSAPP_NUMBER = DEFAULT_SETTINGS.contact_whatsapp.replace(/[^0-9]/g, '');
-
 export function WhatsAppButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(DEFAULT_SETTINGS.whatsapp_avatar);
+  const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_SETTINGS.contact_whatsapp.replace(/[^0-9]/g, ''));
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,6 +27,30 @@ export function WhatsAppButton() {
     service: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const supabase = createAdminBrowserClient() as any;
+        const { data } = await supabase
+          .from('site_settings')
+          .select('key, value')
+          .in('key', ['whatsapp_avatar', 'contact_whatsapp']);
+
+        if (data) {
+          const avatar = data.find((s: any) => s.key === 'whatsapp_avatar');
+          if (avatar && avatar.value) setAvatarUrl(avatar.value);
+
+          const phone = data.find((s: any) => s.key === 'contact_whatsapp');
+          if (phone && phone.value) setWhatsappNumber(phone.value.replace(/[^0-9]/g, ''));
+        }
+      } catch (err) {
+        console.error('Error fetching dynamic WhatsApp settings:', err);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -61,7 +85,7 @@ export function WhatsAppButton() {
         const message = encodeURIComponent(
           `Hola! Soy *${formData.name}* y estoy interesado/a en: *${formData.service}*. Mi teléfono es: ${formData.phone}`
         );
-        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+        window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
         handleClose();
       }, 1500);
     } catch (err) {
@@ -70,7 +94,7 @@ export function WhatsAppButton() {
       const message = encodeURIComponent(
         `Hola! Soy *${formData.name}* y estoy interesado/a en: *${formData.service}*. Mi teléfono es: ${formData.phone}`
       );
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
+      window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
       handleClose();
     } finally {
       setIsLoading(false);
@@ -108,7 +132,7 @@ export function WhatsAppButton() {
           {/* Main circle with executive photo */}
           <div className="relative w-16 h-16 rounded-full border-4 border-green-500 shadow-2xl overflow-hidden bg-gray-200 hover:scale-110 transition-transform duration-300">
             <Image
-              src="/ejecutiva.png"
+              src={avatarUrl}
               alt="Ejecutiva Activos en Red"
               fill
               className="object-cover object-center scale-110"
@@ -138,7 +162,7 @@ export function WhatsAppButton() {
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full border-3 border-white shadow-lg overflow-hidden bg-gray-200 flex-shrink-0" style={{borderWidth: '3px'}}>
                   <Image
-                    src="/ejecutiva.png"
+                    src={avatarUrl}
                     alt="Ejecutiva"
                     width={56}
                     height={56}
