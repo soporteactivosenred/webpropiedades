@@ -1,13 +1,23 @@
 /**
- * Format a price in UF (Unidad de Fomento) — Chilean real estate standard
+ * Format a price:
+ * - Venta → UF (e.g. "3.375 UF")
+ * - Arriendo → CLP/mes (e.g. "$450.000/mes")
  */
 export function formatPrice(price: number, priceType: 'sale' | 'rent'): string {
-  const formatted = new Intl.NumberFormat('es-CL', {
-    maximumFractionDigits: 0,
-  }).format(price);
+  if (priceType === 'rent') {
+    const clp = new Intl.NumberFormat('es-CL', {
+      style: 'currency',
+      currency: 'CLP',
+      maximumFractionDigits: 0,
+    }).format(price);
+    return `${clp}/mes`;
+  }
 
-  const suffix = priceType === 'rent' ? ' UF/mes' : ' UF';
-  return `${formatted}${suffix}`;
+  // Venta → UF
+  const uf = new Intl.NumberFormat('es-CL', {
+    maximumFractionDigits: 2,
+  }).format(price);
+  return `${uf} UF`;
 }
 
 
