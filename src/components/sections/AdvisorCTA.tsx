@@ -17,7 +17,7 @@ export function AdvisorCTA() {
           {/* Left Side: Image */}
           <div className="relative w-full lg:w-2/5 aspect-[16/10] lg:aspect-[4/3] shrink-0 rounded-2xl overflow-hidden shadow-md">
             <img
-              src="https://images.unsplash.com/photo-1557200134-90327ee9fafa?w=800&q=80"
+              src="/agente-ia.png"
               alt="Asesor Inmobiliario Digital"
               className="w-full h-full object-cover"
             />
