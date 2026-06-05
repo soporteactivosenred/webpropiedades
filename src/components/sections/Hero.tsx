@@ -2,17 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, MapPin, Home, Building2 } from 'lucide-react';
 import Image from 'next/image';
 
 const OPERATION_TYPES = [
-  { value: '', label: 'Selecciona una operación' },
+  { value: '', label: 'Todos los estados' },
   { value: 'sale', label: 'Venta' },
   { value: 'rent', label: 'Arriendo' },
 ];
 
 const PROPERTY_TYPES = [
-  { value: '', label: 'Selecciona una tipología' },
+  { value: '', label: 'Todos los tipos' },
   { value: 'house', label: 'Casa' },
   { value: 'apartment', label: 'Departamento' },
   { value: 'land', label: 'Terreno' },
@@ -21,7 +21,7 @@ const PROPERTY_TYPES = [
 ];
 
 const CITIES = [
-  { value: '', label: 'Selecciona una ciudad' },
+  { value: '', label: 'Todas las ubicaciones' },
   { value: 'Santiago', label: 'Santiago' },
   { value: 'Las Condes', label: 'Las Condes' },
   { value: 'Providencia', label: 'Providencia' },
@@ -40,35 +40,53 @@ const SLIDER_IMAGES = [
   'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80'
 ];
 
+interface CustomSelectProps {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
 function CustomSelect({
   label,
   options,
   value,
   onChange,
-}: {
-  label: string;
-  options: { value: string; label: string }[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
+  icon: Icon,
+}: CustomSelectProps) {
+  const selectedOption = options.find((o) => o.value === value);
+  const displayLabel = selectedOption ? selectedOption.label : options[0]?.label;
+
   return (
-    <div className="flex-1 min-w-0">
-      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
-        {label}
-      </label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none bg-transparent text-gray-700 text-sm font-medium pr-6 focus:outline-none cursor-pointer"
-        >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+    <div className="flex items-center gap-3 w-full min-w-0 group">
+      {/* Icon container */}
+      <div className="flex-shrink-0 p-2 text-primary-600 transition-colors">
+        <Icon className="w-8 h-8 stroke-[1.5]" />
+      </div>
+      
+      {/* Text & Select container */}
+      <div className="flex-1 min-w-0 text-left">
+        <span className="block text-sm font-bold text-gray-800 tracking-tight leading-none mb-1">
+          {label}
+        </span>
+        <div className="relative flex items-center">
+          <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          >
+            {options.map((o) => (
+              <option key={o.value} value={o.value} className="text-gray-800 bg-white">
+                {o.label}
+              </option>
+            ))}
+          </select>
+          <span className="block text-xs md:text-sm text-gray-500 font-medium truncate pr-5 select-none pointer-events-none">
+            {displayLabel}
+          </span>
+          <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-600 group-hover:text-primary-800 transition-colors pointer-events-none" />
+        </div>
       </div>
     </div>
   );
@@ -177,62 +195,69 @@ export function Hero() {
       {/* ── Search card ── */}
       <div className="absolute bottom-0 left-0 right-0 z-20 translate-y-1/2">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pb-0">
-          <div className="bg-white/70 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl px-8 pt-8 pb-10">
+          <div className="bg-white/95 backdrop-blur-xl border border-gray-100 rounded-3xl md:rounded-[2.5rem] shadow-2xl px-6 py-8 md:px-10 md:py-10">
             {/* Title */}
-            <div className="mb-6">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-                Busca, encuentra{' '}
-                <span className="text-primary-600">y agenda</span>
+            <div className="mb-8 text-center">
+              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 tracking-tight">
+                Encuentra la propiedad en <span className="text-primary-600 font-extrabold">Activos en Red</span>, que hace match contigo.
               </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                Selecciona el tipo de operación, tipología y ciudad que buscas.{' '}
-                <span className="text-primary-600 font-medium">
-                  Te mostramos lo que se adapta a ti.
-                </span>
-              </p>
             </div>
 
             {/* Filters row */}
-            <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4 md:gap-0 bg-white rounded-2xl px-6 py-5 shadow-sm border border-gray-100">
-              {/* Operation */}
-              <div className="flex-1 md:pr-6 md:border-r border-gray-200">
+            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-4 bg-white rounded-3xl md:rounded-full px-6 py-6 md:py-4 shadow-md border border-gray-100">
+              {/* City/Comuna */}
+              <div className="w-full md:flex-1">
                 <CustomSelect
-                  label="Tipo de operación"
-                  options={OPERATION_TYPES}
-                  value={operation}
-                  onChange={setOperation}
-                />
-              </div>
-
-              {/* Property type */}
-              <div className="flex-1 md:px-6 md:border-r border-gray-200">
-                <CustomSelect
-                  label="Tipología"
-                  options={PROPERTY_TYPES}
-                  value={propertyType}
-                  onChange={setPropertyType}
-                />
-              </div>
-
-              {/* City */}
-              <div className="flex-1 md:pl-6">
-                <CustomSelect
-                  label="Ciudad"
+                  label="Ciudad o comuna"
                   options={CITIES}
                   value={city}
                   onChange={setCity}
+                  icon={MapPin}
                 />
               </div>
 
-              {/* Search button */}
-              <div className="md:ml-4 flex items-end">
+              {/* Divider 1 */}
+              <div className="hidden md:block w-px h-10 bg-gray-200" />
+              <div className="block md:hidden w-full h-px bg-gray-100" />
+
+              {/* Property type */}
+              <div className="w-full md:flex-1">
+                <CustomSelect
+                  label="Tipo de propiedad"
+                  options={PROPERTY_TYPES}
+                  value={propertyType}
+                  onChange={setPropertyType}
+                  icon={Home}
+                />
+              </div>
+
+              {/* Divider 2 */}
+              <div className="hidden md:block w-px h-10 bg-gray-200" />
+              <div className="block md:hidden w-full h-px bg-gray-100" />
+
+              {/* Operation / Estado */}
+              <div className="w-full md:flex-1">
+                <CustomSelect
+                  label="Estado"
+                  options={OPERATION_TYPES}
+                  value={operation}
+                  onChange={setOperation}
+                  icon={Building2}
+                />
+              </div>
+
+              {/* Divider 3 */}
+              <div className="hidden md:block w-px h-10 bg-gray-200" />
+
+              {/* Search Button */}
+              <div className="w-full md:w-auto flex justify-center md:justify-start pt-2 md:pt-0">
                 <button
                   onClick={handleSearch}
-                  className="w-full md:w-auto flex items-center justify-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-semibold px-6 py-3.5 rounded-full transition-all hover:shadow-lg active:scale-95"
+                  className="w-full md:w-14 md:h-14 lg:w-16 lg:h-16 py-3.5 md:py-0 flex items-center justify-center bg-primary-600 hover:bg-accent-500 text-white rounded-xl md:rounded-full font-bold gap-2 transition-all duration-300 shadow-lg hover:shadow-primary-600/30 hover:scale-105 active:scale-95"
                   aria-label="Buscar propiedades"
                 >
-                  <Search className="w-5 h-5" />
-                  <span className="md:hidden">Buscar</span>
+                  <Search className="w-5 h-5 md:w-6 md:h-6 stroke-[2]" />
+                  <span className="md:hidden">Buscar propiedades</span>
                 </button>
               </div>
             </div>
