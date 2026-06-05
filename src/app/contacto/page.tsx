@@ -50,6 +50,24 @@ export default function ContactPage() {
       return;
     }
 
+    // Send email notification via Resend
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: data.message,
+          source: 'website'
+        }),
+      });
+    } catch (emailError) {
+      console.error('Error enviando email:', emailError);
+      // No bloqueamos el flujo de éxito si el email falla
+    }
+
     setSuccess(true);
     setIsSubmitting(false);
   };

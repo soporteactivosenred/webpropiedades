@@ -86,6 +86,20 @@ export function WhatsAppButton() {
         status: 'new',
       }]);
 
+      // Enviar email vía Resend (opcional, no bloqueante)
+      const emailPlaceholder = `whatsapp-${Date.now()}@consulta.cl`;
+      fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: emailPlaceholder,
+          phone: formData.phone,
+          message: formData.service,
+          source: 'whatsapp'
+        }),
+      }).catch(err => console.error('Error enviando email:', err));
+
       setStep('success');
 
       // Redirigir a WhatsApp después de 1.5 segundos
