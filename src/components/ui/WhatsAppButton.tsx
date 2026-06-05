@@ -108,10 +108,10 @@ export function WhatsAppButton() {
           {/* Main circle with executive photo */}
           <div className="relative w-16 h-16 rounded-full border-4 border-green-500 shadow-2xl overflow-hidden bg-gray-200 hover:scale-110 transition-transform duration-300">
             <Image
-              src="/ejecutiva-whatsapp.png"
+              src="/ejecutiva.png"
               alt="Ejecutiva Activos en Red"
               fill
-              className="object-cover object-[center_10%] scale-125"
+              className="object-cover object-center scale-110"
             />
           </div>
 
@@ -138,7 +138,7 @@ export function WhatsAppButton() {
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full border-3 border-white shadow-lg overflow-hidden bg-gray-200 flex-shrink-0" style={{borderWidth: '3px'}}>
                   <Image
-                    src="/ejecutiva-whatsapp.png"
+                    src="/ejecutiva.png"
                     alt="Ejecutiva"
                     width={56}
                     height={56}
