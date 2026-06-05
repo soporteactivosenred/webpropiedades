@@ -31,22 +31,7 @@ async function FeaturedProperties() {
   );
 }
 
-async function RecentProperties() {
-  const supabase: any = await createServerClient();
-  const { data: properties } = await getRecentProperties(supabase, 3);
 
-  if (!properties || properties.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {properties.map((property: any) => (
-        <PropertyCard key={property.id} property={property} compact />
-      ))}
-    </div>
-  );
-}
 
 async function MapShowcaseSection() {
   const supabase: any = await createServerClient();
@@ -89,27 +74,7 @@ export default function HomePage() {
       <PropertyTypesSection />
       <WhyChooseUs />
 
-      {/* Recent Properties */}
-      <section className="py-16 md:py-24 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-                Nuevas publicaciones
-              </h2>
-              <p className="mt-2 text-gray-600 dark:text-gray-400">
-                Las propiedades más recientes en nuestro portal
-              </p>
-            </div>
-            <Link href="/propiedades">
-              <Button variant="ghost">Ver todas →</Button>
-            </Link>
-          </div>
-          <Suspense fallback={<div className="animate-pulse"><div className="h-48 bg-gray-200 rounded-xl" /></div>}>
-            <RecentProperties />
-          </Suspense>
-        </div>
-      </section>
+
 
       <CTASection />
     </>
