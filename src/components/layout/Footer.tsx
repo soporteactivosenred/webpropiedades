@@ -23,7 +23,7 @@ function Footer() {
 
   return (
     <footer className="bg-primary-950 text-gray-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="lg:col-span-1">
@@ -36,16 +36,16 @@ function Footer() {
                 className="h-10 w-auto object-contain brightness-0 invert"
               />
             </Link>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-400 mb-6 leading-relaxed">
               {DEFAULT_SETTINGS.site_tagline}. Expertos en bienes raíces con años de experiencia en el mercado chileno.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {DEFAULT_SETTINGS.social_media.facebook && (
                 <a
                   href={DEFAULT_SETTINGS.social_media.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-primary-900 hover:bg-accent-500 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#1877F2] hover:bg-[#0e65d9] text-white transition-all hover:scale-110 shadow-lg"
                   aria-label="Facebook"
                 >
                   <Facebook className="w-5 h-5" />
@@ -56,7 +56,7 @@ function Footer() {
                   href={DEFAULT_SETTINGS.social_media.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-primary-900 hover:bg-accent-500 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] hover:opacity-90 text-white transition-all hover:scale-110 shadow-lg"
                   aria-label="Instagram"
                 >
                   <Instagram className="w-5 h-5" />
@@ -67,7 +67,7 @@ function Footer() {
                   href={DEFAULT_SETTINGS.social_media.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg bg-primary-900 hover:bg-accent-500 transition-colors"
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0A66C2] hover:bg-[#084e96] text-white transition-all hover:scale-110 shadow-lg"
                   aria-label="LinkedIn"
                 >
                   <Linkedin className="w-5 h-5" />
@@ -139,7 +139,7 @@ function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-primary-900 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400">
             © {currentYear} {DEFAULT_SETTINGS.site_name}. Todos los derechos reservados.
           </p>
