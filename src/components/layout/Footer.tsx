@@ -141,7 +141,15 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400">
-            © {currentYear} {DEFAULT_SETTINGS.site_name}. Todos los derechos reservados.
+            © {currentYear} {DEFAULT_SETTINGS.site_name}. Todos los derechos reservados. — Desarrollado por{' '}
+            <a 
+              href="https://webunica.cl" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-gray-300 hover:text-accent-500 transition-colors font-medium"
+            >
+              webunica.cl
+            </a>
           </p>
           <div className="flex gap-6 text-sm">
             <Link href="/privacidad" className="text-gray-400 hover:text-accent-500 transition-colors">
