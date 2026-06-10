@@ -173,13 +173,12 @@ export function Hero() {
 
           <div className="max-w-xl text-center md:text-left mx-auto lg:mx-0 relative z-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight uppercase tracking-tight shadow-sm">
-              Encontramos
+              La evolución
               <br />
-              <span className="text-accent-500 drop-shadow-md">tu propiedad</span>
+              <span className="text-accent-500 drop-shadow-md">del mercado inmobiliario</span>
             </h1>
             <p className="mt-6 text-lg md:text-xl text-gray-200 leading-relaxed drop-shadow-md">
-              Con espacios bien ubicados, pensados para que vivas o inviertas
-              con total confianza en Chile.
+              Accede a las mejores oportunidades de inversión y liquidación bancaria con el respaldo de nuestra trayectoria y tecnología avanzada.
             </p>
             <a
               href="/propiedades"
@@ -199,7 +198,7 @@ export function Hero() {
             {/* Title */}
             <div className="mb-8 text-center">
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 tracking-tight">
-                Encuentra la propiedad en <span className="text-primary-600 font-extrabold">Activos en Red</span>, que hace match contigo.
+                Encuentra tu próximo activo inmobiliario aquí:
               </h2>
             </div>
 
