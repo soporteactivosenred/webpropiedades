@@ -1,42 +1,63 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { KeyRound, Handshake, Calendar, Coins, ArrowRight } from 'lucide-react';
+import { KeyRound, Handshake, Scale, Compass, ArrowRight, Check } from 'lucide-react';
 
 const TABS = [
   {
-    id: 'parte-pago',
-    title: 'Deja tu propiedad en parte de pago',
+    id: 'corretaje',
+    title: 'Corretaje de propiedades',
     icon: KeyRound,
-    description: 'Activos en Red te ayuda a dar el siguiente paso: compra tu oficina, local o departamento hoy dejándonos tu propiedad actual en parte de pago. Nosotros nos encargamos de toda la gestión y tramitación para que no tengas que preocuparte de nada.',
-    link: '/contacto?subject=Parte%20de%20pago',
-    image: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=800&q=80',
+    subtitle: 'Intermediamos profesionalmente la comercialización de tu inmueble, priorizando el máximo valor y rapidez.',
+    features: [
+      'Garantizar una venta segura y libre de preocupaciones.',
+      'Acompañar y asesorar de forma continua durante toda la gestión.',
+      'Optimizar y acelerar los tiempos del proceso comercial.',
+      'Entregar un sólido respaldo tanto legal como comercial.'
+    ],
+    link: '/contacto?subject=Corretaje%20de%20propiedades',
+    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
   },
   {
-    id: 'renta',
-    title: 'Complementa tu renta',
+    id: 'administracion',
+    title: 'Administración de arriendos',
     icon: Handshake,
-    description: 'Suma tus ingresos con un co-deudor (socio, familiar o pareja) para alcanzar la capacidad financiera requerida y calificar al financiamiento de tu próxima propiedad comercial, industrial o residencial sin complicaciones.',
-    link: '/contacto?subject=Complementar%20renta',
+    subtitle: 'Gestionamos integralmente tu propiedad de alquiler, brindando tranquilidad a propietarios e inquilinos.',
+    features: [
+      'Asegurar y organizar tus recaudaciones mensuales con puntualidad.',
+      'Optimizar tu tiempo libre y evitarte preocupaciones innecesarias.',
+      'Evaluar y seleccionar minuciosamente a arrendatarios calificados.',
+      'Entregar un servicio de administración profesional y constante.'
+    ],
+    link: '/contacto?subject=Administracion%20de%20arriendos',
     image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80',
   },
   {
-    id: 'cuotas',
-    title: 'Paga el pie en cuotas',
-    icon: Calendar,
-    description: 'Facilitamos tu inversión dividiendo el pago del pie de tu propiedad en cuotas mensuales sin interés durante el periodo de construcción o mediante convenios de financiamiento flexibles adaptados a tu flujo de caja.',
-    link: '/contacto?subject=Pie%20en%20cuotas',
-    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80',
+    id: 'asesoria',
+    title: 'Asesoría legal y operacional',
+    icon: Scale,
+    subtitle: 'Apoyamos técnica y jurídicamente cada fase de tus gestiones y transacciones de bienes raíces.',
+    features: [
+      'Ejecutar operaciones inmobiliarias seguras y totalmente libres de riesgos.',
+      'Prevenir anticipadamente cualquier conflicto legal o documental.',
+      'Ofrecer un acompañamiento profesional y cercano en todo momento.'
+    ],
+    link: '/contacto?subject=Asesoria%20legal%20y%20operacional',
+    image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',
   },
   {
-    id: 'subsidio',
-    title: 'Subsidio y Leasing',
-    icon: Coins,
-    description: 'Aplica subsidios habitacionales DS19 o DS1 a tu próxima vivienda, o consulta por nuestras opciones de leasing inmobiliario comercial y habitacional que te permiten arrendar con opción de compra, ideal para emprendedores y PyMEs.',
-    link: '/contacto?subject=Subsidio%20y%20Leasing',
-    image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80',
+    id: 'tasacion',
+    title: 'Tasación comercial',
+    icon: Compass,
+    subtitle: 'Determinamos el valor real de tu propiedad basándonos en un riguroso análisis comparativo de mercado.',
+    features: [
+      'Establecer un precio competitivo y ajustado a la realidad del sector.',
+      'Acelerar la velocidad de venta o arriendo de tu inmueble.',
+      'Sustentar técnicamente procesos legales, comerciales o financieros.'
+    ],
+    link: '/contacto?subject=Tasacion%20comercial',
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80',
   },
 ];
 
@@ -52,10 +73,10 @@ export function FinancingSection() {
         {/* Title block */}
         <div className="text-center mb-10 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-            Alternativas de financiamiento
+            Nuestros Servicios
           </h2>
           <p className="mt-4 text-base md:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed">
-            Sabemos lo importante que es este momento. Por eso te ofrecemos distintas formas de financiamiento para elegir tu próximo activo o propiedad.
+            Te acompañamos en cada etapa de tu proceso inmobiliario, entregando soluciones integrales y profesionales para rentabilizar y proteger tus activos.
           </p>
         </div>
 
@@ -96,24 +117,38 @@ export function FinancingSection() {
           {/* Right: Active Tab display box */}
           <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row items-stretch">
             {/* Box Content */}
-            <div className="flex-1 p-6 md:p-10 flex flex-col justify-between gap-6 md:gap-8 min-h-[260px] md:min-h-[300px]">
+            <div className="flex-1 p-6 md:p-10 flex flex-col justify-between gap-6 md:gap-8 min-h-[260px] md:min-h-[350px]">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400">
-                  <ActiveIcon className="w-5 h-5 lg:w-6 lg:h-6" />
-                  <h3 className="text-base md:text-lg font-bold text-gray-900 dark:text-white">
+                <div className="inline-flex items-center gap-2.5 text-accent-600 dark:text-accent-400">
+                  <div className="w-8 h-8 rounded-lg bg-accent-50 dark:bg-accent-950/30 flex items-center justify-center">
+                    <ActiveIcon className="w-4.5 h-4.5 lg:w-5 lg:h-5" />
+                  </div>
+                  <h3 className="text-xs font-extrabold uppercase tracking-wider">
                     {activeTab.title}
                   </h3>
                 </div>
-                <p className="text-gray-600 dark:text-gray-350 text-xs md:text-sm lg:text-base leading-relaxed">
-                  {activeTab.description}
-                </p>
+                
+                <h4 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-snug">
+                  {activeTab.subtitle}
+                </h4>
+
+                <ul className="space-y-2 mt-4">
+                  {activeTab.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5 text-gray-600 dark:text-gray-300 text-xs md:text-sm">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-50 dark:bg-accent-950/30 text-accent-600 dark:text-accent-400 flex items-center justify-center mt-0.5">
+                        <Check className="w-3.5 h-3.5 font-bold" />
+                      </span>
+                      <span className="leading-normal">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               <Link
                 href={activeTab.link}
-                className="inline-flex items-center justify-between gap-3 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 font-bold px-6 py-2.5 rounded-full text-xs md:text-sm transition-all duration-300 self-start group"
+                className="inline-flex items-center justify-between gap-3 border border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/30 font-bold px-6 py-2.5 rounded-full text-xs md:text-sm transition-all duration-300 self-start group mt-4"
               >
-                Ver más
+                Solicitar información
                 <span className="w-5 h-5 lg:w-6 lg:h-6 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform">
                   <ArrowRight className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
                 </span>
