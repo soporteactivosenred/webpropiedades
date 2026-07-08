@@ -78,7 +78,10 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
   return (
     <>
       {/* Desktop/Tablet Layout: Main image + Vertical Thumbnail Carousel */}
-      <div className="hidden md:grid grid-cols-5 gap-4 mb-8 h-[500px]">
+      <div 
+        className="hidden md:grid grid-cols-5 gap-4 mb-8"
+        style={{ height: '500px' }}
+      >
         {/* Main Display Area (Left 4 cols) */}
         <div 
           onClick={() => openLightbox(activeIndex)}
