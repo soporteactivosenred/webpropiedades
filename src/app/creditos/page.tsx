@@ -13,7 +13,7 @@ export default function CreditosPage() {
     <div className="pt-[104px] pb-16 md:pb-24">
       <div className="bg-primary-600 text-white py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Financia tu nuevo hogar</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">Financia tu nuevo hogar</h1>
           <p className="text-xl max-w-2xl mx-auto text-primary-100">
             Te asesoramos paso a paso para que obtengas el crédito hipotecario con las mejores condiciones del mercado.
           </p>
