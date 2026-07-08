@@ -78,11 +78,11 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
   return (
     <>
       {/* Desktop/Tablet Layout: Main image + Vertical Thumbnail Carousel */}
-      <div className="hidden md:grid grid-cols-5 gap-4 mb-8 w-full h-[350px] lg:h-[450px] xl:h-[550px]">
+      <div className="hidden md:grid grid-cols-5 gap-4 mb-8 w-full h-[350px] lg:h-[450px] xl:h-[550px] min-h-0">
         {/* Main Display Area (Left 4 cols) */}
         <div 
           onClick={() => openLightbox(activeIndex)}
-          className="col-span-4 relative h-full rounded-2xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
+          className="col-span-4 relative h-full min-h-0 rounded-2xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
         >
           <Image
             src={images[activeIndex]}
@@ -103,7 +103,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
         </div>
 
         {/* Vertical Thumbnail Column (Right 1 col) */}
-        <div className="col-span-1 h-full flex flex-col">
+        <div className="col-span-1 h-full flex flex-col min-h-0">
           <div 
             ref={thumbnailContainerRef}
             className="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent max-h-full"
