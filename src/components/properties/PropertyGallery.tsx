@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 
 interface PropertyGalleryProps {
   images: string[];
@@ -10,11 +10,13 @@ interface PropertyGalleryProps {
 }
 
 export function PropertyGallery({ images, title }: PropertyGalleryProps) {
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const thumbnailContainerRef = useRef<HTMLDivElement>(null);
 
   const openLightbox = (index: number) => {
-    setCurrentIndex(index);
+    setLightboxIndex(index);
     setIsOpen(true);
     document.body.style.overflow = 'hidden';
   };
@@ -26,15 +28,15 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
 
   const nextImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setCurrentIndex((prev) => (prev + 1) % images.length);
+    setLightboxIndex((prev) => (prev + 1) % images.length);
   };
 
   const prevImage = (e?: React.MouseEvent) => {
     e?.stopPropagation();
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    setLightboxIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
-  // Keyboard navigation
+  // Keyboard navigation for lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
@@ -47,6 +49,24 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, images.length]);
 
+  // Center active thumbnail in scroll view
+  useEffect(() => {
+    const container = thumbnailContainerRef.current;
+    if (!container) return;
+
+    const activeEl = container.children[activeIndex] as HTMLElement;
+    if (!activeEl) return;
+
+    const containerHeight = container.clientHeight;
+    const activeHeight = activeEl.clientHeight;
+    const activeTop = activeEl.offsetTop;
+
+    container.scrollTo({
+      top: activeTop - containerHeight / 2 + activeHeight / 2,
+      behavior: 'smooth',
+    });
+  }, [activeIndex]);
+
   if (!images || images.length === 0) {
     return (
       <div className="relative aspect-[4/3] rounded-xl bg-gray-200 flex items-center justify-center">
@@ -55,63 +75,107 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
     );
   }
 
-  const hasMultiple = images.length > 1;
-  const remainingCount = images.length - 5;
-
   return (
     <>
-      {/* Grid Display */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Main image (left, spans 2 columns on md/lg) */}
+      {/* Desktop/Tablet Layout: Main image + Vertical Thumbnail Carousel */}
+      <div className="hidden md:grid grid-cols-5 gap-4 mb-8 h-[500px]">
+        {/* Main Display Area (Left 4 cols) */}
         <div 
-          onClick={() => openLightbox(0)}
-          className="relative aspect-[4/3] md:col-span-2 rounded-xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
+          onClick={() => openLightbox(activeIndex)}
+          className="col-span-4 relative h-full rounded-2xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
         >
           <Image
-            src={images[0]}
+            src={images[activeIndex]}
             alt={title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
+            className="object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
             priority
           />
-          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
+          {/* Subtle overlay & Zoom button */}
+          <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+            <span className="opacity-0 group-hover:opacity-100 bg-black/60 backdrop-blur-md text-white p-4 rounded-full transition-all duration-300 transform scale-75 group-hover:scale-100 shadow-lg">
+              <Maximize2 className="w-6 h-6" />
+            </span>
+          </div>
+          <span className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full font-medium">
+            Foto {activeIndex + 1} de {images.length}
+          </span>
         </div>
 
-        {/* Secondary images grid (right, 1 column of 2 rows, or grid) */}
-        {hasMultiple && (
-          <div className="grid grid-cols-2 md:grid-cols-1 gap-4">
-            {images.slice(1, 5).map((img, i) => {
-              const actualIndex = i + 1;
-              const isLast = i === 3 && remainingCount > 0;
-
-              return (
-                <div
-                  key={i}
-                  onClick={() => openLightbox(actualIndex)}
-                  className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  <Image
-                    src={img}
-                    alt={`${title} - ${actualIndex + 1}`}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {isLast ? (
-                    <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white transition-all duration-300 group-hover:bg-black/50">
-                      <span className="text-2xl font-bold font-sans">+{remainingCount}</span>
-                      <span className="text-xs uppercase tracking-wider font-semibold">Fotografías</span>
-                    </div>
-                  ) : (
-                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
-                  )}
-                </div>
-              );
-            })}
+        {/* Vertical Thumbnail Column (Right 1 col) */}
+        <div className="col-span-1 h-full flex flex-col">
+          <div 
+            ref={thumbnailContainerRef}
+            className="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent max-h-full"
+            style={{ scrollBehavior: 'smooth' }}
+          >
+            {images.map((img, idx) => (
+              <div
+                key={idx}
+                onClick={() => setActiveIndex(idx)}
+                className={`relative aspect-[4/3] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 flex-shrink-0 ${
+                  idx === activeIndex
+                    ? 'ring-2 ring-primary-500 scale-98 shadow-md'
+                    : 'opacity-70 hover:opacity-100 hover:scale-[1.02]'
+                }`}
+              >
+                <Image
+                  src={img}
+                  alt={`${title} - Miniatura ${idx + 1}`}
+                  fill
+                  className="object-cover"
+                />
+                {idx === activeIndex && (
+                  <div className="absolute inset-0 bg-primary-500/10 border-2 border-primary-500 rounded-xl" />
+                )}
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Mobile Layout: Main Image + Horizontal Thumbnail Row */}
+      <div className="md:hidden flex flex-col gap-3 mb-8">
+        <div 
+          onClick={() => openLightbox(activeIndex)}
+          className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-200"
+        >
+          <Image
+            src={images[activeIndex]}
+            alt={title}
+            fill
+            className="object-cover"
+            priority
+          />
+          <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md text-white text-[11px] px-2.5 py-1 rounded-full font-medium">
+            {activeIndex + 1} / {images.length}
+          </span>
+        </div>
+
+        {/* Horizontal Scrolling Thumbnails */}
+        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none snap-x">
+          {images.map((img, idx) => (
+            <div
+              key={idx}
+              onClick={() => setActiveIndex(idx)}
+              className={`relative aspect-[4/3] w-20 rounded-lg overflow-hidden flex-shrink-0 snap-start transition-all duration-200 ${
+                idx === activeIndex
+                  ? 'ring-2 ring-primary-500 opacity-100 scale-95'
+                  : 'opacity-60'
+              }`}
+            >
+              <Image
+                src={img}
+                alt={`${title} - Miniatura ${idx + 1}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Lightbox Modal (Fullscreen) */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/95 backdrop-blur-sm select-none transition-all duration-300">
           {/* Top Bar */}
@@ -120,8 +184,8 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
               {title}
             </span>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-400 font-medium">
-                {currentIndex + 1} / {images.length}
+              <span className="text-sm text-gray-400 font-medium font-mono">
+                {lightboxIndex + 1} / {images.length}
               </span>
               <button
                 onClick={closeLightbox}
@@ -147,7 +211,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
             {/* Current Image */}
             <div className="relative w-full h-[65vh] md:h-[75vh] flex items-center justify-center">
               <Image
-                src={images[currentIndex]}
+                src={images[lightboxIndex]}
                 alt={`${title} - Vista completa`}
                 fill
                 className="object-contain"
@@ -167,23 +231,23 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
             )}
           </div>
 
-          {/* Thumbnail Carousel at the bottom */}
+          {/* Thumbnail Carousel at the bottom of the modal */}
           {images.length > 1 && (
             <div className="p-4 md:p-6 bg-black/50 border-t border-white/5 backdrop-blur-md max-w-full overflow-x-auto">
               <div className="flex justify-center gap-2 md:gap-3 mx-auto w-max max-w-full pb-2 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 {images.map((img, idx) => (
                   <div
                     key={idx}
-                    onClick={() => setCurrentIndex(idx)}
+                    onClick={() => setLightboxIndex(idx)}
                     className={`relative w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${
-                      idx === currentIndex
+                      idx === lightboxIndex
                         ? 'ring-2 ring-primary-500 scale-105 opacity-100'
                         : 'opacity-50 hover:opacity-80'
                     }`}
                   >
                     <Image
                       src={img}
-                      alt={`Miniatura ${idx + 1}`}
+                      alt={`Miniatura Lightbox ${idx + 1}`}
                       fill
                       className="object-cover"
                     />
