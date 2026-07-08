@@ -79,8 +79,8 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
     <>
       {/* Desktop/Tablet Layout: Main image + Vertical Thumbnail Carousel */}
       <div 
-        className="hidden md:grid grid-cols-5 gap-4 mb-8"
-        style={{ height: '500px' }}
+        className="hidden md:grid grid-cols-5 gap-4 mb-8 w-full"
+        style={{ aspectRatio: '5/3', maxHeight: '550px' }}
       >
         {/* Main Display Area (Left 4 cols) */}
         <div 
