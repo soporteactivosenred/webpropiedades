@@ -79,60 +79,62 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
     <>
       {/* Desktop/Tablet Layout: Main image + Vertical Thumbnail Carousel */}
       <div 
-        className="hidden md:grid grid-cols-5 gap-4 mb-8 w-full"
+        className="hidden md:block w-full relative mb-8"
         style={{ aspectRatio: '5/3', maxHeight: '550px' }}
       >
-        {/* Main Display Area (Left 4 cols) */}
-        <div 
-          onClick={() => openLightbox(activeIndex)}
-          className="col-span-4 relative h-full rounded-2xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
-        >
-          <Image
-            src={images[activeIndex]}
-            alt={title}
-            fill
-            className="object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
-            priority
-          />
-          {/* Subtle overlay & Zoom button */}
-          <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-            <span className="opacity-0 group-hover:opacity-100 bg-black/60 backdrop-blur-md text-white p-4 rounded-full transition-all duration-300 transform scale-75 group-hover:scale-100 shadow-lg">
-              <Maximize2 className="w-6 h-6" />
+        <div className="absolute inset-0 grid grid-cols-5 gap-4">
+          {/* Main Display Area (Left 4 cols) */}
+          <div 
+            onClick={() => openLightbox(activeIndex)}
+            className="col-span-4 relative h-full rounded-2xl overflow-hidden bg-gray-200 cursor-pointer group shadow-sm hover:shadow-md transition-all duration-300"
+          >
+            <Image
+              src={images[activeIndex]}
+              alt={title}
+              fill
+              className="object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
+              priority
+            />
+            {/* Subtle overlay & Zoom button */}
+            <div className="absolute inset-0 bg-black/5 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+              <span className="opacity-0 group-hover:opacity-100 bg-black/60 backdrop-blur-md text-white p-4 rounded-full transition-all duration-300 transform scale-75 group-hover:scale-100 shadow-lg">
+                <Maximize2 className="w-6 h-6" />
+              </span>
+            </div>
+            <span className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full font-medium">
+              Foto {activeIndex + 1} de {images.length}
             </span>
           </div>
-          <span className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white text-xs px-3 py-1.5 rounded-full font-medium">
-            Foto {activeIndex + 1} de {images.length}
-          </span>
-        </div>
 
-        {/* Vertical Thumbnail Column (Right 1 col) */}
-        <div className="col-span-1 h-full flex flex-col">
-          <div 
-            ref={thumbnailContainerRef}
-            className="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent max-h-full"
-            style={{ scrollBehavior: 'smooth' }}
-          >
-            {images.map((img, idx) => (
-              <div
-                key={idx}
-                onClick={() => setActiveIndex(idx)}
-                className={`relative aspect-[4/3] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 flex-shrink-0 ${
-                  idx === activeIndex
-                    ? 'ring-2 ring-primary-500 scale-98 shadow-md'
-                    : 'opacity-70 hover:opacity-100 hover:scale-[1.02]'
-                }`}
-              >
-                <Image
-                  src={img}
-                  alt={`${title} - Miniatura ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                />
-                {idx === activeIndex && (
-                  <div className="absolute inset-0 bg-primary-500/10 border-2 border-primary-500 rounded-xl" />
-                )}
-              </div>
-            ))}
+          {/* Vertical Thumbnail Column (Right 1 col) */}
+          <div className="col-span-1 h-full flex flex-col">
+            <div 
+              ref={thumbnailContainerRef}
+              className="flex-1 flex flex-col gap-3 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent max-h-full"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {images.map((img, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setActiveIndex(idx)}
+                  className={`relative aspect-[4/3] w-full rounded-xl overflow-hidden cursor-pointer transition-all duration-300 flex-shrink-0 ${
+                    idx === activeIndex
+                      ? 'ring-2 ring-primary-500 scale-98 shadow-md'
+                      : 'opacity-70 hover:opacity-100 hover:scale-[1.02]'
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`${title} - Miniatura ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                  {idx === activeIndex && (
+                    <div className="absolute inset-0 bg-primary-500/10 border-2 border-primary-500 rounded-xl" />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
