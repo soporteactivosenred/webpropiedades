@@ -9,6 +9,7 @@ import { formatPrice, formatArea, formatDate } from '@/lib';
 import { PROPERTY_TYPES_LABELS, PRICE_TYPE_LABELS, STATUS_LABELS } from '@/types';
 import { PropertyContactForm } from './PropertyContactForm';
 import { SchemaOrg } from '@/components/seo/SchemaOrg';
+import { PropertyGallery } from '@/components/properties';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -124,34 +125,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         {/* Image Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {property.images && property.images.length > 0 ? (
-            <>
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200">
-                <Image
-                  src={property.images[0]}
-                  alt={property.title}
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              {property.images.length > 1 && (
-                <div className="grid grid-cols-2 gap-4">
-                  {property.images.slice(1, 5).map((img: any, i: any) => (
-                    <div key={i} className="relative aspect-[4/3] rounded-xl overflow-hidden bg-gray-200">
-                      <Image src={img} alt={`${property.title} - ${i + 2}`} fill className="object-cover" />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="relative aspect-[4/3] rounded-xl bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-400">Sin imágenes disponibles</span>
-            </div>
-          )}
-        </div>
+        <PropertyGallery images={property.images || []} title={property.title} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
