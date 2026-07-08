@@ -97,6 +97,61 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    const supabase: any = createAdminBrowserClient();
+    const uploadedUrls: string[] = [];
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileExt = file.name.split('.').pop();
+      const slug = generateSlug(formData.title) || 'property';
+      const fileName = `${slug}-${Date.now()}-${i}.${fileExt}`;
+      const filePath = `images/${fileName}`;
+
+      try {
+        const { data, error: uploadErr } = await supabase.storage
+          .from('properties')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: true,
+          });
+
+        if (uploadErr) {
+          throw uploadErr;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('properties')
+          .getPublicUrl(filePath);
+
+        if (publicUrl) {
+          uploadedUrls.push(publicUrl);
+        }
+      } catch (err: any) {
+        console.error('Error uploading file:', err);
+        setUploadError(`Error al subir la imagen "${file.name}": ${err.message || err}`);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls],
+      }));
+    }
+
+    setIsUploading(false);
+    e.target.value = '';
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -373,16 +428,20 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Imágenes</h2>
         
-        <div className="mb-4">
-          <div className="flex gap-2">
-            <Input
-              label="Agregar Imagen (URL)"
-              name="newImageUrl"
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              placeholder="https://example.com/imagen.jpg"
-            />
-            <div className="flex items-end">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Opción 1: Agregar por URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Agregar Imagen por URL
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newImageUrl}
+                onChange={(e) => setNewImageUrl(e.target.value)}
+                placeholder="https://example.com/imagen.jpg"
+                className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
               <Button
                 type="button"
                 variant="secondary"
@@ -392,7 +451,46 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
               </Button>
             </div>
           </div>
+
+          {/* Opción 2: Subir archivos */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Subir desde tu dispositivo (Supabase Storage)
+            </label>
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-primary-500 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6 px-4 text-center">
+                  <svg className="w-8.h-8 mb-2 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16" width="32" height="32">
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                  </svg>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="font-semibold text-primary-600 dark:text-primary-400">Haz clic para subir</span> o arrastra tus imágenes
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  disabled={isUploading}
+                />
+              </label>
+            </div>
+          </div>
         </div>
+
+        {isUploading && (
+          <div className="text-sm text-primary-600 dark:text-primary-400 mb-4 animate-pulse">
+            Subiendo imágenes, por favor espera...
+          </div>
+        )}
+
+        {uploadError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg text-sm mb-4">
+            {uploadError}
+          </div>
+        )}
 
         {formData.images.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
