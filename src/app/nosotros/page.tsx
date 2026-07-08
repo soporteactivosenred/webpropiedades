@@ -4,7 +4,7 @@ import { DEFAULT_SETTINGS } from '@/types';
 
 const stats = [
   { number: '500+', label: 'Propiedades vendidas' },
-  { number: '15+', label: 'Años de experiencia' },
+  { number: 'Desde 2009', label: 'Trayectoria' },
   { number: '98%', label: 'Clientes satisfechos' },
   { number: '50+', label: 'Propiedades activas' },
 ];
@@ -55,7 +55,7 @@ const team = [
 
 export const metadata = {
   title: 'Nosotros',
-  description: 'Conoce al equipo de Activos en Red. Más de 15 años ayudando a familias a encontrar su hogar ideal en Chile.',
+  description: 'Conoce al equipo de Activos en Red. Ayudando desde el año 2009 a familias a encontrar su hogar ideal en Chile.',
 };
 
 export default function AboutPage() {
@@ -69,7 +69,7 @@ export default function AboutPage() {
               Tu hogar, nuestra pasión
             </h1>
             <p className="mt-6 text-xl text-primary-100">
-              En Activos en Red llevamos más de 15 años ayudando a familias a encontrar 
+              En Activos en Red ayudamos desde el año 2009 a familias a encontrar 
               su lugar perfecto. Somos una inmobiliaria comprometida con la excelencia y 
               el bienestar de nuestros clientes.
             </p>
