@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
 import { Input } from '@/components/ui';
