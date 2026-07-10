@@ -183,7 +183,7 @@ export function Hero() {
               Acceda a carteras exclusivas de activos adjudicados, remates institucionales y oportunidades en liquidación bancaria con descuentos de hasta un 30% bajo el valor de mercado. Todo respaldado por tecnología avanzada y un riguroso blindaje legal previo.
             </p>
             <a
-              href="/propiedades?filter=inversion"
+              href="/oportunidades-inversion"
               className="mt-6 inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-accent-500 text-white hover:text-primary-950 font-bold px-6 py-3 md:px-8 md:py-3.5 rounded-full text-xs md:text-sm uppercase tracking-wide transition-all shadow-xl active:scale-95 w-full sm:w-auto"
             >
               <span>Ver Oportunidades de Inversión</span>

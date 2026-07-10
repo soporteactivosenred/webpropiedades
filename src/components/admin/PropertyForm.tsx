@@ -76,6 +76,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     price_type: property?.price_type || 'sale',
     property_type: property?.property_type || 'house',
     status: property?.status || 'draft',
+    is_bank_liquidation: (property as any)?.is_bank_liquidation || false,
     address: property?.address || '',
     city: property?.city || '',
     region: property?.region || '',
@@ -211,6 +212,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         description: formData.description,
         features: formData.features,
         images: formData.images,
+        is_bank_liquidation: formData.is_bank_liquidation,
       };
 
       let result;
@@ -300,6 +302,26 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             onChange={handleChange}
             options={STATUS_OPTIONS}
           />
+
+          <div className="md:col-span-2 flex items-center mt-2">
+            <label className="flex items-center gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="is_bank_liquidation"
+                checked={formData.is_bank_liquidation}
+                onChange={(e) => setFormData(prev => ({ ...prev, is_bank_liquidation: e.target.checked }))}
+                className="w-5 h-5 text-primary-600 rounded border-gray-300 dark:border-gray-600 focus:ring-primary-500 cursor-pointer"
+              />
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                  Marcar como Liquidación Bancaria / Adjudicado
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  Esta propiedad aparecerá en la sección destacada de oportunidades de inversión.
+                </span>
+              </div>
+            </label>
+          </div>
         </div>
       </div>
 

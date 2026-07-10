@@ -28,6 +28,7 @@ export interface PropertyFilters {
   min_area?: number;
   features?: string[];
   filter?: string;
+  is_bank_liquidation?: boolean;
 }
 
 export interface PropertyCardProps {

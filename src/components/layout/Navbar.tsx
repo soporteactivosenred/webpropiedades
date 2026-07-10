@@ -87,15 +87,21 @@ function Navbar() {
                   >
                     Arriendos
                   </Link>
+                  <Link
+                    href="/oportunidades-inversion"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors font-medium border-t border-gray-50 mt-1 pt-2"
+                  >
+                    Oportunidades de Inversión
+                  </Link>
                 </div>
               </div>
 
               {/* Oportunidades de Inversión (Highlighted Link) */}
               <Link
-                href="/propiedades?filter=inversion"
+                href="/oportunidades-inversion"
                 className={cn(
                   'text-xs font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border transition-all duration-300 shadow-sm shrink-0',
-                  pathname === '/propiedades' && pathname.includes('filter=inversion')
+                  pathname === '/oportunidades-inversion'
                     ? 'bg-amber-100 text-amber-800 border-amber-300 scale-95'
                     : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300 hover:scale-102 hover:shadow-md'
                 )}
@@ -115,7 +121,7 @@ function Navbar() {
                 </button>
                 <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                   <Link
-                    href="/contacto?subject=Inversion%20y%20Liquidaciones%20Bancarias"
+                    href="/oportunidades-inversion"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
                   >
                     Inversión y Liquidaciones Bancarias
@@ -221,13 +227,20 @@ function Navbar() {
                     >
                       Arriendos
                     </Link>
+                    <Link
+                      href="/oportunidades-inversion"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors font-medium"
+                    >
+                      Oportunidades de Inversión
+                    </Link>
                   </div>
                 )}
               </div>
 
               {/* Oportunidades de Inversión */}
               <Link
-                href="/propiedades?filter=inversion"
+                href="/oportunidades-inversion"
                 onClick={() => setIsOpen(false)}
                 className="block px-6 py-4 text-sm font-bold text-amber-700 hover:bg-amber-50/50 border-b border-gray-100 transition-colors bg-amber-50/30"
               >
@@ -246,7 +259,7 @@ function Navbar() {
                 {isMobileServiciosOpen && (
                   <div className="bg-gray-50/50 py-1 border-t border-gray-100 animate-slide-down">
                     <Link
-                      href="/contacto?subject=Inversion%20y%20Liquidaciones%20Bancarias"
+                      href="/oportunidades-inversion"
                       onClick={() => setIsOpen(false)}
                       className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors"
                     >

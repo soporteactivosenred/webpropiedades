@@ -67,6 +67,7 @@ export interface Database {
           year_built: number | null;
           agent_id: string | null;
           views: number;
+          is_bank_liquidation: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -93,6 +94,7 @@ export interface Database {
           year_built?: number | null;
           agent_id?: string | null;
           views?: number;
+          is_bank_liquidation?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -119,6 +121,7 @@ export interface Database {
           year_built?: number | null;
           agent_id?: string | null;
           views?: number;
+          is_bank_liquidation?: boolean;
           created_at?: string;
           updated_at?: string;
         };

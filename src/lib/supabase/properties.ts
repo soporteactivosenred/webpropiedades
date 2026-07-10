@@ -38,6 +38,9 @@ export async function getProperties(
   if (filters?.filter === 'inversion') {
     query = query.or('description.ilike.%liquidación%,description.ilike.%liquidacion%,description.ilike.%inversión%,description.ilike.%inversion%,description.ilike.%adjudicado%,description.ilike.%remate%,title.ilike.%liquidación%,title.ilike.%liquidacion%,title.ilike.%inversión%,title.ilike.%inversion%,title.ilike.%adjudicado%,title.ilike.%remate%');
   }
+  if (filters?.is_bank_liquidation) {
+    query = query.or('is_bank_liquidation.eq.true,description.ilike.%liquidación%,description.ilike.%liquidacion%,description.ilike.%inversión%,description.ilike.%inversion%,description.ilike.%adjudicado%,description.ilike.%remate%,title.ilike.%liquidación%,title.ilike.%liquidacion%,title.ilike.%inversión%,title.ilike.%inversion%,title.ilike.%adjudicado%,title.ilike.%remate%');
+  }
   if (filters?.region) {
     query = query.ilike('region', `%${filters.region}%`);
   }
