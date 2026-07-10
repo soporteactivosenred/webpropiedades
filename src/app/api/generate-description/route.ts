@@ -70,28 +70,48 @@ ${propertyInfo}
 
 Genera únicamente el texto de la descripción comercial en español de manera directa. No incluyas explicaciones de tu lógica de redacción, ni saludos ni notas del sistema fuera de la descripción publicitaria.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+    // Try models in order of preference
+    const modelsToTry = [
+      'gemini-2.0-flash',
+      'gemini-pro',
+      'gemini-1.0-pro',
+    ];
 
-    if (!response.ok) {
+    let response: Response | null = null;
+    let usedModel = '';
+
+    for (const model of modelsToTry) {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+          }),
+        }
+      );
+
+      if (res.ok) {
+        response = res;
+        usedModel = model;
+        break;
+      }
+
+      // Log but keep trying next model
+      const errBody = await res.json().catch(() => ({}));
+      console.warn(`Model ${model} failed (${res.status}):`, JSON.stringify(errBody));
+      response = res; // keep last response for error reporting
+    }
+
+    if (!response || !response.ok) {
+      if (!response) {
+        return NextResponse.json(
+          { error: 'No se pudo conectar con la API de Gemini. Ningún modelo respondió.' },
+          { status: 502 }
+        );
+      }
+
       const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
       console.error('Error llamando a Gemini API:', JSON.stringify(errorData));
 
