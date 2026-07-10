@@ -59,10 +59,17 @@ export async function POST(req: Request) {
 Genera una descripción publicitaria muy atractiva, persuasiva, elegante y optimizada para la venta o arriendo de una propiedad.
 El texto debe sonar natural, entusiasta y sumamente profesional, destacando los puntos fuertes de la propiedad para enganchar al potencial comprador o arrendatario.
 
+REGLAS IMPORTANTES DE FORMATO:
+- NO uses formato Markdown bajo ninguna circunstancia.
+- NO uses asteriscos (*), doble asterisco (**), almohadillas (#) ni ningún símbolo de Markdown.
+- Para los listados usa guiones simples (-) al inicio de cada ítem.
+- Escribe el encabezado como texto normal en la primera línea, sin símbolos.
+- El texto debe estar listo para pegarse directamente en un formulario de texto plano.
+
 Estructura sugerida de la redacción:
 1. Un encabezado o gancho inicial muy llamativo (que no repita exactamente el título de la ficha).
 2. Un párrafo introductorio fluido sobre el estilo de vida, comodidad o la excelente ubicación/conectividad de la propiedad.
-3. Un listado detallado (con viñetas limpias) agrupando las características del inmueble (distribución interior, estacionamiento, bodega, piscina, etc.) y atributos del entorno.
+3. Un listado detallado con guiones (-) agrupando las características del inmueble (distribución interior, estacionamiento, bodega, piscina, etc.) y atributos del entorno.
 4. Un cierre persuasivo con llamada a la acción clara para coordinar visitas.
 
 Datos técnicos del inmueble:
@@ -132,8 +139,16 @@ Genera únicamente el texto de la descripción comercial en español de manera d
     }
 
     const data = await successResponse.json();
-    const suggestedText =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const rawText: string = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Strip any markdown formatting the model might still include
+    const suggestedText = rawText
+      .replace(/\*\*(.+?)\*\*/g, '$1')   // **bold** → plain
+      .replace(/\*(.+?)\*/g, '$1')         // *italic* → plain
+      .replace(/^#{1,6}\s*/gm, '')          // # headings → plain
+      .replace(/^\*\s+/gm, '- ')           // * bullet → - bullet
+      .replace(/^\s*[-•]\s/gm, '- ')       // normalize bullets
+      .trim();
 
     return NextResponse.json({ suggestion: suggestedText });
   } catch (error: any) {
