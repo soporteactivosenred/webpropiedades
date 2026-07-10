@@ -92,10 +92,17 @@ Genera únicamente el texto de la descripción comercial en español de manera d
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Error llamando a Gemini API:', errorData);
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      console.error('Error llamando a Gemini API:', JSON.stringify(errorData));
+
+      const geminiMessage =
+        errorData?.error?.message ||
+        errorData?.error?.status ||
+        JSON.stringify(errorData) ||
+        'Error desconocido de la API de Gemini.';
+
       return NextResponse.json(
-        { error: 'Error al comunicarse con el motor de IA de Gemini. Verifica la API Key.' },
+        { error: `Error Gemini API (HTTP ${response.status}): ${geminiMessage}` },
         { status: 502 }
       );
     }
