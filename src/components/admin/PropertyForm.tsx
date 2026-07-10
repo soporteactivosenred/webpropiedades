@@ -7,6 +7,8 @@ import { Input } from '@/components/ui';
 import { Select } from '@/components/ui';
 import { TextArea } from '@/components/ui';
 import { Button } from '@/components/ui';
+import { Sparkles, Copy, Check, Wand2 } from 'lucide-react';
+import { cn } from '@/lib';
 import type { Database } from '@/types';
 
 type Property = Database['public']['Tables']['properties']['Row'];
@@ -100,6 +102,75 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
   const [newImageUrl, setNewImageUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Gemini state variables
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [aiSuggestedDescription, setAiSuggestedDescription] = useState<string | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleGenerateAIDescription = async () => {
+    if (!formData.title) {
+      setAiError('Por favor ingresa al menos un título para la propiedad antes de generar la sugerencia.');
+      return;
+    }
+
+    setIsGeneratingDescription(true);
+    setAiError(null);
+    setAiSuggestedDescription(null);
+
+    try {
+      const response = await fetch('/api/generate-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          price: formData.price ? parseFloat(formData.price) : 0,
+          price_type: formData.price_type,
+          property_type: formData.property_type,
+          address: formData.address,
+          city: formData.city,
+          region: formData.region,
+          bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
+          bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
+          area: formData.area ? parseFloat(formData.area) : null,
+          features: formData.features,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al generar la descripción.');
+      }
+
+      setAiSuggestedDescription(data.suggestion);
+    } catch (err: any) {
+      console.error(err);
+      setAiError(err.message || 'Ocurrió un error al contactar al servicio de inteligencia artificial.');
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
+
+  const handleApplySuggestion = () => {
+    if (aiSuggestedDescription) {
+      setFormData(prev => ({ ...prev, description: aiSuggestedDescription }));
+    }
+  };
+
+  const handleCopySuggestion = async () => {
+    if (aiSuggestedDescription) {
+      try {
+        await navigator.clipboard.writeText(aiSuggestedDescription);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } catch (err) {
+        console.error('Failed to copy text: ', err);
+      }
+    }
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -434,16 +505,98 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
 
       {/* Description Section */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Descripción</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Descripción</h2>
+          
+          <button
+            type="button"
+            disabled={isGeneratingDescription}
+            onClick={handleGenerateAIDescription}
+            className={cn(
+              "inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg border transition-all shadow-sm active:scale-95",
+              isGeneratingDescription
+                ? "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400 cursor-not-allowed"
+                : "bg-primary-50 border-primary-200 text-primary-700 hover:bg-primary-100 hover:border-primary-300 dark:bg-primary-950/20 dark:border-primary-900 dark:text-primary-300 dark:hover:bg-primary-900/30"
+            )}
+          >
+            {isGeneratingDescription ? (
+              <>
+                <div className="w-3.5 h-3.5 border-2 border-primary-600 dark:border-primary-400 border-t-transparent rounded-full animate-spin"></div>
+                <span>Redactando con IA...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-3.5 h-3.5 text-primary-600 dark:text-primary-400" />
+                <span>Redactar descripción con IA (Gemini)</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {aiError && (
+          <div className="mb-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 px-4 py-2.5 rounded-lg text-xs flex items-center justify-between">
+            <span>{aiError}</span>
+            <button type="button" onClick={() => setAiError(null)} className="text-red-500 hover:text-red-700 font-bold ml-2">✕</button>
+          </div>
+        )}
         
-        <TextArea
-          label="Descripción Detallada"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Describe las características, ventajas y detalles importantes de la propiedad..."
-          rows={6}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="flex flex-col">
+            <TextArea
+              label="Cuerpo de la Descripción"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Describe las características, ventajas y detalles importantes de la propiedad..."
+              rows={12}
+            />
+          </div>
+
+          <div className="flex flex-col border border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-5 bg-gray-50/50 dark:bg-gray-900/30">
+            <div className="flex items-center justify-between mb-3 border-b border-gray-100 dark:border-gray-800 pb-2.5">
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                <Wand2 className="w-3.5 h-3.5 text-accent-500 animate-pulse" />
+                Sugerencia Publicitaria (IA Gemini)
+              </span>
+              {aiSuggestedDescription && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopySuggestion}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 transition-colors shadow-sm"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3 h-3 text-green-500" />
+                        <span className="text-green-600">Copiado</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        <span>Copiar</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleApplySuggestion}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-md bg-accent-500 hover:bg-accent-600 text-white transition-colors shadow-sm"
+                  >
+                    <span>Usar Texto</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto max-h-[280px] text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line font-mono bg-white/70 dark:bg-gray-800/40 p-3 rounded-lg border border-gray-100 dark:border-gray-800 select-all">
+              {aiSuggestedDescription || (
+                <span className="text-gray-400 italic">
+                  Completa los datos de la propiedad (título, precio, ubicación, etc.) y haz clic en "Redactar descripción con IA" para recibir una sugerencia de copy publicitario optimizada por Gemini.
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Images Section */}
