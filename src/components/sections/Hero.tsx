@@ -171,7 +171,7 @@ export function Hero() {
             <div className="absolute inset-0 bg-primary-950/85"></div>
           </div>
 
-          <div className="max-w-2xl text-center md:text-left mx-auto lg:mx-0 relative z-10">
+          <div className="max-w-2xl lg:max-w-[48%] text-center md:text-left mx-auto lg:mx-0 relative z-10">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white leading-tight uppercase tracking-tight shadow-sm">
               La evolución de la
               <br />
@@ -184,7 +184,7 @@ export function Hero() {
             </p>
             <a
               href="/propiedades?filter=inversion"
-              className="mt-6 inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-bold px-6 py-3 md:px-8 md:py-3.5 rounded-full text-xs md:text-sm uppercase tracking-wide transition-all shadow-xl active:scale-95 w-full sm:w-auto"
+              className="mt-6 inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-accent-500 text-white hover:text-primary-950 font-bold px-6 py-3 md:px-8 md:py-3.5 rounded-full text-xs md:text-sm uppercase tracking-wide transition-all shadow-xl active:scale-95 w-full sm:w-auto"
             >
               <span>Ver Oportunidades de Inversión</span>
               <span className="text-base">→</span>
