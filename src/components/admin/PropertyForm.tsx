@@ -263,7 +263,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
 
     try {
       const supabase: any = createAdminBrowserClient();
-      const slug = generateSlug(formData.title);
+      const slug = isEditing && property ? property.slug : generateSlug(formData.title);
 
       const propertyData = {
         title: formData.title,
