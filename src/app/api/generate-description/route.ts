@@ -70,19 +70,23 @@ ${propertyInfo}
 
 Genera únicamente el texto de la descripción comercial en español de manera directa. No incluyas explicaciones de tu lógica de redacción, ni saludos ni notas del sistema fuera de la descripción publicitaria.`;
 
-    // Try models in order of preference
-    const modelsToTry = [
-      'gemini-2.0-flash',
-      'gemini-pro',
-      'gemini-1.0-pro',
+    // Try models in order of preference across both API versions
+    const attemptsToTry = [
+      { version: 'v1beta', model: 'gemini-2.0-flash' },
+      { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
+      { version: 'v1beta', model: 'gemini-1.5-pro-latest' },
+      { version: 'v1beta', model: 'gemini-pro' },
+      { version: 'v1',     model: 'gemini-pro' },
+      { version: 'v1',     model: 'gemini-1.5-flash' },
     ];
 
-    let response: Response | null = null;
-    let usedModel = '';
+    let successResponse: Response | null = null;
+    let lastErrorStatus = 502;
+    let lastErrorMessage = 'Todos los modelos de Gemini fallaron. Verifica que la API Key esté activa y tenga acceso a la API de Generative Language.';
 
-    for (const model of modelsToTry) {
+    for (const { version, model } of attemptsToTry) {
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -93,41 +97,24 @@ Genera únicamente el texto de la descripción comercial en español de manera d
       );
 
       if (res.ok) {
-        response = res;
-        usedModel = model;
+        successResponse = res;
+        console.log(`Gemini OK using model: ${version}/${model}`);
         break;
       }
 
-      // Log but keep trying next model
+      // Read and store error details (body can only be read once per response)
       const errBody = await res.json().catch(() => ({}));
-      console.warn(`Model ${model} failed (${res.status}):`, JSON.stringify(errBody));
-      response = res; // keep last response for error reporting
+      const errMsg = errBody?.error?.message || errBody?.error?.status || JSON.stringify(errBody);
+      console.warn(`[${version}/${model}] failed (${res.status}): ${errMsg}`);
+      lastErrorStatus = res.status;
+      lastErrorMessage = `Error Gemini API (HTTP ${res.status}, modelo ${model}): ${errMsg}`;
     }
 
-    if (!response || !response.ok) {
-      if (!response) {
-        return NextResponse.json(
-          { error: 'No se pudo conectar con la API de Gemini. Ningún modelo respondió.' },
-          { status: 502 }
-        );
-      }
-
-      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-      console.error('Error llamando a Gemini API:', JSON.stringify(errorData));
-
-      const geminiMessage =
-        errorData?.error?.message ||
-        errorData?.error?.status ||
-        JSON.stringify(errorData) ||
-        'Error desconocido de la API de Gemini.';
-
-      return NextResponse.json(
-        { error: `Error Gemini API (HTTP ${response.status}): ${geminiMessage}` },
-        { status: 502 }
-      );
+    if (!successResponse) {
+      return NextResponse.json({ error: lastErrorMessage }, { status: lastErrorStatus });
     }
 
-    const data = await response.json();
+    const data = await successResponse.json();
     const suggestedText =
       data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
