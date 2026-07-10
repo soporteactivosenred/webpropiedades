@@ -70,14 +70,11 @@ ${propertyInfo}
 
 Genera únicamente el texto de la descripción comercial en español de manera directa. No incluyas explicaciones de tu lógica de redacción, ni saludos ni notas del sistema fuera de la descripción publicitaria.`;
 
-    // Try models in order of preference across both API versions
+    // Models confirmed available via /api/admin/gemini-diagnostic
     const attemptsToTry = [
+      { version: 'v1beta', model: 'gemini-2.5-flash' },
       { version: 'v1beta', model: 'gemini-2.0-flash' },
-      { version: 'v1beta', model: 'gemini-1.5-flash-latest' },
-      { version: 'v1beta', model: 'gemini-1.5-pro-latest' },
-      { version: 'v1beta', model: 'gemini-pro' },
-      { version: 'v1',     model: 'gemini-pro' },
-      { version: 'v1',     model: 'gemini-1.5-flash' },
+      { version: 'v1beta', model: 'gemini-3.5-flash' },
     ];
 
     let successResponse: Response | null = null;
