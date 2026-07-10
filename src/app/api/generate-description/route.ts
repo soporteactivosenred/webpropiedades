@@ -71,40 +71,60 @@ ${propertyInfo}
 Genera únicamente el texto de la descripción comercial en español de manera directa. No incluyas explicaciones de tu lógica de redacción, ni saludos ni notas del sistema fuera de la descripción publicitaria.`;
 
     // Models confirmed available via /api/admin/gemini-diagnostic
+    // Ordered: most capable first, lighter models as fallback
     const attemptsToTry = [
       { version: 'v1beta', model: 'gemini-2.5-flash' },
       { version: 'v1beta', model: 'gemini-2.0-flash' },
+      { version: 'v1beta', model: 'gemini-2.0-flash-lite' },
+      { version: 'v1beta', model: 'gemini-2.0-flash-001' },
+      { version: 'v1beta', model: 'gemini-2.0-flash-lite-001' },
+      { version: 'v1beta', model: 'gemini-flash-latest' },
+      { version: 'v1beta', model: 'gemini-flash-lite-latest' },
       { version: 'v1beta', model: 'gemini-3.5-flash' },
     ];
 
     let successResponse: Response | null = null;
     let lastErrorStatus = 502;
-    let lastErrorMessage = 'Todos los modelos de Gemini fallaron. Verifica que la API Key esté activa y tenga acceso a la API de Generative Language.';
+    let lastErrorMessage = 'Todos los modelos de Gemini fallaron.';
+    let allOverloaded = true;
 
     for (const { version, model } of attemptsToTry) {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-          }),
-        }
-      );
+      // Retry up to 2 times per model on 503
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const res = await fetch(
+          `https://generativelanguage.googleapis.com/${version}/models/${model}:generateContent?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+            }),
+          }
+        );
 
-      if (res.ok) {
-        successResponse = res;
-        console.log(`Gemini OK using model: ${version}/${model}`);
-        break;
+        if (res.ok) {
+          successResponse = res;
+          console.log(`Gemini OK using model: ${version}/${model}`);
+          break;
+        }
+
+        const errBody = await res.json().catch(() => ({}));
+        const errMsg = errBody?.error?.message || errBody?.error?.status || JSON.stringify(errBody);
+        console.warn(`[${version}/${model}] attempt ${attempt + 1} failed (${res.status}): ${errMsg}`);
+        lastErrorStatus = res.status;
+
+        if (res.status === 503) {
+          // Model overloaded — wait briefly before retry or next model
+          lastErrorMessage = 'Los modelos de IA están con alta demanda en este momento. Por favor intenta nuevamente en unos segundos.';
+          if (attempt === 0) await new Promise(r => setTimeout(r, 800));
+        } else {
+          allOverloaded = false;
+          lastErrorMessage = `Error Gemini API (HTTP ${res.status}, modelo ${model}): ${errMsg}`;
+          break; // Non-503 error, no point retrying this model
+        }
       }
 
-      // Read and store error details (body can only be read once per response)
-      const errBody = await res.json().catch(() => ({}));
-      const errMsg = errBody?.error?.message || errBody?.error?.status || JSON.stringify(errBody);
-      console.warn(`[${version}/${model}] failed (${res.status}): ${errMsg}`);
-      lastErrorStatus = res.status;
-      lastErrorMessage = `Error Gemini API (HTTP ${res.status}, modelo ${model}): ${errMsg}`;
+      if (successResponse) break;
     }
 
     if (!successResponse) {
