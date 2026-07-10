@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No tienes permisos de administrador.' }, { status: 403 });
     }
 
-    const { email, password, full_name, phone, role } = await req.json();
+    const { email, password, full_name, phone, role, avatar_url } = await req.json();
 
     if (!email || !password || !full_name || !role) {
       return NextResponse.json({ error: 'Faltan campos obligatorios' }, { status: 400 });
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     if (!serviceKey) {
       return NextResponse.json(
         { error: 'La clave secreta SUPABASE_SERVICE_ROLE_KEY no está configurada en el servidor. Por favor configúrala.' },
-        { status: 500 }
+        { status: 550 }
       );
     }
 
@@ -71,6 +71,7 @@ export async function POST(req: Request) {
         email,
         full_name,
         phone: phone || null,
+        avatar_url: avatar_url || null,
         role: role as 'admin' | 'agent' | 'user',
         updated_at: new Date().toISOString(),
       });

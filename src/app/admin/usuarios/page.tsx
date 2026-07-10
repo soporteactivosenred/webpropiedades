@@ -26,7 +26,11 @@ export default function AdminUsersPage() {
     full_name: '',
     phone: '',
     role: 'agent',
+    avatar_url: '',
   });
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUserAndProfiles();
@@ -83,6 +87,61 @@ export default function AdminUsersPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    const file = files[0];
+    
+    // Validate image format
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Por favor selecciona un archivo de imagen válido.');
+      setIsUploading(false);
+      return;
+    }
+
+    // Validate size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError('La imagen debe pesar menos de 2MB.');
+      setIsUploading(false);
+      return;
+    }
+
+    const supabase = createAdminBrowserClient() as any;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `avatar-${Date.now()}.${fileExt}`;
+    const filePath = `avatars/${fileName}`;
+
+    try {
+      const { data, error: uploadErr } = await supabase.storage
+        .from('properties')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+
+      if (uploadErr) {
+        throw uploadErr;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('properties')
+        .getPublicUrl(filePath);
+
+      if (publicUrl) {
+        setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
+      }
+    } catch (err: any) {
+      console.error('Error uploading avatar:', err);
+      setUploadError(`Error al subir la imagen: ${err.message || err}`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setModalLoading(true);
@@ -112,7 +171,9 @@ export default function AdminUsersPage() {
         full_name: '',
         phone: '',
         role: 'agent',
+        avatar_url: '',
       });
+      setUploadError(null);
     } catch (err: any) {
       setModalError(err.message || 'Ocurrió un error inesperado.');
     } finally {
@@ -213,8 +274,16 @@ export default function AdminUsersPage() {
                 profiles.map((profile) => (
                   <tr key={profile.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">
-                        {profile.full_name?.substring(0, 2).toUpperCase() || 'U'}
+                      <div className="w-9 h-9 rounded-full overflow-hidden bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm flex-shrink-0 border border-gray-100">
+                        {profile.avatar_url ? (
+                          <img
+                            src={profile.avatar_url}
+                            alt={profile.full_name || 'Avatar'}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          profile.full_name?.substring(0, 2).toUpperCase() || 'U'
+                        )}
                       </div>
                       <div>
                         <p className="font-semibold text-gray-900">{profile.full_name}</p>
@@ -289,6 +358,33 @@ export default function AdminUsersPage() {
                     {modalError}
                   </div>
                 )}
+
+                {/* Avatar File Upload */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Foto de Perfil (Agente)
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-105 border border-gray-200 flex items-center justify-center text-gray-400 flex-shrink-0">
+                      {formData.avatar_url ? (
+                        <img src={formData.avatar_url} alt="Avatar Preview" className="w-full h-full object-cover" />
+                      ) : (
+                        <User className="w-7 h-7 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarUpload}
+                        disabled={isUploading}
+                        className="block w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                      />
+                      {isUploading && <p className="text-xs text-blue-500">Subiendo foto...</p>}
+                      {uploadError && <p className="text-xs text-red-500">{uploadError}</p>}
+                    </div>
+                  </div>
+                </div>
 
                 {/* Full Name */}
                 <div className="space-y-1">

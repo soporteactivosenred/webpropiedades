@@ -41,7 +41,10 @@ export function PropertyCard({ property, featured = false, compact = false }: Pr
               src={property.images[0]}
               alt={property.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className={cn(
+                "object-cover transition-transform duration-300 group-hover:scale-105",
+                (property.status === 'sold' || property.status === 'rented') && "opacity-60 grayscale-[35%]"
+              )}
               sizes={featured ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 640px) 50vw, 100vw'}
             />
           ) : (
@@ -52,12 +55,22 @@ export function PropertyCard({ property, featured = false, compact = false }: Pr
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-            <span className="px-2 py-1 text-xs font-medium bg-primary-600 text-white rounded">
+            <span className="px-2 py-1 text-xs font-medium bg-primary-600 text-white rounded shadow-sm">
               {priceLabel}
             </span>
             {featured && (
-              <span className="px-2 py-1 text-xs font-medium bg-accent-500 text-white rounded">
+              <span className="px-2 py-1 text-xs font-medium bg-accent-500 text-white rounded shadow-sm">
                 Destacada
+              </span>
+            )}
+            {property.status === 'sold' && (
+              <span className="px-2 py-1 text-xs font-semibold bg-red-600 text-white rounded shadow-sm">
+                Vendida
+              </span>
+            )}
+            {property.status === 'rented' && (
+              <span className="px-2 py-1 text-xs font-semibold bg-amber-500 text-white rounded shadow-sm">
+                Arrendada
               </span>
             )}
           </div>
