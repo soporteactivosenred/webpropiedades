@@ -209,6 +209,53 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     }
   };
 
+  // Applies the company logo as a centered, semi-transparent watermark
+  const applyWatermark = (file: File): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const logo = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        logo.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { resolve(file); return; }
+
+          // Draw original image
+          ctx.drawImage(img, 0, 0);
+
+          // Scale logo to 30% of image width
+          const logoWidth = img.width * 0.30;
+          const scale = logoWidth / logo.width;
+          const logoHeight = logo.height * scale;
+
+          // Center the logo
+          const x = (img.width - logoWidth) / 2;
+          const y = (img.height - logoHeight) / 2;
+
+          // Draw logo with 35% opacity
+          ctx.globalAlpha = 0.35;
+          ctx.drawImage(logo, x, y, logoWidth, logoHeight);
+          ctx.globalAlpha = 1.0;
+
+          URL.revokeObjectURL(objectUrl);
+          canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Canvas toBlob failed'));
+          }, file.type || 'image/jpeg', 0.92);
+        };
+        logo.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(file); }; // skip watermark on error
+        logo.crossOrigin = 'anonymous';
+        logo.src = '/logo.png';
+      };
+      img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error('Could not load image')); };
+      img.src = objectUrl;
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
@@ -227,11 +274,15 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       const filePath = `images/${fileName}`;
 
       try {
+        // Apply watermark before uploading
+        const watermarkedBlob = await applyWatermark(file);
+
         const { data, error: uploadErr } = await supabase.storage
           .from('properties')
-          .upload(filePath, file, {
+          .upload(filePath, watermarkedBlob, {
             cacheControl: '3600',
             upsert: true,
+            contentType: file.type || 'image/jpeg',
           });
 
         if (uploadErr) {
