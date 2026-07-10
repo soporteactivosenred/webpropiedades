@@ -27,6 +27,7 @@ export interface PropertyFilters {
   min_bathrooms?: number;
   min_area?: number;
   features?: string[];
+  filter?: string;
 }
 
 export interface PropertyCardProps {

@@ -171,20 +171,22 @@ export function Hero() {
             <div className="absolute inset-0 bg-primary-950/85"></div>
           </div>
 
-          <div className="max-w-xl text-center md:text-left mx-auto lg:mx-0 relative z-10">
+          <div className="max-w-2xl text-center md:text-left mx-auto lg:mx-0 relative z-10">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight uppercase tracking-tight shadow-sm">
-              La evolución
+              La evolución de la
               <br />
-              <span className="text-accent-500 drop-shadow-md">del mercado inmobiliario</span>
+              <span className="text-accent-500 drop-shadow-md">inversión inmobiliaria</span>
+              <br />
+              en Chile.
             </h1>
             <p className="mt-6 text-lg md:text-xl text-gray-200 leading-relaxed drop-shadow-md">
-              Accede a las mejores oportunidades de inversión y liquidación bancaria con el respaldo de nuestra trayectoria y tecnología avanzada.
+              Acceda a carteras exclusivas de activos adjudicados, remates institucionales y oportunidades en liquidación bancaria con descuentos de hasta un 30% bajo el valor de mercado. Todo respaldado por tecnología avanzada y un riguroso blindaje legal previo.
             </p>
             <a
-              href="/propiedades"
-              className="lg:hidden mt-8 inline-flex items-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-bold px-8 py-4 rounded-full text-base uppercase tracking-wide transition-all shadow-xl active:scale-95"
+              href="/propiedades?filter=inversion"
+              className="mt-8 inline-flex items-center justify-center gap-2 bg-primary-600 hover:bg-accent-500 text-white font-bold px-8 py-4 rounded-full text-sm md:text-base uppercase tracking-wide transition-all shadow-xl active:scale-95 w-full sm:w-auto"
             >
-              Ver propiedades
+              Ver Oportunidades de Inversión
               <span className="text-lg">→</span>
             </a>
           </div>

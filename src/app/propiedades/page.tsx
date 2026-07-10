@@ -13,6 +13,7 @@ interface Props {
     property_type?: string;
     city?: string;
     page?: string;
+    filter?: string;
   }>;
 }
 
@@ -31,6 +32,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
   if (params.type) filters.price_type = params.type as 'sale' | 'rent';
   if (params.property_type) filters.property_type = params.property_type as 'house' | 'apartment' | 'land' | 'commercial' | 'office' | 'industrial';
   if (params.city) filters.city = params.city;
+  if (params.filter) filters.filter = params.filter;
 
   // Fetch properties and cities
   const [{ data: properties, count }, { data: cities }] = await Promise.all([
@@ -46,6 +48,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
     if (params.q) urlParams.set('q', params.q);
     if (params.type) urlParams.set('type', params.type);
     if (params.property_type) urlParams.set('property_type', params.property_type);
+    if (params.filter) urlParams.set('filter', params.filter);
     urlParams.set('page', String(page));
     return `/propiedades?${urlParams.toString()}`;
   };
@@ -56,11 +59,20 @@ export default async function PropertiesPage({ searchParams }: Props) {
       <section className="bg-primary-700 py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white">
-            Encuentra tu propiedad ideal
+            {params.filter === 'inversion' 
+              ? 'Oportunidades de Inversión' 
+              : 'Encuentra tu propiedad ideal'}
           </h1>
           <p className="mt-2 text-primary-100 text-lg">
-            {count || 0} propiedades disponibles
+            {params.filter === 'inversion'
+              ? 'Cartera exclusiva de liquidaciones bancarias, activos adjudicados y remates.'
+              : `${count || 0} propiedades disponibles`}
           </p>
+          {params.filter === 'inversion' && (
+            <p className="mt-1.5 text-xs text-accent-300 font-semibold uppercase tracking-wider">
+              {count || 0} liquidaciones activas encontradas
+            </p>
+          )}
         </div>
       </section>
 
