@@ -284,9 +284,9 @@ export default async function PropertyDetailPage({ params }: Props) {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 lg:sticky lg:top-20 lg:self-start">
             {/* Contact Form */}
-            <Card className="sticky top-20">
+            <Card>
               {property.status === 'sold' || property.status === 'rented' ? (
                 <div className="text-center py-6 space-y-4">
                   <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto text-gray-500">
