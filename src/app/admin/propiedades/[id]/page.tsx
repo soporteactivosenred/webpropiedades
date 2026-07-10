@@ -20,6 +20,19 @@ export default function EditarPropiedadPage() {
     async function fetchProperty() {
       try {
         const supabase = createAdminBrowserClient();
+        
+        // Fetch current user and profile
+        const { data: { user } } = await supabase.auth.getUser();
+        let userRole = 'user';
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          userRole = profile?.role || 'user';
+        }
+
         const { data, error: fetchError } = await supabase
           .from('properties')
           .select('*')
@@ -28,6 +41,12 @@ export default function EditarPropiedadPage() {
 
         if (fetchError) {
           setError(fetchError.message);
+          return;
+        }
+
+        // Validate agent ownership
+        if (userRole === 'agent' && data.agent_id !== user?.id) {
+          setError('No tienes permisos de acceso para editar esta propiedad.');
           return;
         }
 

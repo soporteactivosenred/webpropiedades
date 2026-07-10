@@ -1,5 +1,6 @@
 import { LayoutDashboard, Building2, Users, FileText, Settings, LogOut, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { createServerClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'Panel de Administración — Activos en Red',
@@ -7,11 +8,26 @@ export const metadata = {
 };
 
 // Admin Layout with sidebar navigation
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = (await createServerClient()) as any;
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let role = 'user';
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    role = profile?.role || 'user';
+  }
+
+  const isAdmin = role === 'admin';
+
   return (
     <div className="min-h-screen bg-slate-50 text-gray-900 flex">
       {/* Sidebar */}
@@ -38,11 +54,16 @@ export default function AdminLayout({
             <AdminNavItem href="/admin/propiedades" icon={<Building2 className="w-4 h-4" />} label="Propiedades" />
             <AdminNavItem href="/admin/leads" icon={<Users className="w-4 h-4" />} label="Leads" />
             <AdminNavItem href="/admin/blog" icon={<FileText className="w-4 h-4" />} label="Blog" />
+            {isAdmin && (
+              <AdminNavItem href="/admin/usuarios" icon={<Users className="w-4 h-4" />} label="Usuarios" />
+            )}
           </div>
 
           <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold px-3 mt-6 mb-3">Sistema</p>
           <div className="space-y-0.5">
-            <AdminNavItem href="/admin/configuracion" icon={<Settings className="w-4 h-4" />} label="Configuración" />
+            {isAdmin && (
+              <AdminNavItem href="/admin/configuracion" icon={<Settings className="w-4 h-4" />} label="Configuración" />
+            )}
             <a
               href="/"
               target="_blank"

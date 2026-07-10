@@ -36,6 +36,7 @@ export default function AdminPropertiesPage() {
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<string>('');
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     fetchProperties();
@@ -45,9 +46,34 @@ export default function AdminPropertiesPage() {
     setLoading(true);
     try {
       const supabase = createAdminBrowserClient() as any;
+      
+      // Load user profile if not loaded yet
+      let profile = userProfile;
+      if (!profile) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: p } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          profile = p;
+          setUserProfile(p);
+        }
+      }
+
       let query = supabase.from('properties').select('*').order('created_at', { ascending: false });
       if (statusFilter) query = query.eq('status', statusFilter);
       if (typeFilter) query = query.eq('property_type', typeFilter);
+
+      // Filter by agent_id if role is agent
+      if (profile?.role === 'agent') {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          query = query.eq('agent_id', user.id);
+        }
+      }
+
       const { data, error: fetchError } = await query;
       if (fetchError) { setError(fetchError.message); return; }
       setProperties(data || []);

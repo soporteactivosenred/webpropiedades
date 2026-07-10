@@ -95,6 +95,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     meta_title: '',
     meta_description: '',
     seo_keywords: '',
+    agent_id: (property as any)?.agent_id || '',
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -108,6 +109,42 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
   const [aiSuggestedDescription, setAiSuggestedDescription] = useState<string | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // User management states
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [agents, setAgents] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadUserAndAgents() {
+      try {
+        const supabase = createAdminBrowserClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setCurrentUser(user);
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          setUserProfile(profile);
+
+          // If current user is admin, fetch all admin/agent profiles to assign
+          if (profile?.role === 'admin') {
+            const { data: profilesList } = await supabase
+              .from('profiles')
+              .select('id, full_name, email')
+              .in('role', ['admin', 'agent'])
+              .order('full_name', { ascending: true });
+            setAgents(profilesList || []);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading profiles info:', err);
+      }
+    }
+    loadUserAndAgents();
+  }, []);
 
   const handleGenerateAIDescription = async () => {
     if (!formData.title) {
@@ -284,6 +321,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         features: formData.features,
         images: formData.images,
         is_bank_liquidation: formData.is_bank_liquidation,
+        agent_id: userProfile?.role === 'admin' ? (formData.agent_id || null) : (property?.agent_id || currentUser?.id || null),
       };
 
       let result;
@@ -373,6 +411,19 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             onChange={handleChange}
             options={STATUS_OPTIONS}
           />
+
+          {userProfile?.role === 'admin' && (
+            <Select
+              label="Agente Asignado"
+              name="agent_id"
+              value={formData.agent_id}
+              onChange={handleChange}
+              options={[
+                { value: '', label: 'Sin asignar / Ninguno' },
+                ...agents.map(a => ({ value: a.id, label: a.full_name || a.email }))
+              ]}
+            />
+          )}
 
           <div className="md:col-span-2 flex items-center mt-2">
             <label className="flex items-center gap-3 cursor-pointer select-none">
