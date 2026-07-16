@@ -10,7 +10,6 @@ import { cn } from '@/lib';
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobilePropiedadesOpen, setIsMobilePropiedadesOpen] = useState(false);
-  const [isMobileServiciosOpen, setIsMobileServiciosOpen] = useState(false);
   const pathname = usePathname();
 
   return (
@@ -109,50 +108,18 @@ function Navbar() {
                 Oportunidades de Inversión
               </Link>
 
-              {/* Servicios Dropdown */}
-              <div className="relative group py-2">
-                <Link
-                  href="/#servicios"
-                  className={cn(
-                    'flex items-center gap-1 text-sm font-medium transition-colors text-gray-700 hover:text-primary-600 focus:outline-none'
-                  )}
-                >
-                  <span>Servicios</span>
-                  <ChevronDown className="w-3.5 h-3.5 transition-transform duration-200 group-hover:rotate-180" />
-                </Link>
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-100 rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                  <Link
-                    href="/#servicios"
-                    className="block px-4 py-2 text-sm font-semibold text-primary-600 hover:bg-gray-50 hover:text-primary-700 transition-colors border-b border-gray-50"
-                  >
-                    Ver todos los servicios
-                  </Link>
-                  <Link
-                    href="/oportunidades-inversion"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                  >
-                    Inversión y Liquidaciones Bancarias
-                  </Link>
-                  <Link
-                    href="/contacto?subject=Venta%20y%20Arriendo"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                  >
-                    Venta y Arriendo
-                  </Link>
-                  <Link
-                    href="/contacto?subject=Administracion%20de%20Arriendos"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                  >
-                    Administración de Arriendos
-                  </Link>
-                  <Link
-                    href="/contacto?subject=Tasaciones%20y%20Asesoria%20Legal"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
-                  >
-                    Tasaciones y Asesoría Legal
-                  </Link>
-                </div>
-              </div>
+              {/* Servicios Link */}
+              <Link
+                href="/#servicios"
+                className={cn(
+                  'text-sm font-medium transition-colors py-2 shrink-0',
+                  pathname === '/#servicios'
+                    ? 'text-primary-600'
+                    : 'text-gray-700 hover:text-primary-600'
+                )}
+              >
+                Servicios
+              </Link>
 
               {/* Confíanos tu Activo */}
               <Link
@@ -254,58 +221,14 @@ function Navbar() {
                 Oportunidades de Inversión
               </Link>
 
-              {/* Servicios Accordion */}
-              <div className="border-b border-gray-100">
-                <button
-                  onClick={() => setIsMobileServiciosOpen(!isMobileServiciosOpen)}
-                  className="w-full flex items-center justify-between px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  <span>Servicios</span>
-                  <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", isMobileServiciosOpen && "rotate-180")} />
-                </button>
-                {isMobileServiciosOpen && (
-                  <div className="bg-gray-50/50 py-1 border-t border-gray-100 animate-slide-down">
-                    <Link
-                      href="/#servicios"
-                      onClick={() => {
-                        setIsOpen(false);
-                        setIsMobileServiciosOpen(false);
-                      }}
-                      className="block px-10 py-3 text-sm font-semibold text-primary-600 hover:text-primary-750 transition-colors border-b border-gray-100/50"
-                    >
-                      Ver todos los servicios
-                    </Link>
-                    <Link
-                      href="/oportunidades-inversion"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors"
-                    >
-                      Inversión y Liquidaciones Bancarias
-                    </Link>
-                    <Link
-                      href="/contacto?subject=Venta%20y%20Arriendo"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors"
-                    >
-                      Venta y Arriendo
-                    </Link>
-                    <Link
-                      href="/contacto?subject=Administracion%20de%20Arriendos"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors"
-                    >
-                      Administración de Arriendos
-                    </Link>
-                    <Link
-                      href="/contacto?subject=Tasaciones%20y%20Asesoria%20Legal"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors"
-                    >
-                      Tasaciones y Asesoría Legal
-                    </Link>
-                  </div>
-                )}
-              </div>
+              {/* Servicios Link */}
+              <Link
+                href="/#servicios"
+                onClick={() => setIsOpen(false)}
+                className="block px-6 py-4 text-sm font-medium text-gray-700 hover:bg-gray-50 border-b border-gray-100 transition-colors"
+              >
+                Servicios
+              </Link>
 
               {/* Confíanos tu Activo */}
               <Link
