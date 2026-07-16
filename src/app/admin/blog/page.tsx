@@ -16,14 +16,52 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showNewForm, setShowNewForm] = useState(false);
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
     excerpt: '',
     category: '',
+    featured_image: '',
+    fb_image_url: '',
+    ig_image_url: '',
+    social_caption: '',
+    publish_to_fb: false,
+    publish_to_ig: false,
   });
   const [creating, setCreating] = useState(false);
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+
+  const handleUploadFile = async (file: File, fieldName: 'featured_image' | 'fb_image_url' | 'ig_image_url') => {
+    setUploadingField(fieldName);
+    const supabase = createAdminBrowserClient() as any;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `blog-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+    const filePath = `blog/${fileName}`;
+
+    try {
+      const { data, error: uploadErr } = await supabase.storage
+        .from('properties') // Re-use public bucket
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type || 'image/jpeg',
+        });
+
+      if (uploadErr) throw uploadErr;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('properties')
+        .getPublicUrl(filePath);
+
+      if (publicUrl) {
+        setNewPost(prev => ({ ...prev, [fieldName]: publicUrl }));
+      }
+    } catch (err: any) {
+      alert(`Error al subir imagen: ${err.message || err}`);
+    } finally {
+      setUploadingField(null);
+    }
+  };
 
   useEffect(() => {
     fetchPosts();
@@ -73,6 +111,12 @@ export default function AdminBlogPage() {
           content: newPost.content,
           excerpt: newPost.excerpt,
           category: newPost.category || null,
+          featured_image: newPost.featured_image || null,
+          fb_image_url: newPost.fb_image_url || null,
+          ig_image_url: newPost.ig_image_url || null,
+          social_caption: newPost.social_caption || null,
+          publish_to_fb: newPost.publish_to_fb,
+          publish_to_ig: newPost.publish_to_ig,
           published: false,
           published_at: null,
         }]);
@@ -82,7 +126,18 @@ export default function AdminBlogPage() {
         return;
       }
 
-      setNewPost({ title: '', content: '', excerpt: '', category: '' });
+      setNewPost({ 
+        title: '', 
+        content: '', 
+        excerpt: '', 
+        category: '', 
+        featured_image: '', 
+        fb_image_url: '', 
+        ig_image_url: '', 
+        social_caption: '', 
+        publish_to_fb: false, 
+        publish_to_ig: false 
+      });
       setShowNewForm(false);
       fetchPosts();
     } catch (err) {
@@ -113,6 +168,30 @@ export default function AdminBlogPage() {
       setPosts(posts.map(p => 
         p.id === post.id ? { ...p, published: newPublished, published_at: newPublished ? new Date().toISOString() : null } : p
       ));
+
+      // Trigger social media publishing if active
+      if (newPublished && (post.publish_to_fb || post.publish_to_ig)) {
+        try {
+          const res = await fetch('/api/admin/blog/publish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ postId: post.id }),
+          });
+          const pubData = await res.json();
+          if (pubData.success && pubData.results) {
+            const fbMsg = pubData.results.facebook?.success ? 'Publicado en Facebook. ' : (pubData.results.facebook ? `Error Facebook: ${pubData.results.facebook.error}. ` : '');
+            const igMsg = pubData.results.instagram?.success ? 'Publicado en Instagram. ' : (pubData.results.instagram ? `Error Instagram: ${pubData.results.instagram.error}. ` : '');
+            if (fbMsg || igMsg) {
+              alert(`Artículo publicado en el blog.\n${fbMsg}${igMsg}`);
+            }
+          } else if (pubData.error) {
+            alert(`Artículo publicado en el blog, pero falló la publicación en redes sociales: ${pubData.error}`);
+          }
+          fetchPosts();
+        } catch (publishErr: any) {
+          alert(`Artículo publicado en el blog, pero falló la conexión para publicar en redes sociales: ${publishErr.message || publishErr}`);
+        }
+      }
     } catch (err) {
       alert('Error al actualizar');
     }
@@ -185,6 +264,23 @@ export default function AdminBlogPage() {
               onChange={(e) => setNewPost({ ...newPost, category: e.target.value })}
               placeholder="Ej: Noticias, Consejos, etc."
             />
+            {/* Imagen Principal */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Imagen Principal / Cabecera</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleUploadFile(file, 'featured_image');
+                }}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+              />
+              {uploadingField === 'featured_image' && <p className="text-xs text-gray-500 mt-1">Subiendo...</p>}
+              {newPost.featured_image && (
+                <img src={newPost.featured_image} className="mt-2 h-20 rounded object-cover" alt="Cabecera" />
+              )}
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Extracto</label>
               <textarea
@@ -205,6 +301,89 @@ export default function AdminBlogPage() {
                 rows={8}
                 required
               />
+            </div>
+
+            {/* Sección Redes Sociales */}
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+              <h3 className="text-sm font-bold text-gray-900">Autopublicación en Redes Sociales</h3>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={newPost.publish_to_fb}
+                    onChange={(e) => setNewPost({ ...newPost, publish_to_fb: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 cursor-pointer"
+                  />
+                  Publicar en Facebook
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={newPost.publish_to_ig}
+                    onChange={(e) => setNewPost({ ...newPost, publish_to_ig: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500 cursor-pointer"
+                  />
+                  Publicar en Instagram
+                </label>
+              </div>
+
+              {/* Copia de Redes Sociales */}
+              {(newPost.publish_to_fb || newPost.publish_to_ig) && (
+                <div className="space-y-4 pt-4 border-t border-gray-200">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-750 mb-1">Texto / Pie de foto para Redes Sociales</label>
+                    <textarea
+                      value={newPost.social_caption}
+                      onChange={(e) => setNewPost({ ...newPost, social_caption: e.target.value })}
+                      placeholder="Escribe el texto que acompañará tu post en Facebook/Instagram con hashtags..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500 text-sm"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {newPost.publish_to_fb && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-750 mb-1">Imagen para Facebook (Horizontal, 1200x630px)</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleUploadFile(file, 'fb_image_url');
+                          }}
+                          className="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                        />
+                        {uploadingField === 'fb_image_url' && <p className="text-xs text-gray-500 mt-1">Subiendo...</p>}
+                        {newPost.fb_image_url && (
+                          <img src={newPost.fb_image_url} className="mt-2 h-16 w-32 rounded object-cover" alt="Facebook" />
+                        )}
+                      </div>
+                    )}
+
+                    {newPost.publish_to_ig && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-750 mb-1">Imagen para Instagram (Cuadrada, 1080x1080px)</label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleUploadFile(file, 'ig_image_url');
+                          }}
+                          className="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                        />
+                        {uploadingField === 'ig_image_url' && <p className="text-xs text-gray-500 mt-1">Subiendo...</p>}
+                        {newPost.ig_image_url && (
+                          <img src={newPost.ig_image_url} className="mt-2 h-16 w-16 rounded object-cover" alt="Instagram" />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="flex justify-end gap-3">
               <Button type="button" variant="secondary" onClick={() => setShowNewForm(false)}>
