@@ -1,8 +1,11 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MapPin, Bed, Bath, Square, Calendar, Eye, Phone, Mail, Check, ArrowLeft } from 'lucide-react';
+import { MapPin, Bed, Bath, Square, Calendar, Eye, Phone, Mail, Check, ArrowLeft, Layers } from 'lucide-react';
 import { Button, Card } from '@/components/ui';
+import dynamic from 'next/dynamic';
+
+const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), { ssr: false });
 import { createServerClient } from '@/lib/supabase/server';
 import { getPropertyBySlug, incrementPropertyViews } from '@/lib/supabase';
 import { formatPrice, formatArea, formatDate, cn } from '@/lib';
@@ -243,6 +246,15 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </div>
                   </div>
                 )}
+                {(property as any).terrain_area && (
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <Layers className="w-6 h-6 text-primary-600" />
+                    <div>
+                      <p className="text-2xl font-bold text-gray-900 dark:text-white">{(property as any).terrain_area}</p>
+                      <p className="text-sm text-gray-500">m² terreno</p>
+                    </div>
+                  </div>
+                )}
                 {property.year_built && (
                   <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <Calendar className="w-6 h-6 text-primary-600" />
@@ -278,6 +290,22 @@ export default async function PropertyDetailPage({ params }: Props) {
                       <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </div>
                   ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Ubicación (Mapa) */}
+            {property.latitude && property.longitude && (
+              <Card>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                  Ubicación de la propiedad
+                </h2>
+                <div className="w-full rounded-xl overflow-hidden shadow-sm">
+                  <PropertyMap 
+                    latitude={property.latitude} 
+                    longitude={property.longitude} 
+                    address={property.address} 
+                  />
                 </div>
               </Card>
             )}

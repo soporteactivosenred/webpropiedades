@@ -68,6 +68,7 @@ export interface Database {
           agent_id: string | null;
           views: number;
           is_bank_liquidation: boolean;
+          terrain_area: number | null;
           created_at: string;
           updated_at: string;
         };
@@ -95,6 +96,7 @@ export interface Database {
           agent_id?: string | null;
           views?: number;
           is_bank_liquidation?: boolean;
+          terrain_area?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -122,6 +124,7 @@ export interface Database {
           agent_id?: string | null;
           views?: number;
           is_bank_liquidation?: boolean;
+          terrain_area?: number | null;
           created_at?: string;
           updated_at?: string;
         };

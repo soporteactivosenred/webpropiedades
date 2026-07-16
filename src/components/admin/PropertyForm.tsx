@@ -7,7 +7,7 @@ import { Input } from '@/components/ui';
 import { Select } from '@/components/ui';
 import { TextArea } from '@/components/ui';
 import { Button } from '@/components/ui';
-import { Sparkles, Copy, Check, Wand2 } from 'lucide-react';
+import { Sparkles, Copy, Check, Wand2, MapPin } from 'lucide-react';
 import { cn } from '@/lib';
 import type { Database } from '@/types';
 
@@ -85,6 +85,9 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     bedrooms: property?.bedrooms?.toString() || '',
     bathrooms: property?.bathrooms?.toString() || '',
     area: property?.area?.toString() || '',
+    terrain_area: property?.terrain_area?.toString() || '',
+    latitude: property?.latitude?.toString() || '',
+    longitude: property?.longitude?.toString() || '',
     parking_spaces: property?.parking_spaces?.toString() || '',
     year_built: property?.year_built?.toString() || '',
     description: property?.description || '',
@@ -97,6 +100,10 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     seo_keywords: '',
     agent_id: (property as any)?.agent_id || '',
   });
+
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
+  const [geocodeSuccess, setGeocodeSuccess] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -194,6 +201,41 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
   const handleApplySuggestion = () => {
     if (aiSuggestedDescription) {
       setFormData(prev => ({ ...prev, description: aiSuggestedDescription }));
+    }
+  };
+
+  const handleGeocode = async () => {
+    if (!formData.address || !formData.city) return;
+    setIsGeocoding(true);
+    setGeocodeError(null);
+    setGeocodeSuccess(false);
+
+    try {
+      const query = encodeURIComponent(`${formData.address}, ${formData.city}, ${formData.region || ''}, Chile`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1`, {
+        headers: {
+          'User-Agent': 'ActivosEnRed-PropertyApp/1.0',
+        }
+      });
+      
+      if (!res.ok) throw new Error('Error al conectar con el servicio de geocodificación.');
+      
+      const data = await res.json();
+      
+      if (data && data.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          latitude: parseFloat(data[0].lat).toFixed(6),
+          longitude: parseFloat(data[0].lon).toFixed(6),
+        }));
+        setGeocodeSuccess(true);
+      } else {
+        setGeocodeError('No se encontraron coordenadas para esta dirección. Por favor ingrésalas manualmente.');
+      }
+    } catch (err: any) {
+      setGeocodeError(err.message || 'Error al geocodificar.');
+    } finally {
+      setIsGeocoding(false);
     }
   };
 
@@ -366,6 +408,9 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
         area: formData.area ? parseFloat(formData.area) : null,
+        terrain_area: formData.terrain_area ? parseFloat(formData.terrain_area) : null,
+        latitude: formData.latitude ? parseFloat(formData.latitude) : null,
+        longitude: formData.longitude ? parseFloat(formData.longitude) : null,
         parking_spaces: formData.parking_spaces ? parseInt(formData.parking_spaces) : null,
         year_built: formData.year_built ? parseInt(formData.year_built) : null,
         description: formData.description,
@@ -531,6 +576,49 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             placeholder="Ej: Metropolitana"
             required
           />
+
+          <div className="md:col-span-2 border-t border-gray-100 dark:border-gray-750 pt-4 mt-2">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Coordenadas del Mapa</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Requeridas para mostrar el mapa en la ficha de propiedad.</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGeocode}
+                leftIcon={<MapPin className="w-4 h-4" />}
+                disabled={isGeocoding || !formData.address || !formData.city}
+              >
+                {isGeocoding ? 'Buscando...' : 'Buscar Coordenadas'}
+              </Button>
+            </div>
+
+            {geocodeError && (
+              <p className="text-xs text-red-500 mb-3">{geocodeError}</p>
+            )}
+            {geocodeSuccess && (
+              <p className="text-xs text-emerald-500 mb-3">¡Coordenadas encontradas correctamente!</p>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Latitud"
+                name="latitude"
+                value={formData.latitude}
+                onChange={handleChange}
+                placeholder="Ej: -33.4123"
+              />
+              <Input
+                label="Longitud"
+                name="longitude"
+                value={formData.longitude}
+                onChange={handleChange}
+                placeholder="Ej: -70.6045"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -558,12 +646,21 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
           />
 
           <Input
-            label="Superficie (m²)"
+            label="Superficie Construida (m²)"
             name="area"
             type="number"
             value={formData.area}
             onChange={handleChange}
             placeholder="Ej: 120"
+          />
+
+          <Input
+            label="Superficie Terreno (m²)"
+            name="terrain_area"
+            type="number"
+            value={formData.terrain_area}
+            onChange={handleChange}
+            placeholder="Ej: 500"
           />
 
           <Input
