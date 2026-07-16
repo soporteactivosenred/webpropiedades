@@ -16,6 +16,7 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNewForm, setShowNewForm] = useState(false);
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
