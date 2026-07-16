@@ -115,16 +115,16 @@ export default function CapRateCalculator() {
   };
 
   return (
-    <div className="bg-gray-900 text-gray-100 rounded-3xl border border-gray-800 shadow-2xl p-6 md:p-8 max-w-6xl mx-auto">
+    <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl p-6 md:p-8 max-w-6xl mx-auto">
       {/* Unit and Mode Selectors */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 pb-6 border-b border-gray-800">
-        <div className="flex bg-gray-950 p-1.5 rounded-xl border border-gray-850">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 pb-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex bg-gray-50 dark:bg-gray-950 p-1.5 rounded-xl border border-gray-100 dark:border-gray-850">
           <button
             onClick={() => setMode('tradicional')}
             className={`px-5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
               mode === 'tradicional'
                 ? 'bg-primary-600 text-white shadow-md'
-                : 'text-gray-400 hover:text-gray-200'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             Arriendo Tradicional
@@ -134,18 +134,18 @@ export default function CapRateCalculator() {
             className={`px-5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${
               mode === 'airbnb'
                 ? 'bg-primary-600 text-white shadow-md'
-                : 'text-gray-400 hover:text-gray-200'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             Airbnb / Vacacional
           </button>
         </div>
 
-        <div className="flex bg-gray-950 p-1.5 rounded-xl border border-gray-850">
+        <div className="flex bg-gray-50 dark:bg-gray-950 p-1.5 rounded-xl border border-gray-100 dark:border-gray-850">
           <button
             onClick={() => handleUnitChange('UF')}
             className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-              unit === 'UF' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-300'
+              unit === 'UF' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             UF
@@ -153,7 +153,7 @@ export default function CapRateCalculator() {
           <button
             onClick={() => handleUnitChange('CLP')}
             className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-              unit === 'CLP' ? 'bg-gray-800 text-white' : 'text-gray-500 hover:text-gray-300'
+              unit === 'CLP' ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             CLP ($)
@@ -164,45 +164,45 @@ export default function CapRateCalculator() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left: Inputs */}
         <div className="lg:col-span-7 space-y-6">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary-400 flex items-center gap-2">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 flex items-center gap-2">
             <TrendingUp className="w-4 h-4" /> Datos de la Propiedad
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5">
+              <label className="block text-xs text-gray-650 dark:text-gray-400 mb-1.5 font-medium">
                 Valor del Inmueble ({unit})
               </label>
               <input
                 type="number"
                 value={propertyValue}
                 onChange={(e) => setPropertyValue(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="w-full bg-gray-950 border border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"
+                className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white outline-none"
               />
             </div>
 
             {mode === 'tradicional' ? (
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5">
+                <label className="block text-xs text-gray-650 dark:text-gray-400 mb-1.5 font-medium">
                   Arriendo Mensual Estimado ({unit})
                 </label>
                 <input
                   type="number"
                   value={monthlyRent}
                   onChange={(e) => setMonthlyRent(Math.max(0, parseFloat(e.target.value) || 0))}
-                  className="w-full bg-gray-950 border border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white outline-none"
                 />
               </div>
             ) : (
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5">
+                <label className="block text-xs text-gray-650 dark:text-gray-400 mb-1.5 font-medium">
                   Tarifa por Noche Estimada ({unit})
                 </label>
                 <input
                   type="number"
                   value={dailyRate}
                   onChange={(e) => setDailyRate(Math.max(0, parseFloat(e.target.value) || 0))}
-                  className="w-full bg-gray-950 border border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"
+                  className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white outline-none"
                 />
               </div>
             )}
@@ -212,8 +212,8 @@ export default function CapRateCalculator() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs text-gray-400">Ocupación Anual</label>
-                  <span className="text-xs font-bold text-primary-400">{occupancyRate}%</span>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Ocupación Anual</label>
+                  <span className="text-xs font-bold text-primary-600 dark:text-primary-400">{occupancyRate}%</span>
                 </div>
                 <input
                   type="range"
@@ -221,13 +221,13 @@ export default function CapRateCalculator() {
                   max="100"
                   value={occupancyRate}
                   onChange={(e) => setOccupancyRate(parseInt(e.target.value))}
-                  className="w-full accent-primary-500 h-1.5 bg-gray-850 rounded-lg cursor-pointer"
+                  className="w-full accent-primary-500 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-lg cursor-pointer"
                 />
               </div>
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs text-gray-400">Comisión de Plataformas (Airbnb/Booking)</label>
-                  <span className="text-xs font-bold text-primary-400">{platformFee}%</span>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Comisión de Plataformas (Airbnb/Booking)</label>
+                  <span className="text-xs font-bold text-primary-600 dark:text-primary-400">{platformFee}%</span>
                 </div>
                 <input
                   type="range"
@@ -235,38 +235,38 @@ export default function CapRateCalculator() {
                   max="30"
                   value={platformFee}
                   onChange={(e) => setPlatformFee(parseInt(e.target.value))}
-                  className="w-full accent-primary-500 h-1.5 bg-gray-850 rounded-lg cursor-pointer"
+                  className="w-full accent-primary-500 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-lg cursor-pointer"
                 />
               </div>
             </div>
           )}
 
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary-400 pt-4 border-t border-gray-850 flex items-center gap-2">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400 pt-4 border-t border-gray-100 dark:border-gray-850 flex items-center gap-2">
             <Percent className="w-4 h-4" /> Egresos y Vacancia
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5">
+              <label className="block text-xs text-gray-650 dark:text-gray-400 mb-1.5 font-medium">
                 Gastos Comunes / Administración Mensual ({unit})
               </label>
               <input
                 type="number"
                 value={monthlyAdmin}
                 onChange={(e) => setMonthlyAdmin(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="w-full bg-gray-950 border border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"
+                className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5">
+              <label className="block text-xs text-gray-650 dark:text-gray-400 mb-1.5 font-medium">
                 Contribuciones / Impuesto Predial Anual ({unit})
               </label>
               <input
                 type="number"
                 value={annualTaxes}
                 onChange={(e) => setAnnualTaxes(Math.max(0, parseFloat(e.target.value) || 0))}
-                className="w-full bg-gray-950 border border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-white outline-none"
+                className="w-full bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 rounded-xl px-4 py-3 text-sm font-semibold text-gray-900 dark:text-white outline-none"
               />
             </div>
           </div>
@@ -275,8 +275,8 @@ export default function CapRateCalculator() {
             {mode === 'tradicional' && (
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs text-gray-400">Tasa de Vacancia Anual (Meses desocupados)</label>
-                  <span className="text-xs font-bold text-primary-400">{vacancyRate}%</span>
+                  <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Tasa de Vacancia Anual (Meses desocupados)</label>
+                  <span className="text-xs font-bold text-primary-600 dark:text-primary-400">{vacancyRate}%</span>
                 </div>
                 <input
                   type="range"
@@ -285,15 +285,15 @@ export default function CapRateCalculator() {
                   step="1"
                   value={vacancyRate}
                   onChange={(e) => setVacancyRate(parseInt(e.target.value))}
-                  className="w-full accent-primary-500 h-1.5 bg-gray-850 rounded-lg cursor-pointer"
+                  className="w-full accent-primary-500 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-lg cursor-pointer"
                 />
               </div>
             )}
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs text-gray-400">Provisión para Mantenimiento (% sobre ingresos)</label>
-                <span className="text-xs font-bold text-primary-400">{maintenanceRate}%</span>
+                <label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Provisión para Mantenimiento (% sobre ingresos)</label>
+                <span className="text-xs font-bold text-primary-600 dark:text-primary-400">{maintenanceRate}%</span>
               </div>
               <input
                 type="range"
@@ -302,22 +302,22 @@ export default function CapRateCalculator() {
                 step="0.5"
                 value={maintenanceRate}
                 onChange={(e) => setMaintenanceRate(parseFloat(e.target.value))}
-                className="w-full accent-primary-500 h-1.5 bg-gray-850 rounded-lg cursor-pointer"
+                className="w-full accent-primary-500 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-lg cursor-pointer"
               />
             </div>
           </div>
         </div>
 
         {/* Right: Results Display */}
-        <div className="lg:col-span-5 bg-gray-950 rounded-2xl border border-gray-800 p-6 flex flex-col items-center">
+        <div className="lg:col-span-5 bg-gray-50 dark:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 p-6 flex flex-col items-center">
           <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">
             Rentabilidad Anual (CAP RATE)
           </h4>
 
           {/* Large Cap Rate number */}
-          <div className="text-5xl md:text-6xl font-black text-white mt-2 mb-1 flex items-baseline gap-1">
+          <div className="text-5xl md:text-6xl font-black text-gray-900 dark:text-white mt-2 mb-1 flex items-baseline gap-1">
             {calculations.capRate.toFixed(2)}
-            <span className="text-2xl font-bold text-primary-500">%</span>
+            <span className="text-2xl font-bold text-primary-650 dark:text-primary-500">%</span>
           </div>
 
           <div className="text-xs text-gray-500 mb-4">
@@ -331,32 +331,32 @@ export default function CapRateCalculator() {
 
           {/* Metrics summary cards */}
           <div className="w-full grid grid-cols-2 gap-3 mt-8">
-            <div className="bg-gray-900 border border-gray-850 rounded-xl p-3.5">
+            <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-850 rounded-xl p-3.5 shadow-sm">
               <span className="text-[10px] uppercase font-bold tracking-wider text-gray-500 block mb-1">
                 Flujo Mensual Neto
               </span>
-              <span className="text-sm font-bold text-emerald-400">
+              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-450">
                 {formatVal(calculations.monthlyFlow)}
               </span>
             </div>
-            <div className="bg-gray-900 border border-gray-850 rounded-xl p-3.5">
+            <div className="bg-white dark:bg-gray-900 border border-gray-150 dark:border-gray-850 rounded-xl p-3.5 shadow-sm">
               <span className="text-[10px] uppercase font-bold tracking-wider text-gray-500 block mb-1">
                 Ingreso Neto Anual (NOI)
               </span>
-              <span className="text-sm font-bold text-white">
+              <span className="text-sm font-bold text-gray-900 dark:text-white">
                 {formatVal(calculations.netOperatingIncome)}
               </span>
             </div>
           </div>
 
           {/* Donut Chart / Progress Bar breakdown */}
-          <div className="w-full mt-6 pt-6 border-t border-gray-850 space-y-3.5">
-            <span className="text-xs font-semibold text-gray-400 block mb-1 text-center">
+          <div className="w-full mt-6 pt-6 border-t border-gray-150 dark:border-gray-850 space-y-3.5">
+            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 block mb-1 text-center">
               Desglose de Ingresos Brutos Anuales
             </span>
 
             {/* Stacked Progress Bar */}
-            <div className="w-full h-4 bg-gray-900 rounded-full overflow-hidden flex">
+            <div className="w-full h-4 bg-gray-200 dark:bg-gray-900 rounded-full overflow-hidden flex">
               <div
                 style={{ width: `${calculations.chart.netPct}%` }}
                 className="bg-emerald-500 h-full transition-all duration-300"
@@ -385,7 +385,7 @@ export default function CapRateCalculator() {
             </div>
 
             {/* Legend grid */}
-            <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-400 pt-1">
+            <div className="grid grid-cols-2 gap-2 text-[10px] text-gray-600 dark:text-gray-400 pt-1">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded bg-emerald-500 inline-block flex-shrink-0" />
                 <span>Ingreso Neto ({calculations.chart.netPct.toFixed(0)}%)</span>
