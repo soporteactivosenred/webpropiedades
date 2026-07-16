@@ -355,7 +355,14 @@ export default function AdminConfiguracionPage() {
               value={settings.meta_fb_page_id}
               onChange={handleChange}
               placeholder="Ej: 102938475610293"
-              hint="ID numérico de tu página comercial de Facebook."
+              hint={
+                <span>
+                  ID numérico de tu página comercial de Facebook. Puedes ver tus páginas en la{' '}
+                  <a href="https://www.facebook.com/pages" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline font-semibold">
+                    sección de Páginas de Facebook
+                  </a>.
+                </span>
+              }
             />
 
             <Input
@@ -364,7 +371,14 @@ export default function AdminConfiguracionPage() {
               value={settings.meta_ig_business_id}
               onChange={handleChange}
               placeholder="Ej: 17841401234567890"
-              hint="ID comercial de tu cuenta de Instagram vinculada a tu página de Facebook."
+              hint={
+                <span>
+                  ID comercial de tu cuenta de Instagram vinculada. Puedes encontrarlo en la{' '}
+                  <a href="https://business.facebook.com/settings/instagram-profiles" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline font-semibold">
+                    Configuración de Cuentas de Instagram en Business Manager
+                  </a>.
+                </span>
+              }
             />
 
             <Input
@@ -373,7 +387,17 @@ export default function AdminConfiguracionPage() {
               value={settings.meta_page_access_token}
               onChange={handleChange}
               placeholder="Escribe el token de Meta (empieza con EAAB...)"
-              hint="Token de acceso de larga duración generado desde el Portal de Desarrolladores de Meta (Graph API Explorer) con permisos de publicación."
+              hint={
+                <span>
+                  Token de acceso de larga duración. Genera tu token en el{' '}
+                  <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline font-semibold">
+                    Explorador de Graph API
+                  </a> y extiéndelo desde la{' '}
+                  <a href="https://developers.facebook.com/tools/accesstoken" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline font-semibold">
+                    Herramienta de Tokens de Acceso
+                  </a> para evitar que expire.
+                </span>
+              }
             />
           </div>
         </div>
