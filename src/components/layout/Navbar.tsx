@@ -78,7 +78,7 @@ function Navbar() {
                     href="/propiedades?type=sale"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary-600 transition-colors"
                   >
-                    Venta Tradicional
+                    Venta
                   </Link>
                   <Link
                     href="/propiedades?type=rent"
@@ -192,7 +192,7 @@ function Navbar() {
                       onClick={() => setIsOpen(false)}
                       className="block px-10 py-3 text-sm text-gray-600 hover:text-primary-600 transition-colors"
                     >
-                      Venta Tradicional
+                      Venta
                     </Link>
                     <Link
                       href="/propiedades?type=rent"
