@@ -39,19 +39,25 @@ export async function POST(req: Request) {
     }
 
     // 2. Fetch Meta integration configurations from site_settings
-    const { data: setting, error: settingErr } = await supabaseAdmin
+    const { data: settingsList, error: settingsErr } = await supabaseAdmin
       .from('site_settings')
-      .select('value')
-      .eq('key', 'meta_integration_config')
-      .single();
+      .select('key, value')
+      .in('key', ['meta_fb_page_id', 'meta_ig_business_id', 'meta_page_access_token']);
 
-    if (settingErr || !setting) {
+    if (settingsErr || !settingsList || settingsList.length === 0) {
       return NextResponse.json({
         error: 'Integración de Meta no configurada. Por favor ve a configuración de administración e ingresa tus tokens de acceso.',
       }, { status: 400 });
     }
 
-    const { fb_page_id, ig_business_id, page_access_token } = setting.value as any;
+    const settingsMap: Record<string, string> = {};
+    settingsList.forEach((s: any) => {
+      settingsMap[s.key] = String(s.value);
+    });
+
+    const fb_page_id = settingsMap.meta_fb_page_id;
+    const ig_business_id = settingsMap.meta_ig_business_id;
+    const page_access_token = settingsMap.meta_page_access_token;
 
     if (!page_access_token) {
       return NextResponse.json({ error: 'Falta el Token de Acceso de Meta.' }, { status: 400 });

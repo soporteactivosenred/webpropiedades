@@ -22,6 +22,9 @@ interface SettingsFormData {
   seo_default_description: string;
   seo_default_keywords: string;
   og_image: string;
+  meta_fb_page_id: string;
+  meta_ig_business_id: string;
+  meta_page_access_token: string;
 }
 
 export default function AdminConfiguracionPage() {
@@ -39,6 +42,9 @@ export default function AdminConfiguracionPage() {
     seo_default_description: '',
     seo_default_keywords: '',
     og_image: '',
+    meta_fb_page_id: '',
+    meta_ig_business_id: '',
+    meta_page_access_token: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -82,6 +88,9 @@ export default function AdminConfiguracionPage() {
         seo_default_description: settingsMap.seo_default_description || '',
         seo_default_keywords: settingsMap.seo_default_keywords || '',
         og_image: settingsMap.og_image || '',
+        meta_fb_page_id: settingsMap.meta_fb_page_id || '',
+        meta_ig_business_id: settingsMap.meta_ig_business_id || '',
+        meta_page_access_token: settingsMap.meta_page_access_token || '',
       });
     } catch (err) {
       setError('Error al cargar configuración');
@@ -114,6 +123,9 @@ export default function AdminConfiguracionPage() {
         { key: 'seo_default_description', value: settings.seo_default_description },
         { key: 'seo_default_keywords', value: settings.seo_default_keywords },
         { key: 'og_image', value: settings.og_image },
+        { key: 'meta_fb_page_id', value: settings.meta_fb_page_id },
+        { key: 'meta_ig_business_id', value: settings.meta_ig_business_id },
+        { key: 'meta_page_access_token', value: settings.meta_page_access_token },
       ];
 
       for (const setting of settingsToUpdate) {
@@ -325,6 +337,43 @@ export default function AdminConfiguracionPage() {
               onChange={handleChange}
               placeholder="https://ejemplo.com/imagen-og.jpg"
               hint="Imagen para Open Graph (1200x630px recomendado)"
+            />
+          </div>
+        </div>
+
+        {/* Meta Integration Settings */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Integración de Redes Sociales (Meta Graph API)</h2>
+          <p className="text-sm text-gray-500 mb-6">
+            Configura las credenciales de tu aplicación de Meta para permitir la autopublicación automática de los artículos de blog en tu Página de Facebook y tu cuenta de Instagram Business.
+          </p>
+          
+          <div className="space-y-4">
+            <Input
+              label="ID de la Página de Facebook"
+              name="meta_fb_page_id"
+              value={settings.meta_fb_page_id}
+              onChange={handleChange}
+              placeholder="Ej: 102938475610293"
+              hint="ID numérico de tu página comercial de Facebook."
+            />
+
+            <Input
+              label="ID de la Cuenta de Instagram Business"
+              name="meta_ig_business_id"
+              value={settings.meta_ig_business_id}
+              onChange={handleChange}
+              placeholder="Ej: 17841401234567890"
+              hint="ID comercial de tu cuenta de Instagram vinculada a tu página de Facebook."
+            />
+
+            <Input
+              label="Token de Acceso de Meta (System User / Page Token)"
+              name="meta_page_access_token"
+              value={settings.meta_page_access_token}
+              onChange={handleChange}
+              placeholder="Escribe el token de Meta (empieza con EAAB...)"
+              hint="Token de acceso de larga duración generado desde el Portal de Desarrolladores de Meta (Graph API Explorer) con permisos de publicación."
             />
           </div>
         </div>
