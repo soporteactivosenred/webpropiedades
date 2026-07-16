@@ -43,7 +43,7 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
       email: data.email,
       phone: data.phone || null,
       message: `Propiedad: ${propertyTitle} (ID: ${propertyId})\n\n${data.message}`,
-      source: 'property_inquiry',
+      source: 'website',
       status: 'new'
     });
 

@@ -39,7 +39,7 @@ export default function ContactPage() {
       email: data.email,
       phone: data.phone || null,
       message: data.message,
-      source: 'contact_form',
+      source: 'website',
       status: 'new'
     });
 
