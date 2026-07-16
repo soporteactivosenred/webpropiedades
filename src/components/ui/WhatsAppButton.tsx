@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { X, MessageCircle, User, Phone, Home, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, MessageCircle, User, Phone, Mail, Home, Loader2, CheckCircle2 } from 'lucide-react';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
 import { DEFAULT_SETTINGS } from '@/types';
 
@@ -24,6 +24,7 @@ export function WhatsAppButton() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
+    email: '',
     service: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -64,6 +65,11 @@ export function WhatsAppButton() {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = 'El nombre es requerido';
     if (!formData.phone.trim()) newErrors.phone = 'El teléfono es requerido';
+    if (!formData.email.trim()) {
+      newErrors.email = 'El correo es requerido';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'El correo no es válido';
+    }
     if (!formData.service) newErrors.service = 'Selecciona un servicio';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -80,20 +86,19 @@ export function WhatsAppButton() {
       await supabase.from('leads').insert([{
         name: formData.name,
         phone: formData.phone,
-        email: `whatsapp-${Date.now()}@consulta.cl`, // email placeholder requerido
+        email: formData.email,
         message: `Servicio: ${formData.service}`,
         source: 'whatsapp',
         status: 'new',
       }]);
 
       // Enviar email vía Resend (opcional, no bloqueante)
-      const emailPlaceholder = `whatsapp-${Date.now()}@consulta.cl`;
       fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
-          email: emailPlaceholder,
+          email: formData.email,
           phone: formData.phone,
           message: formData.service,
           source: 'whatsapp'
@@ -127,7 +132,7 @@ export function WhatsAppButton() {
     setIsOpen(false);
     setTimeout(() => {
       setStep('form');
-      setFormData({ name: '', phone: '', service: '' });
+      setFormData({ name: '', phone: '', email: '', service: '' });
       setErrors({});
     }, 300);
   };
@@ -266,6 +271,28 @@ export function WhatsAppButton() {
                         />
                       </div>
                       {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    </div>
+
+                    {/* Correo Electrónico */}
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Correo electrónico *
+                      </label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="Ej: maria@ejemplo.com"
+                          className={`w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
+                            errors.email
+                              ? 'border-red-300 focus:ring-red-200'
+                              : 'border-gray-200 focus:ring-green-200 focus:border-green-400'
+                          }`}
+                        />
+                      </div>
+                      {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
 
                     {/* Servicio */}
