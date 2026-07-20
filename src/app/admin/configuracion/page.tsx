@@ -51,6 +51,14 @@ export default function AdminConfiguracionPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Estado para el test de conexión Meta
+  const [testing, setTesting] = useState(false);
+  const [testResults, setTestResults] = useState<{
+    token: { ok: boolean; message: string; detail: string };
+    facebook: { ok: boolean; message: string; detail: string };
+    instagram: { ok: boolean; message: string; detail: string };
+  } | null>(null);
+
   useEffect(() => {
     fetchSettings();
   }, []);
@@ -154,6 +162,32 @@ export default function AdminConfiguracionPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setSettings(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleTestMeta = async () => {
+    setTesting(true);
+    setTestResults(null);
+    try {
+      const res = await fetch('/api/admin/test-meta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          meta_fb_page_id: settings.meta_fb_page_id,
+          meta_ig_business_id: settings.meta_ig_business_id,
+          meta_page_access_token: settings.meta_page_access_token,
+        }),
+      });
+      const data = await res.json();
+      if (data.results) {
+        setTestResults(data.results);
+      } else {
+        setTestResults(null);
+      }
+    } catch {
+      setTestResults(null);
+    } finally {
+      setTesting(false);
+    }
   };
 
   if (loading) {
@@ -399,6 +433,85 @@ export default function AdminConfiguracionPage() {
                 </span>
               }
             />
+          </div>
+
+          {/* Botón Probar Conexión */}
+          <div className="pt-4 border-t border-gray-100 mt-4">
+            <button
+              type="button"
+              onClick={handleTestMeta}
+              disabled={testing}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200"
+              style={{
+                background: testing ? '#e5e7eb' : 'linear-gradient(135deg, #1877f2 0%, #e1306c 100%)',
+                color: testing ? '#9ca3af' : '#ffffff',
+                cursor: testing ? 'not-allowed' : 'pointer',
+                boxShadow: testing ? 'none' : '0 2px 8px 0 rgba(24,119,242,0.25)',
+              }}
+            >
+              {testing ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Probando conexión...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Probar Conexión con Meta
+                </>
+              )}
+            </button>
+
+            {/* Resultados del test */}
+            {testResults && (
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                {(
+                  [
+                    { key: 'token', label: 'Token de Acceso', icon: '🔑' },
+                    { key: 'facebook', label: 'Página de Facebook', icon: '🔵' },
+                    { key: 'instagram', label: 'Instagram Business', icon: '📸' },
+                  ] as { key: 'token' | 'facebook' | 'instagram'; label: string; icon: string }[]
+                ).map(({ key, label, icon }) => {
+                  const r = testResults[key];
+                  return (
+                    <div
+                      key={key}
+                      className={`rounded-xl p-4 border-2 flex flex-col gap-1 transition-all duration-200 ${
+                        r.ok ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{icon}</span>
+                        <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</span>
+                        <span
+                          className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                            r.ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                          }`}
+                        >
+                          {r.ok ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          )}
+                          {r.ok ? 'OK' : 'Error'}
+                        </span>
+                      </div>
+                      <p className={`text-sm font-semibold ${r.ok ? 'text-green-800' : 'text-red-800'}`}>{r.message}</p>
+                      <p className={`text-xs ${r.ok ? 'text-green-600' : 'text-red-500'}`}>{r.detail}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
