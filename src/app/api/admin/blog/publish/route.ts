@@ -71,14 +71,17 @@ export async function POST(req: Request) {
       try {
         const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl';
         const postUrl = `${siteUrl}/blog/${post.slug}`;
-        
-        const fbRes = await fetch(`https://graph.facebook.com/v18.0/${fb_page_id}/feed`, {
+
+        // Nota: No se envía 'picture' porque Facebook solo permite
+        // personalizar la imagen si el dominio está verificado (#100).
+        // Facebook generará automáticamente la preview usando las
+        // etiquetas Open Graph del artículo del blog.
+        const fbRes = await fetch(`https://graph.facebook.com/v20.0/${fb_page_id}/feed`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             message: post.social_caption || post.excerpt || post.title,
             link: postUrl,
-            picture: post.fb_image_url || post.featured_image || undefined,
             access_token: page_access_token,
           }),
         });
@@ -94,6 +97,7 @@ export async function POST(req: Request) {
         results.facebook = { success: false, error: fbErr.message };
       }
     }
+
 
     // 4. Autopublish to Instagram (requires a public image URL)
     const igImage = post.ig_image_url || post.featured_image;
