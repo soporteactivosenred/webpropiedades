@@ -69,6 +69,11 @@ export interface Database {
           views: number;
           is_bank_liquidation: boolean;
           terrain_area: number | null;
+          publish_to_fb: boolean;
+          publish_to_ig: boolean;
+          social_caption: string | null;
+          fb_post_id: string | null;
+          ig_media_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -97,6 +102,11 @@ export interface Database {
           views?: number;
           is_bank_liquidation?: boolean;
           terrain_area?: number | null;
+          publish_to_fb?: boolean;
+          publish_to_ig?: boolean;
+          social_caption?: string | null;
+          fb_post_id?: string | null;
+          ig_media_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -125,6 +135,11 @@ export interface Database {
           views?: number;
           is_bank_liquidation?: boolean;
           terrain_area?: number | null;
+          publish_to_fb?: boolean;
+          publish_to_ig?: boolean;
+          social_caption?: string | null;
+          fb_post_id?: string | null;
+          ig_media_id?: string | null;
           created_at?: string;
           updated_at?: string;
         };

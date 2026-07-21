@@ -99,6 +99,10 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     meta_description: '',
     seo_keywords: '',
     agent_id: (property as any)?.agent_id || '',
+    // Social Media Autopublish fields
+    publish_to_fb: (property as any)?.publish_to_fb || false,
+    publish_to_ig: (property as any)?.publish_to_ig || false,
+    social_caption: (property as any)?.social_caption || '',
   });
 
   const [isGeocoding, setIsGeocoding] = useState(false);
@@ -137,7 +141,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
           setUserProfile(profile);
 
           // If current user is admin, fetch all admin/agent profiles to assign
-          if (profile?.role === 'admin') {
+          if ((profile as any)?.role === 'admin') {
             const { data: profilesList } = await supabase
               .from('profiles')
               .select('id, full_name, email')
@@ -418,6 +422,9 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         images: formData.images,
         is_bank_liquidation: formData.is_bank_liquidation,
         agent_id: userProfile?.role === 'admin' ? (formData.agent_id || null) : (property?.agent_id || currentUser?.id || null),
+        publish_to_fb: formData.publish_to_fb,
+        publish_to_ig: formData.publish_to_ig,
+        social_caption: formData.social_caption || null,
       };
 
       let result;
@@ -437,6 +444,21 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       if (result.error) {
         setError(result.error.message);
         return;
+      }
+
+      const savedProp = result.data?.[0];
+
+      // Disparar autopublicación en redes si está seleccionado
+      if (savedProp?.id && (formData.publish_to_fb || formData.publish_to_ig)) {
+        try {
+          await fetch('/api/admin/properties/publish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ propertyId: savedProp.id }),
+          });
+        } catch (pubErr) {
+          console.error('Error al autopublicar propiedad en redes:', pubErr);
+        }
       }
 
       router.push('/admin/propiedades');
@@ -951,6 +973,68 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             placeholder="casa, venta, santiago, las condes"
             hint="Separadas por comas. Ej: casa, venta, santiago, departamento"
           />
+        </div>
+      </div>
+
+      {/* Social Media Autopublish Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2 flex items-center gap-2">
+          <span>📲</span> Autopublicación en Redes Sociales (Meta Graph API)
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Publica esta propiedad automáticamente en tu Página de Facebook y cuenta de Instagram Business al guardar.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-6">
+            <label className="inline-flex items-center gap-2 cursor-pointer font-medium text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="publish_to_fb"
+                checked={formData.publish_to_fb}
+                onChange={(e) => setFormData(prev => ({ ...prev, publish_to_fb: e.target.checked }))}
+                className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+              />
+              <span>🔵 Publicar en Facebook</span>
+            </label>
+
+            <label className="inline-flex items-center gap-2 cursor-pointer font-medium text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="publish_to_ig"
+                checked={formData.publish_to_ig}
+                onChange={(e) => setFormData(prev => ({ ...prev, publish_to_ig: e.target.checked }))}
+                className="w-4 h-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+              />
+              <span>📸 Publicar en Instagram</span>
+            </label>
+          </div>
+
+          {(formData.publish_to_fb || formData.publish_to_ig) && (
+            <div className="pt-2 space-y-2">
+              <TextArea
+                label="Texto / Pie de foto para Redes Sociales (Opcional)"
+                name="social_caption"
+                value={formData.social_caption}
+                onChange={handleChange}
+                placeholder="Escribe un mensaje personalizado con emojis y hashtags. Si lo dejas vacío, se generará una bajada atractiva automáticamente con el precio, ubicación y características de la propiedad."
+                rows={4}
+                hint="Tip: Incluye hashtags relevantes como #Inmobiliaria #Propiedades #Venta"
+              />
+            </div>
+          )}
+
+          {isEditing && (property as any)?.fb_post_id && (
+            <p className="text-xs text-green-600 font-semibold flex items-center gap-1">
+              ✓ Publicado previamente en Facebook (ID: {(property as any).fb_post_id})
+            </p>
+          )}
+
+          {isEditing && (property as any)?.ig_media_id && (
+            <p className="text-xs text-green-600 font-semibold flex items-center gap-1">
+              ✓ Publicado previamente en Instagram (ID: {(property as any).ig_media_id})
+            </p>
+          )}
         </div>
       </div>
 

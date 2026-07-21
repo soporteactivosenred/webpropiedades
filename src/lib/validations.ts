@@ -44,10 +44,12 @@ export const propertyFormSchema = z.object({
   area: z.number().min(1).optional(),
   parking_spaces: z.number().int().min(0).optional(),
   features: z.array(z.string()).optional(),
-  images: z.array(z.string()).min(1, 'Agrega al menos una imagen'),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   year_built: z.number().int().min(1800).max(new Date().getFullYear()).optional(),
+  publish_to_fb: z.boolean().optional(),
+  publish_to_ig: z.boolean().optional(),
+  social_caption: z.string().optional(),
 });
 
 export type PropertyFormData = z.infer<typeof propertyFormSchema>;
