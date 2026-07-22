@@ -54,6 +54,23 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
       return;
     }
 
+    // Send email via Resend API
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: `Consulta sobre la propiedad: ${propertyTitle}\n\n${data.message}`,
+          source: 'website',
+        }),
+      });
+    } catch (emailErr) {
+      console.error('Error enviando email:', emailErr);
+    }
+
     setSuccess(true);
     setIsSubmitting(false);
   };

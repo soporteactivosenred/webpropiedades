@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Button, Input, Select, TextArea } from '@/components/ui';
 import { Home, Building2, LandPlot, Warehouse, Building, Check, Phone, Mail } from 'lucide-react';
+import { createClientComponentClient } from '@/lib/supabase/client';
 
 const propertyTypes = [
   { value: 'house', label: 'Casa', icon: Home },
@@ -16,15 +17,65 @@ export default function SellPropertyPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [step, setStep] = useState(1);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage(null);
 
-    // Simulate submission
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setSuccess(true);
-    setIsSubmitting(false);
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get('name') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const propertyType = formData.get('property_type') as string;
+    const address = formData.get('address') as string;
+    const city = formData.get('city') as string;
+    const region = formData.get('region') as string;
+    const price = formData.get('price') as string;
+    const priceType = formData.get('price_type') as string;
+    const description = formData.get('message') as string;
+
+    const formattedMessage = [
+      `SOLICITUD DE CAPTACIÓN / VENTA DE PROPIEDAD`,
+      `• Tipo de Inmueble: ${propertyType}`,
+      `• Dirección: ${address}, ${city}, ${region}`,
+      `• Operación: ${priceType === 'sale' ? 'Venta' : 'Arriendo'}`,
+      `• Precio Esperado: $${Number(price || 0).toLocaleString('es-CL')} CLP`,
+      description ? `\nDescripción adicional: ${description}` : '',
+    ].filter(Boolean).join('\n');
+
+    try {
+      const supabase = createClientComponentClient() as any;
+      
+      await supabase.from('leads').insert({
+        name,
+        email,
+        phone: phone || null,
+        message: formattedMessage,
+        source: 'website',
+        status: 'new',
+      });
+
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          message: formattedMessage,
+          source: 'vender_propiedad',
+        }),
+      });
+
+      setSuccess(true);
+    } catch (err: any) {
+      console.error('Error enviando formulario de captación:', err);
+      setErrorMessage('Hubo un problema al enviar la solicitud. Por favor intenta nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (success) {
@@ -103,6 +154,11 @@ export default function SellPropertyPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {errorMessage && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-6">
+                {errorMessage}
+              </div>
+            )}
             {step === 1 && (
               <>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
