@@ -30,7 +30,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   contact_phone: '+56 9 1234 5678',
   contact_whatsapp: '+56912345678',
   whatsapp_avatar: '/ejecutiva.png',
-  contact_address: 'Av. Principal 1234, Santiago, Chile',
+  contact_address: 'La Serena, Chile',
   social_media: {
     facebook: 'https://facebook.com/activosenred',
     instagram: 'https://instagram.com/activosenred',

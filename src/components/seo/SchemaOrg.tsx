@@ -52,7 +52,7 @@ export function OrganizationSchema({
   logo = '/images/logo.png',
   email = 'info@activosenred.cl',
   phone = '+56 9 1234 5678',
-  address = 'Av. Principal 1234, Santiago, Chile',
+  address = 'La Serena, Chile',
   socialLinks = {},
 }: OrganizationSchemaProps) {
   const schema = {
