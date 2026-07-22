@@ -214,20 +214,20 @@ export default function SellPropertyPage() {
                   <Input
                     name="address"
                     label="Dirección"
-                    placeholder="Ej: Av. Providencia 1234, Santiago"
+                    placeholder="Ej: Av. del Mar 1000, La Serena"
                     required
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <Input
                       name="city"
                       label="Ciudad"
-                      placeholder="Santiago"
+                      placeholder="La Serena"
                       required
                     />
                     <Input
                       name="region"
                       label="Región"
-                      placeholder="Metropolitana"
+                      placeholder="Coquimbo"
                       required
                     />
                   </div>
