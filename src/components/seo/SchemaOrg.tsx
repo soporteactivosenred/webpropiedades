@@ -50,7 +50,7 @@ export function OrganizationSchema({
   description = 'Encuentra tu próxima propiedad con Activos en Red. Casas, departamentos, terrenos y más.',
   url = 'https://activosenred.cl',
   logo = '/images/logo.png',
-  email = 'contacto@activosenred.cl',
+  email = 'info@activosenred.cl',
   phone = '+56 9 1234 5678',
   address = 'Av. Principal 1234, Santiago, Chile',
   socialLinks = {},
