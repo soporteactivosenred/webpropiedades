@@ -26,7 +26,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   site_name: 'Activos en Red',
   site_tagline: 'Tu hogar, nuestra pasión',
   site_description: 'Encuentra tu próxima propiedad con Activos en Red. Casas, departamentos, terrenos y más.',
-  contact_email: 'info@activosenred.cl',
+  contact_email: 'contacto@activosenred.cl',
   contact_phone: '+56 9 1234 5678',
   contact_whatsapp: '+56912345678',
   whatsapp_avatar: '/ejecutiva.png',
