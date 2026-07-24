@@ -8,7 +8,7 @@ import dynamic from 'next/dynamic';
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), { ssr: false });
 import { createServerClient } from '@/lib/supabase/server';
 import { getPropertyBySlug, incrementPropertyViews } from '@/lib/supabase';
-import { formatPrice, formatArea, formatDate, cn } from '@/lib';
+import { formatPrice, formatArea, formatDate, getPropertyCode, cn } from '@/lib';
 import { PROPERTY_TYPES_LABELS, PRICE_TYPE_LABELS, STATUS_LABELS, DEFAULT_SETTINGS } from '@/types';
 import { PropertyContactForm } from './PropertyContactForm';
 import { SchemaOrg } from '@/components/seo/SchemaOrg';
@@ -103,6 +103,8 @@ export default async function PropertyDetailPage({ params }: Props) {
   const typeLabel = PROPERTY_TYPES_LABELS[property.property_type as keyof typeof PROPERTY_TYPES_LABELS];
   const priceLabel = PRICE_TYPE_LABELS[property.price_type as keyof typeof PRICE_TYPE_LABELS];
   const statusLabel = STATUS_LABELS[property.status as keyof typeof STATUS_LABELS];
+  const propertyCode = getPropertyCode(property);
+  const fullPropertyUrl = `${SITE_URL}/propiedades/${slug}`;
 
   return (
     <>
@@ -177,7 +179,10 @@ export default async function PropertyDetailPage({ params }: Props) {
           <div className="lg:col-span-2 space-y-8">
             {/* Header */}
             <div>
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                <span className="px-2.5 py-1 text-xs font-mono font-bold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-md shadow-sm">
+                  CÓDIGO: {propertyCode}
+                </span>
                 <span className="badge-primary">{priceLabel}</span>
                 <span className="badge-gray">{typeLabel}</span>
                 <span className={`badge ${
@@ -197,19 +202,25 @@ export default async function PropertyDetailPage({ params }: Props) {
 
             {/* Price */}
             <Card>
-              <div className="flex items-baseline justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Precio</p>
                   <p className="text-3xl font-bold text-primary-600">
                     {formatPrice(property.price, property.price_type)}
                   </p>
                 </div>
-                {property.views > 0 && (
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <Eye className="w-4 h-4" />
-                    <span className="text-sm">{property.views} visitas</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700">
+                    <span className="text-gray-500 dark:text-gray-400">Código Ref:</span>{' '}
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{propertyCode}</span>
                   </div>
-                )}
+                  {property.views > 0 && (
+                    <div className="flex items-center gap-1 text-gray-500 text-sm">
+                      <Eye className="w-4 h-4" />
+                      <span>{property.views} visitas</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </Card>
 
@@ -335,7 +346,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                     ¿Te interesa esta propiedad?
                   </h3>
-                  <PropertyContactForm propertyId={property.id} propertyTitle={property.title} />
+                  <PropertyContactForm propertyId={property.id} propertyTitle={property.title} propertySlug={slug} propertyCode={propertyCode} />
                 </>
               )}
             </Card>
@@ -388,7 +399,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     )}
                     {agentProfile.phone && (
                       <a
-                        href={`https://wa.me/${agentProfile.phone.replace(/\D/g, '')}`}
+                        href={`https://wa.me/${agentProfile.phone.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Me interesa la propiedad "${property.title}" (Código: ${propertyCode}). Enlace: ${fullPropertyUrl}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block w-full"
@@ -418,7 +429,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     </Button>
                   </a>
                   <a
-                    href={`https://wa.me/${DEFAULT_SETTINGS.contact_whatsapp.replace(/\D/g, '')}`}
+                    href={`https://wa.me/${DEFAULT_SETTINGS.contact_whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Me interesa la propiedad "${property.title}" (Código: ${propertyCode}). Enlace: ${fullPropertyUrl}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full"

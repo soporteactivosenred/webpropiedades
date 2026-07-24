@@ -9,9 +9,11 @@ import { createClientComponentClient } from '@/lib/supabase/client';
 interface Props {
   propertyId: string;
   propertyTitle: string;
+  propertySlug?: string;
+  propertyCode?: string;
 }
 
-export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
+export function PropertyContactForm({ propertyId, propertyTitle, propertySlug, propertyCode }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -36,13 +38,18 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
       return;
     }
 
+    const origin = typeof window !== 'undefined' && window.location.origin
+      ? window.location.origin
+      : (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl');
+    const propertyUrl = propertySlug ? `${origin}/propiedades/${propertySlug}` : undefined;
+
     const supabase = createClientComponentClient() as any;
     
     const { error } = await supabase.from('leads').insert({
       name: data.name,
       email: data.email,
       phone: data.phone || null,
-      message: `Propiedad: ${propertyTitle} (ID: ${propertyId})\n\n${data.message}`,
+      message: `Consulta sobre Propiedad: "${propertyTitle}"\nCódigo: ${propertyCode || 'N/A'}\nEnlace: ${propertyUrl || 'N/A'}\n\nMensaje:\n${data.message}`,
       source: 'website',
       status: 'new'
     });
@@ -54,7 +61,7 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
       return;
     }
 
-    // Send email via Resend API
+    // Send email via Resend API with property code & URL
     try {
       await fetch('/api/contact', {
         method: 'POST',
@@ -63,8 +70,11 @@ export function PropertyContactForm({ propertyId, propertyTitle }: Props) {
           name: data.name,
           email: data.email,
           phone: data.phone,
-          message: `Consulta sobre la propiedad: ${propertyTitle}\n\n${data.message}`,
-          source: 'website',
+          message: data.message,
+          propertyTitle,
+          propertyCode,
+          propertyUrl,
+          source: 'property_inquiry',
         }),
       });
     } catch (emailErr) {

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { MapPin, Bed, Bath, Square, Eye } from 'lucide-react';
 import { Card } from '@/components/ui';
 import { Property, PROPERTY_TYPES_LABELS, PRICE_TYPE_LABELS } from '@/types';
-import { formatPrice, cn } from '@/lib';
+import { formatPrice, getPropertyCode, cn } from '@/lib';
 
 interface PropertyCardProps {
   property: Property;
@@ -17,6 +17,7 @@ export function PropertyCard({ property, featured = false, compact = false }: Pr
   const propertyUrl = `/propiedades/${property.slug}`;
   const typeLabel = PROPERTY_TYPES_LABELS[property.property_type];
   const priceLabel = PRICE_TYPE_LABELS[property.price_type];
+  const propertyCode = getPropertyCode(property);
 
   return (
     <Link href={propertyUrl} className="block group">
@@ -73,6 +74,13 @@ export function PropertyCard({ property, featured = false, compact = false }: Pr
                 Arrendada
               </span>
             )}
+          </div>
+
+          {/* Property Code Badge */}
+          <div className="absolute top-3 right-3 z-10">
+            <span className="px-2 py-1 text-xs font-mono font-bold bg-slate-950/85 text-slate-100 rounded shadow-md border border-white/20 backdrop-blur-sm">
+              {propertyCode}
+            </span>
           </div>
 
           {/* Views count */}

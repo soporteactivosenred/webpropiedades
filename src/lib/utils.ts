@@ -145,6 +145,32 @@ export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
 }
 
 /**
+ * Obtiene o genera el Código de Referencia de una propiedad (ej. COD-1041)
+ */
+export function getPropertyCode(property: { code?: string | null; slug?: string; id?: string } | null | undefined): string {
+  if (!property) return 'COD-0000';
+  
+  if (property.code && typeof property.code === 'string' && property.code.trim() !== '') {
+    const clean = property.code.trim().toUpperCase();
+    return clean.startsWith('COD-') || clean.startsWith('REF-') ? clean : `COD-${clean}`;
+  }
+  
+  if (property.slug) {
+    const match = property.slug.match(/-(\d+)$/);
+    if (match && match[1]) {
+      return `COD-${match[1]}`;
+    }
+  }
+
+  if (property.id) {
+    const cleanId = property.id.replace(/-/g, '').slice(0, 6).toUpperCase();
+    return `COD-${cleanId}`;
+  }
+
+  return 'COD-0000';
+}
+
+/**
  * Sleep/delay utility
  */
 export function sleep(ms: number): Promise<void> {
