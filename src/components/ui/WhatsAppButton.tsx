@@ -10,7 +10,6 @@ const SERVICES = [
   'Comprar una propiedad',
   'Arrendar una propiedad',
   'Vender mi propiedad',
-  'Acceso a crédito hipotecario',
   'Tasación de propiedad',
   'Asesoría general',
 ];
