@@ -7,7 +7,7 @@ import { Input } from '@/components/ui';
 import { Select } from '@/components/ui';
 import { TextArea } from '@/components/ui';
 import { Button } from '@/components/ui';
-import { Sparkles, Copy, Check, Wand2, MapPin } from 'lucide-react';
+import { Sparkles, Copy, Check, Wand2, MapPin, ArrowLeft, ArrowRight, Star, Trash2, GripVertical } from 'lucide-react';
 import { cn } from '@/lib';
 import type { Database } from '@/types';
 
@@ -114,6 +114,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
   const [newImageUrl, setNewImageUrl] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
 
   // Gemini state variables
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
@@ -388,6 +389,52 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
     }));
+  };
+
+  const handleMoveImage = (index: number, direction: 'left' | 'right') => {
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= formData.images.length) return;
+
+    setFormData(prev => {
+      const newImages = [...prev.images];
+      const temp = newImages[index];
+      newImages[index] = newImages[targetIndex];
+      newImages[targetIndex] = temp;
+      return { ...prev, images: newImages };
+    });
+  };
+
+  const handleMakeCoverImage = (index: number) => {
+    if (index === 0) return;
+    setFormData(prev => {
+      const newImages = [...prev.images];
+      const [selectedImage] = newImages.splice(index, 1);
+      return { ...prev, images: [selectedImage, ...newImages] };
+    });
+  };
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedImageIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedImageIndex === null || draggedImageIndex === index) return;
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedImageIndex === null || draggedImageIndex === dropIndex) return;
+
+    setFormData(prev => {
+      const newImages = [...prev.images];
+      const [draggedImg] = newImages.splice(draggedImageIndex, 1);
+      newImages.splice(dropIndex, 0, draggedImg);
+      return { ...prev, images: newImages };
+    });
+    setDraggedImageIndex(null);
   };
 
   const handleSubmit = async (e: React.FormEvent, publishNow = false) => {
@@ -889,31 +936,104 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         )}
 
         {formData.images.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {formData.images.map((url, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={url}
-                  alt={`Imagen ${index + 1}`}
-                  className="w-full h-32 object-cover rounded-lg"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x150?text=Error';
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  ×
-                </button>
-                {index === 0 && (
-                  <span className="absolute bottom-2 left-2 bg-primary-600 text-white text-xs px-2 py-1 rounded">
-                    Portada
-                  </span>
-                )}
-              </div>
-            ))}
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-1.5 font-medium">
+              <GripVertical className="w-4 h-4 text-primary-500" />
+              <span>Arrastra las imágenes o usa las flechas para ordenar cómo aparecerán en la web y en el carrusel de redes sociales. La primera foto será la portada.</span>
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {formData.images.map((url, index) => {
+                const isCover = index === 0;
+                const isDragging = draggedImageIndex === index;
+
+                return (
+                  <div
+                    key={`${url}-${index}`}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                    className={cn(
+                      "relative group rounded-xl overflow-hidden border-2 transition-all duration-200 bg-gray-100 dark:bg-gray-700/50 cursor-grab active:cursor-grabbing select-none",
+                      isCover
+                        ? "border-primary-500 shadow-md ring-2 ring-primary-500/20"
+                        : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600",
+                      isDragging && "opacity-40 border-dashed border-primary-400 scale-95"
+                    )}
+                  >
+                    <img
+                      src={url}
+                      alt={`Imagen ${index + 1}`}
+                      className="w-full h-36 object-cover pointer-events-none"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x150?text=Error';
+                      }}
+                    />
+
+                    {/* Position badge / Portada badge */}
+                    <div className="absolute top-2 left-2 flex items-center gap-1 z-10 pointer-events-none">
+                      {isCover ? (
+                        <span className="inline-flex items-center gap-1 bg-primary-600 text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm">
+                          <Star className="w-3.5 h-3.5 fill-current text-yellow-300" /> Portada
+                        </span>
+                      ) : (
+                        <span className="bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2 py-0.5 rounded-md">
+                          #{index + 1}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Quick action controls overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2 pointer-events-auto">
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          title="Eliminar imagen"
+                          className="bg-red-500/90 hover:bg-red-600 text-white rounded-lg p-1.5 transition-colors shadow"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-1 bg-black/75 backdrop-blur-sm p-1.5 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            disabled={index === 0}
+                            onClick={() => handleMoveImage(index, 'left')}
+                            title="Mover a la izquierda / subir posición"
+                            className="p-1 rounded bg-white/20 hover:bg-white/40 disabled:opacity-25 text-white transition-colors disabled:cursor-not-allowed"
+                          >
+                            <ArrowLeft className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={index === formData.images.length - 1}
+                            onClick={() => handleMoveImage(index, 'right')}
+                            title="Mover a la derecha / bajar posición"
+                            className="p-1 rounded bg-white/20 hover:bg-white/40 disabled:opacity-25 text-white transition-colors disabled:cursor-not-allowed"
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {!isCover && (
+                          <button
+                            type="button"
+                            onClick={() => handleMakeCoverImage(index)}
+                            title="Establecer como foto de portada"
+                            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-amber-500 hover:bg-amber-600 text-white rounded transition-colors shadow-sm"
+                          >
+                            <Star className="w-3 h-3 fill-current" /> Portada
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
