@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
 import type { Database } from '@/types';
+import { getPropertyCode } from '@/lib';
 import { PlusCircle, Pencil, Eye, EyeOff, Trash2, ExternalLink, Search, SlidersHorizontal, Image as ImageIcon } from 'lucide-react';
 
 type Property = Database['public']['Tables']['properties']['Row'];
@@ -198,6 +199,7 @@ export default function AdminPropertiesPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/70">
+                  <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Código</th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Propiedad</th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Precio</th>
@@ -208,6 +210,11 @@ export default function AdminPropertiesPage() {
               <tbody className="divide-y divide-gray-50">
                 {properties.map((property) => (
                   <tr key={property.id} className="hover:bg-gray-50/60 transition-colors">
+                    <td className="px-5 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-slate-900 text-white shadow-sm">
+                        {getPropertyCode(property)}
+                      </span>
+                    </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         {property.images && (property.images as string[]).length > 0 ? (
