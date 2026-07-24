@@ -180,7 +180,7 @@ export default async function PropertyDetailPage({ params }: Props) {
             {/* Header */}
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <span className="px-2.5 py-1 text-xs font-mono font-bold bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 rounded-md shadow-sm">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 shadow-sm">
                   CÓDIGO: {propertyCode}
                 </span>
                 <span className="badge-primary">{priceLabel}</span>
@@ -210,9 +210,9 @@ export default async function PropertyDetailPage({ params }: Props) {
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <div className="px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm border border-slate-200 dark:border-slate-700">
-                    <span className="text-gray-500 dark:text-gray-400">Código Ref:</span>{' '}
-                    <span className="font-mono font-bold text-slate-900 dark:text-white">{propertyCode}</span>
+                  <div className="inline-flex items-center px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 rounded-full text-sm font-semibold shadow-sm gap-1.5">
+                    <span>Código Ref:</span>
+                    <span className="font-mono font-bold text-emerald-800 dark:text-emerald-200">{propertyCode}</span>
                   </div>
                   {property.views > 0 && (
                     <div className="flex items-center gap-1 text-gray-500 text-sm">

@@ -78,7 +78,7 @@ export function PropertyCard({ property, featured = false, compact = false }: Pr
 
           {/* Property Code Badge */}
           <div className="absolute top-3 right-3 z-10">
-            <span className="px-2 py-1 text-xs font-mono font-bold bg-slate-950/85 text-slate-100 rounded shadow-md border border-white/20 backdrop-blur-sm">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50/95 text-emerald-800 border border-emerald-200/80 shadow-md backdrop-blur-sm">
               {propertyCode}
             </span>
           </div>

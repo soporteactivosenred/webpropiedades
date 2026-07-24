@@ -211,7 +211,7 @@ export default function AdminPropertiesPage() {
                 {properties.map((property) => (
                   <tr key={property.id} className="hover:bg-gray-50/60 transition-colors">
                     <td className="px-5 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-slate-900 text-white shadow-sm">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 shadow-sm">
                         {getPropertyCode(property)}
                       </span>
                     </td>
