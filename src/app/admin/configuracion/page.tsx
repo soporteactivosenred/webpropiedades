@@ -69,7 +69,70 @@ export default function AdminConfiguracionPage() {
 
   // Estado para el test de conexión Mercado Libre
   const [testingMeli, setTestingMeli] = useState(false);
+  const [exchangingCode, setExchangingCode] = useState(false);
   const [meliTestResult, setMeliTestResult] = useState<{ ok: boolean; message: string; detail?: string } | null>(null);
+
+  useEffect(() => {
+    fetchSettings();
+    checkOAuthCode();
+  }, []);
+
+  const checkOAuthCode = async () => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      setExchangingCode(true);
+      setMeliTestResult({ ok: fontStateOk(false), message: 'Autenticando y obteniendo tokens de Mercado Libre...', detail: 'Por favor espera unos segundos...' } as any);
+      try {
+        const redirectUri = window.location.origin + '/admin/configuracion';
+        const res = await fetch('/api/admin/meli/exchange-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, redirectUri }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setMeliTestResult({ ok: true, message: '¡Cuenta de Mercado Libre conectada y autorizada exitosamente!', detail: `ID Usuario: ${data.user_id}` });
+          // Limpiar el parámetro de la URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+          fetchSettings();
+        } else {
+          setMeliTestResult({ ok: false, message: 'Error al autorizar con Mercado Libre', detail: data.error });
+        }
+      } catch (err: any) {
+        setMeliTestResult({ ok: false, message: 'Error en el proceso de autorización', detail: err.message });
+      } finally {
+        setExchangingCode(false);
+      }
+    }
+  };
+
+  function fontStateOk(state: boolean) { return state; }
+
+  const handleConnectMeli = async () => {
+    if (!settings.meli_app_id.trim()) {
+      alert('Por favor ingresa primero tu App ID (Client ID) de Mercado Libre.');
+      return;
+    }
+    // Guardar las credenciales actuales en Supabase antes de redirigir
+    setSaving(true);
+    try {
+      const supabase = createAdminBrowserClient() as any;
+      await supabase.from('site_settings').upsert([
+        { key: 'meli_app_id', value: settings.meli_app_id.trim() },
+        { key: 'meli_client_secret', value: settings.meli_client_secret.trim() },
+      ]);
+    } catch (e) {
+      console.error('Error guardando credenciales:', e);
+    } finally {
+      setSaving(false);
+    }
+
+    const redirectUri = window.location.origin + '/admin/configuracion';
+    const authUrl = `https://auth.mercadolibre.cl/authorization?response_type=code&client_id=${settings.meli_app_id.trim()}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+    window.location.href = authUrl;
+  };
 
   const handleTestMeli = async () => {
     setTestingMeli(true);
@@ -84,10 +147,6 @@ export default function AdminConfiguracionPage() {
       setTestingMeli(false);
     }
   };
-
-  useEffect(() => {
-    fetchSettings();
-  }, []);
 
   const fetchSettings = async () => {
     setLoading(true);
@@ -580,26 +639,27 @@ export default function AdminConfiguracionPage() {
               />
             </div>
 
-            <Input
-              label="Access Token (Bearer Token)"
-              type="password"
-              placeholder="APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              value={settings.meli_access_token}
-              onChange={(e) => setSettings({ ...settings, meli_access_token: e.target.value })}
-            />
-
-            <Input
-              label="Refresh Token"
-              type="password"
-              placeholder="TG-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              value={settings.meli_refresh_token}
-              onChange={(e) => setSettings({ ...settings, meli_refresh_token: e.target.value })}
-            />
-
-            <div className="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-gray-400">
-                ¿Necesitas crear tu aplicación de desarrollador? Visita <a href="https://developers.mercadolibre.cl/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-medium">developers.mercadolibre.cl</a>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2 text-xs text-amber-900">
+              <p className="font-bold text-sm text-amber-950 flex items-center gap-1.5">
+                <span>💡</span> Cómo conectar la API de Mercado Libre en 2 pasos:
               </p>
+              <ol className="list-decimal list-inside space-y-1 text-amber-900/90 leading-relaxed font-medium">
+                <li>Ingresa arriba el <strong>App ID (Client ID)</strong> y el <strong>Client Secret</strong> de tu app en developers.mercadolibre.cl.</li>
+                <li>En la configuración de tu App en Mercado Libre, coloca como <strong>Redirect URI / URL de redirección</strong>: <code className="bg-amber-100 text-amber-950 px-1.5 py-0.5 rounded font-mono select-all">https://www.activosenred.cl/admin/configuracion</code></li>
+                <li>Haz clic en <strong>"🔗 Conectar / Autorizar Cuenta Mercado Libre"</strong> para iniciar sesión y autorizar. ¡Los Tokens se generarán y guardarán automáticamente!</li>
+              </ol>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <Button
+                type="button"
+                onClick={handleConnectMeli}
+                isLoading={exchangingCode}
+                className="bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-sm shadow-md"
+              >
+                🔗 Conectar / Autorizar Cuenta Mercado Libre
+              </Button>
+
               <Button
                 type="button"
                 variant="outline"
@@ -609,6 +669,30 @@ export default function AdminConfiguracionPage() {
               >
                 Probar Conexión Mercado Libre
               </Button>
+            </div>
+
+            <div className="pt-2 border-t border-gray-100">
+              <details className="text-xs text-gray-500">
+                <summary className="cursor-pointer font-semibold text-gray-700 hover:text-gray-900">
+                  Ver / Editar Tokens manualmente (Avanzado)
+                </summary>
+                <div className="space-y-3 pt-3">
+                  <Input
+                    label="Access Token (Bearer Token)"
+                    type="password"
+                    placeholder="APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    value={settings.meli_access_token}
+                    onChange={(e) => setSettings({ ...settings, meli_access_token: e.target.value })}
+                  />
+                  <Input
+                    label="Refresh Token"
+                    type="password"
+                    placeholder="TG-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                    value={settings.meli_refresh_token}
+                    onChange={(e) => setSettings({ ...settings, meli_refresh_token: e.target.value })}
+                  />
+                </div>
+              </details>
             </div>
 
             {meliTestResult && (
