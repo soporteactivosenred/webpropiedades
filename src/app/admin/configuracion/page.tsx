@@ -29,6 +29,7 @@ interface SettingsFormData {
   meli_client_secret: string;
   meli_access_token: string;
   meli_refresh_token: string;
+  meli_redirect_uri: string;
 }
 
 export default function AdminConfiguracionPage() {
@@ -53,6 +54,7 @@ export default function AdminConfiguracionPage() {
     meli_client_secret: '',
     meli_access_token: '',
     meli_refresh_token: '',
+    meli_redirect_uri: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -85,149 +87,151 @@ export default function AdminConfiguracionPage() {
       setExchangingCode(true);
       setMeliTestResult({ ok: fontStateOk(false), message: 'Autenticando y obteniendo tokens de Mercado Libre...', detail: 'Por favor espera unos segundos...' } as any);
       try {
-        const redirectUri = window.location.origin + '/admin/configuracion';
-        const res = await fetch('/api/admin/meli/exchange-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, redirectUri }),
-        });
-        const data = await res.json();
-        if (data.success) {
-          setMeliTestResult({ ok: true, message: '¡Cuenta de Mercado Libre conectada y autorizada exitosamente!', detail: `ID Usuario: ${data.user_id}` });
-          // Limpiar el parámetro de la URL
-          window.history.replaceState({}, document.title, window.location.pathname);
-          fetchSettings();
-        } else {
-          setMeliTestResult({ ok: false, message: 'Error al autorizar con Mercado Libre', detail: data.error });
-        }
-      } catch (err: any) {
-        setMeliTestResult({ ok: false, message: 'Error en el proceso de autorización', detail: err.message });
-      } finally {
-        setExchangingCode(false);
+      const redirectUri = (settings.meli_redirect_uri || (window.location.origin + '/admin/configuracion')).trim();
+      const res = await fetch('/api/admin/meli/exchange-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, redirectUri }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMeliTestResult({ ok: true, message: '¡Cuenta de Mercado Libre conectada y autorizada exitosamente!', detail: `ID Usuario: ${data.user_id}` });
+        // Limpiar el parámetro de la URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        fetchSettings();
+      } else {
+        setMeliTestResult({ ok: false, message: 'Error al autorizar con Mercado Libre', detail: data.error });
       }
+    } catch (err: any) {
+      setMeliTestResult({ ok: false, message: 'Error en el proceso de autorización', detail: err.message });
+    } finally {
+      setExchangingCode(false);
     }
-  };
+  }
+};
 
-  function fontStateOk(state: boolean) { return state; }
+const handleConnectMeli = async () => {
+  if (!settings.meli_app_id.trim()) {
+    alert('Por favor ingresa primero tu App ID (Client ID) de Mercado Libre.');
+    return;
+  }
+  const redirectUri = (settings.meli_redirect_uri || (window.location.origin + '/admin/configuracion')).trim();
+  
+  // Guardar las credenciales actuales en Supabase antes de redirigir
+  setSaving(true);
+  try {
+    const supabase = createAdminBrowserClient() as any;
+    await supabase.from('site_settings').upsert([
+      { key: 'meli_app_id', value: settings.meli_app_id.trim() },
+      { key: 'meli_client_secret', value: settings.meli_client_secret.trim() },
+      { key: 'meli_redirect_uri', value: redirectUri },
+    ]);
+  } catch (e) {
+    console.error('Error guardando credenciales:', e);
+  } finally {
+    setSaving(false);
+  }
 
-  const handleConnectMeli = async () => {
-    if (!settings.meli_app_id.trim()) {
-      alert('Por favor ingresa primero tu App ID (Client ID) de Mercado Libre.');
+  const authUrl = `https://auth.mercadolibre.cl/authorization?response_type=code&client_id=${settings.meli_app_id.trim()}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  window.location.href = authUrl;
+};
+
+const handleTestMeli = async () => {
+  setTestingMeli(true);
+  setMeliTestResult(null);
+  try {
+    const res = await fetch('/api/admin/test-meli', { method: 'POST' });
+    const data = await res.json();
+    setMeliTestResult(data);
+  } catch (err: any) {
+    setMeliTestResult({ ok: false, message: 'Error de conexión', detail: err.message });
+  } finally {
+    setTestingMeli(false);
+  }
+};
+
+const fetchSettings = async () => {
+  setLoading(true);
+  try {
+    const supabase = createAdminBrowserClient() as any;
+    const { data, error: fetchError } = await supabase
+      .from('site_settings')
+      .select('*');
+
+    if (fetchError) {
+      setError(fetchError.message);
       return;
     }
-    // Guardar las credenciales actuales en Supabase antes de redirigir
-    setSaving(true);
-    try {
-      const supabase = createAdminBrowserClient() as any;
-      await supabase.from('site_settings').upsert([
-        { key: 'meli_app_id', value: settings.meli_app_id.trim() },
-        { key: 'meli_client_secret', value: settings.meli_client_secret.trim() },
-      ]);
-    } catch (e) {
-      console.error('Error guardando credenciales:', e);
-    } finally {
-      setSaving(false);
-    }
 
-    const redirectUri = window.location.origin + '/admin/configuracion';
-    const authUrl = `https://auth.mercadolibre.cl/authorization?response_type=code&client_id=${settings.meli_app_id.trim()}&redirect_uri=${encodeURIComponent(redirectUri)}`;
-    window.location.href = authUrl;
-  };
+    // Map settings to form data
+    const settingsMap: Record<string, string> = {};
+    data?.forEach((setting: any) => {
+      settingsMap[setting.key] = String(setting.value);
+    });
 
-  const handleTestMeli = async () => {
-    setTestingMeli(true);
-    setMeliTestResult(null);
-    try {
-      const res = await fetch('/api/admin/test-meli', { method: 'POST' });
-      const data = await res.json();
-      setMeliTestResult(data);
-    } catch (err: any) {
-      setMeliTestResult({ ok: false, message: 'Error de conexión', detail: err.message });
-    } finally {
-      setTestingMeli(false);
-    }
-  };
+    setSettings({
+      site_name: settingsMap.site_name || 'Activos en Red',
+      site_description: settingsMap.site_description || '',
+      whatsapp_number: settingsMap.whatsapp_number || '',
+      whatsapp_avatar: settingsMap.whatsapp_avatar || '/ejecutiva.png',
+      contact_email: settingsMap.contact_email || '',
+      facebook_url: settingsMap.facebook_url || '',
+      instagram_url: settingsMap.instagram_url || '',
+      linkedin_url: settingsMap.linkedin_url || '',
+      twitter_url: settingsMap.twitter_url || '',
+      seo_default_title: settingsMap.seo_default_title || '',
+      seo_default_description: settingsMap.seo_default_description || '',
+      seo_default_keywords: settingsMap.seo_default_keywords || '',
+      og_image: settingsMap.og_image || '',
+      meta_fb_page_id: settingsMap.meta_fb_page_id || '',
+      meta_ig_business_id: settingsMap.meta_ig_business_id || '',
+      meta_page_access_token: settingsMap.meta_page_access_token || '',
+      meli_app_id: settingsMap.meli_app_id || '',
+      meli_client_secret: settingsMap.meli_client_secret || '',
+      meli_access_token: settingsMap.meli_access_token || '',
+      meli_refresh_token: settingsMap.meli_refresh_token || '',
+      meli_redirect_uri: settingsMap.meli_redirect_uri || (typeof window !== 'undefined' ? window.location.origin + '/admin/configuracion' : 'https://www.activosenred.cl/admin/configuracion'),
+    });
+  } catch (err) {
+    setError('Error al cargar configuración');
+  } finally {
+    setLoading(false);
+  }
+};
 
-  const fetchSettings = async () => {
-    setLoading(true);
-    try {
-      const supabase = createAdminBrowserClient() as any;
-      const { data, error: fetchError } = await supabase
-        .from('site_settings')
-        .select('*');
+const handleSave = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setSaving(true);
+  setError(null);
+  setSuccess(false);
 
-      if (fetchError) {
-        setError(fetchError.message);
-        return;
-      }
+  try {
+    const supabase = createAdminBrowserClient() as any;
 
-      // Map settings to form data
-      const settingsMap: Record<string, string> = {};
-      data?.forEach((setting: any) => {
-        settingsMap[setting.key] = String(setting.value);
-      });
-
-      setSettings({
-        site_name: settingsMap.site_name || 'Activos en Red',
-        site_description: settingsMap.site_description || '',
-        whatsapp_number: settingsMap.whatsapp_number || '',
-        whatsapp_avatar: settingsMap.whatsapp_avatar || '/ejecutiva.png',
-        contact_email: settingsMap.contact_email || '',
-        facebook_url: settingsMap.facebook_url || '',
-        instagram_url: settingsMap.instagram_url || '',
-        linkedin_url: settingsMap.linkedin_url || '',
-        twitter_url: settingsMap.twitter_url || '',
-        seo_default_title: settingsMap.seo_default_title || '',
-        seo_default_description: settingsMap.seo_default_description || '',
-        seo_default_keywords: settingsMap.seo_default_keywords || '',
-        og_image: settingsMap.og_image || '',
-        meta_fb_page_id: settingsMap.meta_fb_page_id || '',
-        meta_ig_business_id: settingsMap.meta_ig_business_id || '',
-        meta_page_access_token: settingsMap.meta_page_access_token || '',
-        meli_app_id: settingsMap.meli_app_id || '',
-        meli_client_secret: settingsMap.meli_client_secret || '',
-        meli_access_token: settingsMap.meli_access_token || '',
-        meli_refresh_token: settingsMap.meli_refresh_token || '',
-      });
-    } catch (err) {
-      setError('Error al cargar configuración');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setError(null);
-    setSuccess(false);
-
-    try {
-      const supabase = createAdminBrowserClient() as any;
-
-      // Update each setting individually
-      const settingsToUpdate = [
-        { key: 'site_name', value: settings.site_name },
-        { key: 'site_description', value: settings.site_description },
-        { key: 'whatsapp_number', value: settings.whatsapp_number },
-        { key: 'whatsapp_avatar', value: settings.whatsapp_avatar },
-        { key: 'contact_email', value: settings.contact_email },
-        { key: 'facebook_url', value: settings.facebook_url },
-        { key: 'instagram_url', value: settings.instagram_url },
-        { key: 'linkedin_url', value: settings.linkedin_url },
-        { key: 'twitter_url', value: settings.twitter_url },
-        { key: 'seo_default_title', value: settings.seo_default_title },
-        { key: 'seo_default_description', value: settings.seo_default_description },
-        { key: 'seo_default_keywords', value: settings.seo_default_keywords },
-        { key: 'og_image', value: settings.og_image },
-        { key: 'meta_fb_page_id', value: settings.meta_fb_page_id },
-        { key: 'meta_ig_business_id', value: settings.meta_ig_business_id },
-        { key: 'meta_page_access_token', value: settings.meta_page_access_token },
-        { key: 'meli_app_id', value: settings.meli_app_id },
-        { key: 'meli_client_secret', value: settings.meli_client_secret },
-        { key: 'meli_access_token', value: settings.meli_access_token },
-        { key: 'meli_refresh_token', value: settings.meli_refresh_token },
-      ];
+    // Update each setting individually
+    const settingsToUpdate = [
+      { key: 'site_name', value: settings.site_name },
+      { key: 'site_description', value: settings.site_description },
+      { key: 'whatsapp_number', value: settings.whatsapp_number },
+      { key: 'whatsapp_avatar', value: settings.whatsapp_avatar },
+      { key: 'contact_email', value: settings.contact_email },
+      { key: 'facebook_url', value: settings.facebook_url },
+      { key: 'instagram_url', value: settings.instagram_url },
+      { key: 'linkedin_url', value: settings.linkedin_url },
+      { key: 'twitter_url', value: settings.twitter_url },
+      { key: 'seo_default_title', value: settings.seo_default_title },
+      { key: 'seo_default_description', value: settings.seo_default_description },
+      { key: 'seo_default_keywords', value: settings.seo_default_keywords },
+      { key: 'og_image', value: settings.og_image },
+      { key: 'meta_fb_page_id', value: settings.meta_fb_page_id },
+      { key: 'meta_ig_business_id', value: settings.meta_ig_business_id },
+      { key: 'meta_page_access_token', value: settings.meta_page_access_token },
+      { key: 'meli_app_id', value: settings.meli_app_id },
+      { key: 'meli_client_secret', value: settings.meli_client_secret },
+      { key: 'meli_access_token', value: settings.meli_access_token },
+      { key: 'meli_refresh_token', value: settings.meli_refresh_token },
+      { key: 'meli_redirect_uri', value: settings.meli_redirect_uri },
+    ];
 
       for (const setting of settingsToUpdate) {
         // Try to update, if not exists insert
@@ -639,14 +643,44 @@ export default function AdminConfiguracionPage() {
               />
             </div>
 
+            <div className="space-y-1">
+              <Input
+                label="URL de Redirección (Redirect URI configurada en Mercado Libre)"
+                placeholder="https://www.activosenred.cl/admin/configuracion"
+                value={settings.meli_redirect_uri}
+                onChange={(e) => setSettings({ ...settings, meli_redirect_uri: e.target.value })}
+                hint="Debe ser EXACTAMENTE idéntica a la 'Redirect URI' configurada en el panel de tu App en developers.mercadolibre.cl"
+              />
+              <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
+                <span className="text-gray-400">Usar rápida:</span>
+                <button
+                  type="button"
+                  onClick={() => setSettings({ ...settings, meli_redirect_uri: 'https://www.activosenred.cl/admin/configuracion' })}
+                  className="text-amber-700 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 font-mono font-medium"
+                >
+                  https://www.activosenred.cl/admin/configuracion
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSettings({ ...settings, meli_redirect_uri: 'https://activosenred.cl/admin/configuracion' })}
+                  className="text-amber-700 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 font-mono font-medium"
+                >
+                  https://activosenred.cl/admin/configuracion
+                </button>
+              </div>
+            </div>
+
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-2 text-xs text-amber-900">
               <p className="font-bold text-sm text-amber-950 flex items-center gap-1.5">
-                <span>💡</span> Cómo conectar la API de Mercado Libre en 2 pasos:
+                <span>⚠️</span> ¿Por qué Mercado Libre muestra "Lo sentimos, la aplicación no puede conectarse a tu cuenta"?
               </p>
-              <ol className="list-decimal list-inside space-y-1 text-amber-900/90 leading-relaxed font-medium">
-                <li>Ingresa arriba el <strong>App ID (Client ID)</strong> y el <strong>Client Secret</strong> de tu app en developers.mercadolibre.cl.</li>
-                <li>En la configuración de tu App en Mercado Libre, coloca como <strong>Redirect URI / URL de redirección</strong>: <code className="bg-amber-100 text-amber-950 px-1.5 py-0.5 rounded font-mono select-all">https://www.activosenred.cl/admin/configuracion</code></li>
-                <li>Haz clic en <strong>"🔗 Conectar / Autorizar Cuenta Mercado Libre"</strong> para iniciar sesión y autorizar. ¡Los Tokens se generarán y guardarán automáticamente!</li>
+              <p className="text-amber-900/90 leading-relaxed font-medium">
+                Este mensaje ocurre cuando la <strong>Redirect URI</strong> de arriba no coincide carácter por carácter (letra por letra) con la <strong>Redirect URI</strong> configurada en tu App en <strong>developers.mercadolibre.cl</strong>.
+              </p>
+              <ol className="list-decimal list-inside space-y-1 text-amber-900/90 leading-relaxed font-medium pt-1">
+                <li>Ve a <a href="https://developers.mercadolibre.cl/" target="_blank" rel="noopener noreferrer" className="underline font-bold text-blue-700">developers.mercadolibre.cl</a> → Mis Aplicaciones → Editar tu App.</li>
+                <li>Copia la <strong>Redirect URI</strong> que tienes escrita ahí y pégala en el campo de arriba (o asegúrate de que sean 100% idénticas).</li>
+                <li>Haz clic en <strong>"🔗 Conectar / Autorizar Cuenta Mercado Libre"</strong>.</li>
               </ol>
             </div>
 
