@@ -25,6 +25,10 @@ interface SettingsFormData {
   meta_fb_page_id: string;
   meta_ig_business_id: string;
   meta_page_access_token: string;
+  meli_app_id: string;
+  meli_client_secret: string;
+  meli_access_token: string;
+  meli_refresh_token: string;
 }
 
 export default function AdminConfiguracionPage() {
@@ -45,6 +49,10 @@ export default function AdminConfiguracionPage() {
     meta_fb_page_id: '',
     meta_ig_business_id: '',
     meta_page_access_token: '',
+    meli_app_id: '',
+    meli_client_secret: '',
+    meli_access_token: '',
+    meli_refresh_token: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -58,6 +66,24 @@ export default function AdminConfiguracionPage() {
     facebook: { ok: boolean; message: string; detail: string };
     instagram: { ok: boolean; message: string; detail: string };
   } | null>(null);
+
+  // Estado para el test de conexión Mercado Libre
+  const [testingMeli, setTestingMeli] = useState(false);
+  const [meliTestResult, setMeliTestResult] = useState<{ ok: boolean; message: string; detail?: string } | null>(null);
+
+  const handleTestMeli = async () => {
+    setTestingMeli(true);
+    setMeliTestResult(null);
+    try {
+      const res = await fetch('/api/admin/test-meli', { method: 'POST' });
+      const data = await res.json();
+      setMeliTestResult(data);
+    } catch (err: any) {
+      setMeliTestResult({ ok: false, message: 'Error de conexión', detail: err.message });
+    } finally {
+      setTestingMeli(false);
+    }
+  };
 
   useEffect(() => {
     fetchSettings();
@@ -99,6 +125,10 @@ export default function AdminConfiguracionPage() {
         meta_fb_page_id: settingsMap.meta_fb_page_id || '',
         meta_ig_business_id: settingsMap.meta_ig_business_id || '',
         meta_page_access_token: settingsMap.meta_page_access_token || '',
+        meli_app_id: settingsMap.meli_app_id || '',
+        meli_client_secret: settingsMap.meli_client_secret || '',
+        meli_access_token: settingsMap.meli_access_token || '',
+        meli_refresh_token: settingsMap.meli_refresh_token || '',
       });
     } catch (err) {
       setError('Error al cargar configuración');
@@ -134,6 +164,10 @@ export default function AdminConfiguracionPage() {
         { key: 'meta_fb_page_id', value: settings.meta_fb_page_id },
         { key: 'meta_ig_business_id', value: settings.meta_ig_business_id },
         { key: 'meta_page_access_token', value: settings.meta_page_access_token },
+        { key: 'meli_app_id', value: settings.meli_app_id },
+        { key: 'meli_client_secret', value: settings.meli_client_secret },
+        { key: 'meli_access_token', value: settings.meli_access_token },
+        { key: 'meli_refresh_token', value: settings.meli_refresh_token },
       ];
 
       for (const setting of settingsToUpdate) {
@@ -510,6 +544,77 @@ export default function AdminConfiguracionPage() {
                     </div>
                   );
                 })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Mercado Libre & Portal Inmobiliario Integration Card */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-amber-50/50 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span className="bg-amber-400 text-amber-950 text-xs px-2 py-0.5 rounded font-black uppercase">Mercado Libre</span>
+                Integración Mercado Libre / Portal Inmobiliario Chile (API MLC)
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Configura tus credenciales de la API de Mercado Libre Developers para publicar inmuebles automáticamente en Mercado Libre y Portal Inmobiliario Chile.
+              </p>
+            </div>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="App ID (Client ID)"
+                placeholder="Ej: 1234567890"
+                value={settings.meli_app_id}
+                onChange={(e) => setSettings({ ...settings, meli_app_id: e.target.value })}
+              />
+              <Input
+                label="Client Secret (Secret Key)"
+                type="password"
+                placeholder="Ej: xxxxxxxxxxxxxxxx"
+                value={settings.meli_client_secret}
+                onChange={(e) => setSettings({ ...settings, meli_client_secret: e.target.value })}
+              />
+            </div>
+
+            <Input
+              label="Access Token (Bearer Token)"
+              type="password"
+              placeholder="APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              value={settings.meli_access_token}
+              onChange={(e) => setSettings({ ...settings, meli_access_token: e.target.value })}
+            />
+
+            <Input
+              label="Refresh Token"
+              type="password"
+              placeholder="TG-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              value={settings.meli_refresh_token}
+              onChange={(e) => setSettings({ ...settings, meli_refresh_token: e.target.value })}
+            />
+
+            <div className="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-gray-400">
+                ¿Necesitas crear tu aplicación de desarrollador? Visita <a href="https://developers.mercadolibre.cl/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-medium">developers.mercadolibre.cl</a>
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleTestMeli}
+                isLoading={testingMeli}
+                className="border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold"
+              >
+                Probar Conexión Mercado Libre
+              </Button>
+            </div>
+
+            {meliTestResult && (
+              <div className={`p-4 rounded-xl border-2 transition-all ${meliTestResult.ok ? 'border-green-200 bg-green-50 text-green-900' : 'border-red-200 bg-red-50 text-red-900'}`}>
+                <p className="font-semibold text-sm">{meliTestResult.message}</p>
+                {meliTestResult.detail && <p className="text-xs mt-0.5 opacity-80">{meliTestResult.detail}</p>}
               </div>
             )}
           </div>

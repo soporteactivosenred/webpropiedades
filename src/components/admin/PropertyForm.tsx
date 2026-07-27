@@ -103,7 +103,16 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     publish_to_fb: (property as any)?.publish_to_fb || false,
     publish_to_ig: (property as any)?.publish_to_ig || false,
     social_caption: (property as any)?.social_caption || '',
+    // Mercado Libre Autopublish fields
+    publish_to_meli: (property as any)?.publish_to_meli || false,
+    meli_item_id: (property as any)?.meli_item_id || '',
+    meli_permalink: (property as any)?.meli_permalink || '',
+    meli_status: (property as any)?.meli_status || '',
+    meli_listing_type: (property as any)?.meli_listing_type || 'gold_special',
   });
+
+  const [isPublishingMeli, setIsPublishingMeli] = useState(false);
+  const [meliPublishResult, setMeliPublishResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null);
 
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodeError, setGeocodeError] = useState<string | null>(null);
@@ -437,6 +446,36 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     setDraggedImageIndex(null);
   };
 
+  const handlePublishMeliNow = async () => {
+    if (!property?.id) return;
+    setIsPublishingMeli(true);
+    setMeliPublishResult(null);
+    try {
+      const res = await fetch('/api/admin/properties/publish-meli', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ propertyId: property.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setMeliPublishResult({ success: true, message: data.message });
+        setFormData(prev => ({
+          ...prev,
+          publish_to_meli: true,
+          meli_item_id: data.meli_item_id,
+          meli_permalink: data.meli_permalink,
+          meli_status: 'active',
+        }));
+      } else {
+        setMeliPublishResult({ success: false, error: data.error });
+      }
+    } catch (err: any) {
+      setMeliPublishResult({ success: false, error: err.message });
+    } finally {
+      setIsPublishingMeli(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent, publishNow = false) => {
     e.preventDefault();
     setError(null);
@@ -472,6 +511,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         publish_to_fb: formData.publish_to_fb,
         publish_to_ig: formData.publish_to_ig,
         social_caption: formData.social_caption || null,
+        publish_to_meli: formData.publish_to_meli,
+        meli_listing_type: formData.meli_listing_type,
       };
 
       let result;
@@ -505,6 +546,19 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
           });
         } catch (pubErr) {
           console.error('Error al autopublicar propiedad en redes:', pubErr);
+        }
+      }
+
+      // Disparar autopublicación en Mercado Libre si está seleccionado
+      if (savedProp?.id && formData.publish_to_meli) {
+        try {
+          await fetch('/api/admin/properties/publish-meli', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ propertyId: savedProp.id }),
+          });
+        } catch (meliErr) {
+          console.error('Error al autopublicar propiedad en Mercado Libre:', meliErr);
         }
       }
 
@@ -1154,6 +1208,96 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             <p className="text-xs text-green-600 font-semibold flex items-center gap-1">
               ✓ Publicado previamente en Instagram (ID: {(property as any).ig_media_id})
             </p>
+          )}
+        </div>
+      </div>
+
+      {/* Mercado Libre Autopublish Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <span className="bg-amber-400 text-amber-950 text-xs px-2 py-0.5 rounded font-black uppercase">Mercado Libre</span>
+            Publicación en Mercado Libre y Portal Inmobiliario Chile
+          </h2>
+          {isEditing && property?.id && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePublishMeliNow}
+              isLoading={isPublishingMeli}
+              className="border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-semibold"
+            >
+              {formData.meli_item_id ? '🔄 Sincronizar / Actualizar en Mercado Libre' : '🚀 Publicar en Mercado Libre Ahora'}
+            </Button>
+          )}
+        </div>
+        
+        <p className="text-sm text-gray-500 mb-4">
+          Publica esta propiedad directamente en la red de Mercado Libre Chile y Portal Inmobiliario.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-6">
+            <label className="inline-flex items-center gap-2 cursor-pointer font-medium text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="publish_to_meli"
+                checked={formData.publish_to_meli}
+                onChange={(e) => setFormData(prev => ({ ...prev, publish_to_meli: e.target.checked }))}
+                className="w-4 h-4 text-amber-600 rounded border-gray-300 focus:ring-amber-500"
+              />
+              <span>🟡 Sincronizar automáticamente con Mercado Libre / Portal Inmobiliario</span>
+            </label>
+          </div>
+
+          {formData.publish_to_meli && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tipo de Exposición (Listing Type)
+                </label>
+                <select
+                  name="meli_listing_type"
+                  value={formData.meli_listing_type}
+                  onChange={(e) => setFormData(prev => ({ ...prev, meli_listing_type: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-amber-500 focus:border-amber-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  <option value="gold_special">Oro Especial (Recomendado)</option>
+                  <option value="gold_premium">Oro Premium (Máxima Exposición)</option>
+                  <option value="gold">Oro</option>
+                  <option value="silver">Plata</option>
+                  <option value="free">Gratuita</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {formData.meli_item_id && (
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-emerald-600" />
+                Publicado en Mercado Libre / Portal Inmobiliario (ID: {formData.meli_item_id})
+              </span>
+              {formData.meli_permalink && (
+                <a
+                  href={formData.meli_permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-emerald-700 hover:text-emerald-900 underline font-bold flex items-center gap-1"
+                >
+                  Ver Ficha en Mercado Libre ↗
+                </a>
+              )}
+            </div>
+          )}
+
+          {meliPublishResult && (
+            <div className={`p-3 rounded-lg border text-xs font-semibold ${
+              meliPublishResult.success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {meliPublishResult.success ? meliPublishResult.message : `Error: ${meliPublishResult.error}`}
+            </div>
           )}
         </div>
       </div>
