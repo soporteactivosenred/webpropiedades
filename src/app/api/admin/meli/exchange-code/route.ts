@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const { data: settingsList } = await supabaseAdmin
       .from('site_settings')
       .select('key, value')
-      .in('key', ['meli_app_id', 'meli_client_secret']);
+      .in('key', ['meli_app_id', 'meli_client_secret', 'meli_code_verifier']);
 
     const settingsMap: Record<string, string> = {};
     settingsList?.forEach((s: any) => {
@@ -33,6 +33,7 @@ export async function POST(req: Request) {
 
     const appId = bodyAppId || settingsMap.meli_app_id;
     const clientSecret = bodyClientSecret || settingsMap.meli_client_secret;
+    const codeVerifier = settingsMap.meli_code_verifier;
 
     if (!appId || !clientSecret) {
       return NextResponse.json({
@@ -40,17 +41,23 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    const tokenParams: Record<string, string> = {
+      grant_type: 'authorization_code',
+      client_id: appId.trim(),
+      client_secret: clientSecret.trim(),
+      code: code.trim(),
+      redirect_uri: redirectUri,
+    };
+
+    if (codeVerifier) {
+      tokenParams['code_verifier'] = codeVerifier.trim();
+    }
+
     // Intercambiar el código por access_token y refresh_token en Mercado Libre
     const tokenRes = await fetch('https://api.mercadolibre.com/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: appId.trim(),
-        client_secret: clientSecret.trim(),
-        code: code.trim(),
-        redirect_uri: redirectUri,
-      }),
+      body: new URLSearchParams(tokenParams),
     });
 
     const tokenData = await tokenRes.json();

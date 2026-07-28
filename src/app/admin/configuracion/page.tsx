@@ -142,30 +142,49 @@ export default function AdminConfiguracionPage() {
   }
 };
 
+async function generatePkce() {
+  const verifier = Array.from(window.crypto.getRandomValues(new Uint8Array(32)))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('');
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+  return { verifier, challenge };
+}
+
 const handleConnectMeli = async () => {
   if (!settings.meli_app_id.trim()) {
     alert('Por favor ingresa primero tu App ID (Client ID) de Mercado Libre.');
     return;
   }
-  const redirectUri = (settings.meli_redirect_uri || (window.location.origin + '/admin/configuracion')).trim();
+  const redirectUri = (settings.meli_redirect_uri || 'https://activosenred.cl/api/mercadolibre/callback').trim();
   
-  // Guardar las credenciales actuales en Supabase antes de redirigir
+  // Guardar las credenciales actuales y el PKCE code_verifier en Supabase antes de redirigir
   setSaving(true);
   try {
+    const pkce = await generatePkce();
     const supabase = createAdminBrowserClient() as any;
     await supabase.from('site_settings').upsert([
       { key: 'meli_app_id', value: settings.meli_app_id.trim() },
       { key: 'meli_client_secret', value: settings.meli_client_secret.trim() },
       { key: 'meli_redirect_uri', value: redirectUri },
+      { key: 'meli_code_verifier', value: pkce.verifier },
     ]);
+
+    const authUrl = `https://auth.mercadolibre.cl/authorization?response_type=code&client_id=${settings.meli_app_id.trim()}&redirect_uri=${encodeURIComponent(redirectUri)}&code_challenge=${pkce.challenge}&code_challenge_method=S256`;
+    window.location.href = authUrl;
   } catch (e) {
-    console.error('Error guardando credenciales:', e);
+    console.error('Error guardando credenciales o generando PKCE:', e);
+    alert('Error al iniciar la autorización de Mercado Libre.');
   } finally {
     setSaving(false);
   }
-
-  const authUrl = `https://auth.mercadolibre.cl/authorization?response_type=code&client_id=${settings.meli_app_id.trim()}&redirect_uri=${encodeURIComponent(redirectUri)}`;
-  window.location.href = authUrl;
 };
 
 // Estado para el test de conexión Yapo.cl

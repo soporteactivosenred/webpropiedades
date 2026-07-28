@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     const { data: settingsList } = await supabaseAdmin
       .from('site_settings')
       .select('key, value')
-      .in('key', ['meli_app_id', 'meli_client_secret', 'meli_redirect_uri']);
+      .in('key', ['meli_app_id', 'meli_client_secret', 'meli_redirect_uri', 'meli_code_verifier']);
 
     const settingsMap: Record<string, string> = {};
     settingsList?.forEach((s: any) => {
@@ -36,22 +36,29 @@ export async function GET(req: Request) {
     const appId = settingsMap.meli_app_id || '3761073179873403';
     const clientSecret = settingsMap.meli_client_secret;
     const redirectUri = settingsMap.meli_redirect_uri || 'https://activosenred.cl/api/mercadolibre/callback';
+    const codeVerifier = settingsMap.meli_code_verifier;
 
     if (!clientSecret) {
       return NextResponse.redirect(`${siteUrl}/admin/configuracion?meli_error=Falta_Client_Secret`);
+    }
+
+    const tokenBodyParams: Record<string, string> = {
+      grant_type: 'authorization_code',
+      client_id: appId.trim(),
+      client_secret: clientSecret.trim(),
+      code: code.trim(),
+      redirect_uri: redirectUri.trim(),
+    };
+
+    if (codeVerifier) {
+      tokenBodyParams['code_verifier'] = codeVerifier.trim();
     }
 
     // Intercambiar el código por el Access Token en Mercado Libre
     const tokenRes = await fetch('https://api.mercadolibre.com/oauth/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        client_id: appId.trim(),
-        client_secret: clientSecret.trim(),
-        code: code.trim(),
-        redirect_uri: redirectUri.trim(),
-      }),
+      body: new URLSearchParams(tokenBodyParams),
     });
 
     const tokenData = await tokenRes.json();
