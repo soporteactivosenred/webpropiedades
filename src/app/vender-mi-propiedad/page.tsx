@@ -183,7 +183,7 @@ export default function SellPropertyPage() {
                       name="phone"
                       type="tel"
                       label="Teléfono"
-                      placeholder="+56 9 1234 5678"
+                      placeholder="+56 9 73081220"
                       required
                     />
                   </div>
@@ -273,8 +273,8 @@ export default function SellPropertyPage() {
         <div className="mt-8 text-center">
           <p className="text-gray-600 dark:text-gray-400">
             ¿Prefieres hablar directamente?{' '}
-            <a href="tel:+56912345678" className="text-primary-600 font-medium hover:underline">
-              Llámanos al +56 9 1234 5678
+            <a href="tel:+56973081220" className="text-primary-600 font-medium hover:underline">
+              Llámanos al +56 9 73081220
             </a>
           </p>
         </div>

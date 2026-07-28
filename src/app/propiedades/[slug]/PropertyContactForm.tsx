@@ -125,7 +125,7 @@ export function PropertyContactForm({ propertyId, propertyTitle, propertySlug, p
         name="phone"
         type="tel"
         label="Teléfono (opcional)"
-        placeholder="+56 9 1234 5678"
+        placeholder="+56 9 73081220"
         error={errors.phone}
       />
       <TextArea

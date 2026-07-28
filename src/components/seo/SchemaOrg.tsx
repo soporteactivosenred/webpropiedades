@@ -51,8 +51,8 @@ export function OrganizationSchema({
   url = 'https://activosenred.cl',
   logo = '/images/logo.png',
   email = 'contacto@activosenred.cl',
-  phone = '+56 9 1234 5678',
-  address = 'La Serena, Chile',
+  phone = '+56 9 73081220',
+  address = 'Gómez Carreño 333, La Serena',
   socialLinks = {},
 }: OrganizationSchemaProps) {
   const schema = {

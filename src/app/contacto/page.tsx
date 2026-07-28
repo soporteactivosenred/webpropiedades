@@ -139,7 +139,7 @@ export default function ContactPage() {
                   name="phone"
                   type="tel"
                   label="Teléfono"
-                  placeholder="+56 9 1234 5678"
+                  placeholder="+56 9 73081220"
                   error={errors.phone}
                 />
                 <TextArea

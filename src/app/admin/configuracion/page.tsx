@@ -386,7 +386,7 @@ const handleSave = async (e: React.FormEvent) => {
               name="whatsapp_number"
               value={settings.whatsapp_number}
               onChange={handleChange}
-              placeholder="+56912345678"
+              placeholder="+56973081220"
               hint="Número con código de país, sin espacios ni guiones"
             />
 

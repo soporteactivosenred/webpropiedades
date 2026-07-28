@@ -27,10 +27,10 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   site_tagline: 'Tu hogar, nuestra pasión',
   site_description: 'Encuentra tu próxima propiedad con Activos en Red. Casas, departamentos, terrenos y más.',
   contact_email: 'contacto@activosenred.cl',
-  contact_phone: '+56 9 1234 5678',
-  contact_whatsapp: '+56912345678',
+  contact_phone: '+56 9 73081220',
+  contact_whatsapp: '+56973081220',
   whatsapp_avatar: '/ejecutiva.png',
-  contact_address: 'La Serena, Chile',
+  contact_address: 'Gómez Carreño 333, La Serena',
   social_media: {
     facebook: 'https://facebook.com/activosenred',
     instagram: 'https://instagram.com/activosenred',

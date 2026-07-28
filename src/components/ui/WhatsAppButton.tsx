@@ -261,7 +261,7 @@ export function WhatsAppButton() {
                           type="tel"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          placeholder="+56 9 1234 5678"
+                          placeholder="+56 9 73081220"
                           className={`w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 transition-colors ${
                             errors.phone
                               ? 'border-red-300 focus:ring-red-200'

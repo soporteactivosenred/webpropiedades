@@ -14,7 +14,7 @@ const features = [
   },
   {
     icon: Key,
-    title: 'Trámites帮你',
+    title: 'Trámites',
     description: 'Te acompañamos en todo el proceso de compra o arriendo',
   },
   {

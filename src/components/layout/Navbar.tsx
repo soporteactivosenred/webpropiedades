@@ -21,11 +21,11 @@ function Navbar() {
             Activos en Red &mdash; Expertos inmobiliarios en Chile
           </span>
           <a
-            href="tel:+56912345678"
+            href="tel:+56973081220"
             className="flex items-center gap-1.5 hover:text-white transition-colors ml-auto"
           >
             <Phone className="w-3 h-3" />
-            +569 1234 5678
+            +56 9 73081220
           </a>
         </div>
       </div>
