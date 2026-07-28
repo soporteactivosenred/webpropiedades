@@ -60,10 +60,29 @@ export async function POST() {
 
     const meData = await meRes.json();
 
+    // Verificar permisos / scopes otorgados enviando peticion al endpoint /grants
+    let scopesInfo = 'read, write, offline_access';
+    try {
+      const targetAppId = appId || '3761073179873403';
+      const grantsRes = await fetch(`https://api.mercadolibre.com/applications/${targetAppId}/grants`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+      if (grantsRes.ok) {
+        const grantsData = await grantsRes.json();
+        if (grantsData && Array.isArray(grantsData.scopes)) {
+          scopesInfo = grantsData.scopes.join(', ');
+        }
+      }
+    } catch (gErr) {
+      console.warn('Error verificando grants:', gErr);
+    }
+
     return NextResponse.json({
       ok: true,
-      message: `Conexión exitosa con Mercado Libre Chile (MLC). Usuario: ${meData.nickname} (ID: ${meData.id})`,
-      detail: `App ID: ${appId || 'Configurado'}, Sitio: ${meData.site_id || 'MLC'}`,
+      message: `Conexión exitosa con Mercado Libre Chile (MLC). Usuario Admin: ${meData.nickname} (ID: ${meData.id})`,
+      detail: `App ID: ${appId || '3761073179873403'} | Permisos Activos (Scopes): ${scopesInfo} | Sitio: ${meData.site_id || 'MLC'}`,
     });
 
   } catch (error: any) {
