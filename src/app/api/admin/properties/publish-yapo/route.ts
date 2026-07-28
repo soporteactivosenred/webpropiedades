@@ -47,27 +47,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Propiedad no encontrada.' }, { status: 404 });
     }
 
-    // 2. Obtener la configuración de Yapo.cl desde site_settings
+    // 2. Obtener la configuración de Yapo.cl desde site_settings con fallbacks del correo oficial
     const { data: settingsList } = await supabaseAdmin
       .from('site_settings')
       .select('key, value')
-      .in('key', ['yapo_api_key', 'yapo_token', 'yapo_account_id', 'yapo_api_url']);
+      .in('key', ['yapo_api_key', 'yapo_token', 'yapo_account_id', 'yapo_slug', 'yapo_email', 'yapo_api_url']);
 
     const settingsMap: Record<string, string> = {};
     settingsList?.forEach((s: any) => {
       settingsMap[s.key] = String(s.value);
     });
 
-    const apiKey = settingsMap.yapo_api_key;
-    const token = settingsMap.yapo_token;
-    const accountId = settingsMap.yapo_account_id;
+    const apiKey = settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy';
+    const token = settingsMap.yapo_token || '6676a3bdde0df';
+    const accountId = settingsMap.yapo_account_id || '13722681';
+    const slug = settingsMap.yapo_slug || 'merino-propiedades';
+    const email = settingsMap.yapo_email || 'merinopropiedades@gmail.com';
     const apiUrl = settingsMap.yapo_api_url || 'https://public-api.yapo.cl/v1/ads';
-
-    if (!apiKey && !token) {
-      return NextResponse.json({
-        error: 'Integración de Yapo.cl no configurada. Por favor ingresa la API Key o Token en /admin/configuracion.',
-      }, { status: 400 });
-    }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl';
     const images = (property.images || []).map((img: string) => getFullImageUrl(img, siteUrl));
@@ -78,15 +74,20 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    // 3. Construir payload para Yapo.cl API
+    // 3. Construir payload oficial para la API de Yapo.cl / Pack Inmobiliario
     const yapoPayload = {
-      account_id: accountId || undefined,
+      user_id: accountId,
+      account_id: accountId,
+      slug: slug,
+      email: email,
+      external_id: property.id,
+      code: property.code || `COD-${property.id.slice(0, 6)}`,
       title: property.title,
-      description: property.description + `\n\nPublicado desde Activos en Red: ${siteUrl}/propiedades/${property.slug}`,
+      description: property.description + `\n\nVer ficha completa en Activos en Red: ${siteUrl}/propiedades/${property.slug}`,
       price: property.price,
       currency: property.price_type === 'sale' ? 'UF' : 'CLP',
       category_id: YAPO_CATEGORY_MAP[property.property_type] || '1020',
-      type: property.price_type === 'sale' ? 's' : 'r', // 's' = sale, 'r' = rent
+      type: property.price_type === 'sale' ? 's' : 'r', // 's' = venta, 'r' = arriendo
       address: property.address,
       commune: property.city,
       region: property.region || 'Coquimbo',
@@ -94,7 +95,6 @@ export async function POST(req: Request) {
       bathrooms: property.bathrooms || undefined,
       size_m2: property.area || property.terrain_area || undefined,
       images: images.slice(0, 20),
-      external_id: property.id,
     };
 
     let resultData: any;
@@ -106,8 +106,11 @@ export async function POST(req: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': apiKey || '',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'X-API-Key': apiKey,
+          'X-User-Id': accountId,
+          'X-Slug': slug,
+          'X-Slug-Key': token,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(yapoPayload),
       });

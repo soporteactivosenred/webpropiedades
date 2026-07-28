@@ -33,6 +33,8 @@ interface SettingsFormData {
   yapo_api_key: string;
   yapo_token: string;
   yapo_account_id: string;
+  yapo_slug: string;
+  yapo_email: string;
   yapo_api_url: string;
 }
 
@@ -59,10 +61,12 @@ export default function AdminConfiguracionPage() {
     meli_access_token: '',
     meli_refresh_token: '',
     meli_redirect_uri: '',
-    yapo_api_key: '',
-    yapo_token: '',
-    yapo_account_id: '',
-    yapo_api_url: '',
+    yapo_api_key: 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy',
+    yapo_token: '6676a3bdde0df',
+    yapo_account_id: '13722681',
+    yapo_slug: 'merino-propiedades',
+    yapo_email: 'merinopropiedades@gmail.com',
+    yapo_api_url: 'https://public-api.yapo.cl/v1/ads',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -217,9 +221,11 @@ const fetchSettings = async () => {
       meli_access_token: settingsMap.meli_access_token || '',
       meli_refresh_token: settingsMap.meli_refresh_token || '',
       meli_redirect_uri: settingsMap.meli_redirect_uri || (typeof window !== 'undefined' ? window.location.origin + '/admin/configuracion' : 'https://www.activosenred.cl/admin/configuracion'),
-      yapo_api_key: settingsMap.yapo_api_key || '',
-      yapo_token: settingsMap.yapo_token || '',
-      yapo_account_id: settingsMap.yapo_account_id || '',
+      yapo_api_key: settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy',
+      yapo_token: settingsMap.yapo_token || '6676a3bdde0df',
+      yapo_account_id: settingsMap.yapo_account_id || '13722681',
+      yapo_slug: settingsMap.yapo_slug || 'merino-propiedades',
+      yapo_email: settingsMap.yapo_email || 'merinopropiedades@gmail.com',
       yapo_api_url: settingsMap.yapo_api_url || 'https://public-api.yapo.cl/v1/ads',
     });
   } catch (err) {
@@ -264,6 +270,8 @@ const handleSave = async (e: React.FormEvent) => {
       { key: 'yapo_api_key', value: settings.yapo_api_key },
       { key: 'yapo_token', value: settings.yapo_token },
       { key: 'yapo_account_id', value: settings.yapo_account_id },
+      { key: 'yapo_slug', value: settings.yapo_slug },
+      { key: 'yapo_email', value: settings.yapo_email },
       { key: 'yapo_api_url', value: settings.yapo_api_url },
     ];
 
@@ -778,10 +786,10 @@ const handleSave = async (e: React.FormEvent) => {
             <div>
               <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded font-black uppercase">Yapo.cl</span>
-                Integración Yapo.cl (API / Pack Inmobiliario)
+                Integración Yapo.cl (API & Importador XML)
               </h2>
               <p className="text-xs text-gray-500 mt-0.5">
-                Configura la API Key o Token proporcionado por Yapo.cl (public-api.yapo.cl) para publicar y sincronizar tus inmuebles.
+                Credenciales activas de tu Pack Inmobiliario provistas por el Equipo SAC de Yapo.cl.
               </p>
             </div>
           </div>
@@ -789,39 +797,84 @@ const handleSave = async (e: React.FormEvent) => {
           <div className="p-6 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Yapo API Key"
-                type="password"
-                placeholder="Ej: yapo_pk_xxxxxxxxxxxx"
-                value={settings.yapo_api_key}
+                label="Email de la Cuenta"
+                placeholder="merinopropiedades@gmail.com"
+                value={settings.yapo_email || 'merinopropiedades@gmail.com'}
+                onChange={(e) => setSettings({ ...settings, yapo_email: e.target.value })}
+              />
+              <Input
+                label="User ID (Account ID)"
+                placeholder="13722681"
+                value={settings.yapo_account_id || '13722681'}
+                onChange={(e) => setSettings({ ...settings, yapo_account_id: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Import API Key"
+                type="text"
+                placeholder="Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy"
+                value={settings.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy'}
                 onChange={(e) => setSettings({ ...settings, yapo_api_key: e.target.value })}
               />
               <Input
-                label="Token de Integración (Bearer Token)"
-                type="password"
-                placeholder="Ej: yapo_tok_xxxxxxxxxxxx"
-                value={settings.yapo_token}
+                label="Slug API Key (Token)"
+                type="text"
+                placeholder="6676a3bdde0df"
+                value={settings.yapo_token || '6676a3bdde0df'}
                 onChange={(e) => setSettings({ ...settings, yapo_token: e.target.value })}
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Account ID / ID de Cliente (Opcional)"
-                placeholder="Ej: 987654"
-                value={settings.yapo_account_id}
-                onChange={(e) => setSettings({ ...settings, yapo_account_id: e.target.value })}
+                label="Slug Corporativo"
+                placeholder="merino-propiedades"
+                value={settings.yapo_slug || 'merino-propiedades'}
+                onChange={(e) => setSettings({ ...settings, yapo_slug: e.target.value })}
               />
               <Input
                 label="URL API de Yapo.cl"
                 placeholder="https://public-api.yapo.cl/v1/ads"
-                value={settings.yapo_api_url}
+                value={settings.yapo_api_url || 'https://public-api.yapo.cl/v1/ads'}
                 onChange={(e) => setSettings({ ...settings, yapo_api_url: e.target.value })}
               />
             </div>
 
+            {/* XML Feed URL Section */}
+            <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-2">
+              <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wider">
+                📡 URL del Feed XML de Importación Automática (Yapo.cl Import)
+              </h3>
+              <p className="text-xs text-gray-600">
+                Puedes registrar esta URL en tu panel de Yapo (<a href="https://www.yapo.cl/account/cnImport/xmlmanual" target="_blank" rel="noopener noreferrer" className="text-red-600 underline font-semibold">yapo.cl/account/cnImport/xmlmanual</a>) para la importación automática mediante XML:
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="text"
+                  readOnly
+                  value="https://www.activosenred.cl/api/yapo/feed.xml"
+                  className="w-full px-3 py-1.5 bg-white border border-gray-300 rounded text-xs font-mono text-gray-700 select-all"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText('https://www.activosenred.cl/api/yapo/feed.xml');
+                    alert('¡URL del Feed XML copiada al portapapeles!');
+                  }}
+                  className="text-xs shrink-0"
+                >
+                  📋 Copiar URL
+                </Button>
+              </div>
+            </div>
+
             <div className="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-gray-400">
-                ¿Tienes un Pack Inmobiliario en Yapo.cl? Contacta a tu ejecutivo de Yapo para obtener tus accesos de API.
+              <p className="text-xs text-gray-500">
+                Cuenta oficial configurada: merino-propiedades (ID: 13722681)
               </p>
               <Button
                 type="button"
@@ -830,7 +883,7 @@ const handleSave = async (e: React.FormEvent) => {
                 isLoading={testingYapo}
                 className="border-red-300 bg-red-50 hover:bg-red-100 text-red-900 text-xs font-semibold"
               >
-                Probar Conexión Yapo.cl
+                Verificar Credenciales Yapo.cl
               </Button>
             </div>
 
