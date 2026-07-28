@@ -60,7 +60,7 @@ export default function AdminConfiguracionPage() {
     meli_client_secret: '',
     meli_access_token: '',
     meli_refresh_token: '',
-    meli_redirect_uri: '',
+    meli_redirect_uri: 'https://activosenred.cl/api/mercadolibre/callback',
     yapo_api_key: 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy',
     yapo_token: '6676a3bdde0df',
     yapo_account_id: '13722681',
@@ -95,6 +95,26 @@ export default function AdminConfiguracionPage() {
     if (typeof window === 'undefined') return;
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
+    const meliConnected = params.get('meli_connected');
+    const meliError = params.get('meli_error');
+
+    if (meliConnected) {
+      setMeliTestResult({
+        ok: true,
+        message: '¡Cuenta de Mercado Libre conectada y autorizada exitosamente!',
+        detail: 'Tokens recibidos y guardados en la base de datos.',
+      });
+      return;
+    }
+
+    if (meliError) {
+      setMeliTestResult({
+        ok: false,
+        message: 'Error en la autorización de Mercado Libre',
+        detail: decodeURIComponent(meliError),
+      });
+      return;
+    }
     if (code) {
       setExchangingCode(true);
       setMeliTestResult({ ok: fontStateOk(false), message: 'Autenticando y obteniendo tokens de Mercado Libre...', detail: 'Por favor espera unos segundos...' } as any);
@@ -220,7 +240,7 @@ const fetchSettings = async () => {
       meli_client_secret: settingsMap.meli_client_secret || '',
       meli_access_token: settingsMap.meli_access_token || '',
       meli_refresh_token: settingsMap.meli_refresh_token || '',
-      meli_redirect_uri: settingsMap.meli_redirect_uri || (typeof window !== 'undefined' ? window.location.origin + '/admin/configuracion' : 'https://www.activosenred.cl/admin/configuracion'),
+      meli_redirect_uri: settingsMap.meli_redirect_uri || 'https://activosenred.cl/api/mercadolibre/callback',
       yapo_api_key: settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy',
       yapo_token: settingsMap.yapo_token || '6676a3bdde0df',
       yapo_account_id: settingsMap.yapo_account_id || '13722681',
@@ -688,26 +708,26 @@ const handleSave = async (e: React.FormEvent) => {
             <div className="space-y-1">
               <Input
                 label="URL de Redirección (Redirect URI configurada en Mercado Libre)"
-                placeholder="https://www.activosenred.cl/admin/configuracion"
+                placeholder="https://activosenred.cl/api/mercadolibre/callback"
                 value={settings.meli_redirect_uri}
                 onChange={(e) => setSettings({ ...settings, meli_redirect_uri: e.target.value })}
                 hint="Debe ser EXACTAMENTE idéntica a la 'Redirect URI' configurada en el panel de tu App en developers.mercadolibre.cl"
               />
               <div className="flex flex-wrap gap-2 pt-1 text-[11px]">
-                <span className="text-gray-400">Usar rápida:</span>
+                <span className="text-gray-400 font-semibold">Usar rápida (Configurada en tu App):</span>
                 <button
                   type="button"
-                  onClick={() => setSettings({ ...settings, meli_redirect_uri: 'https://www.activosenred.cl/admin/configuracion' })}
-                  className="text-amber-700 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 font-mono font-medium"
+                  onClick={() => setSettings({ ...settings, meli_redirect_uri: 'https://activosenred.cl/api/mercadolibre/callback' })}
+                  className="text-amber-800 bg-amber-100 hover:bg-amber-200 px-2 py-0.5 rounded border border-amber-300 font-mono font-bold"
                 >
-                  https://www.activosenred.cl/admin/configuracion
+                  https://activosenred.cl/api/mercadolibre/callback ★
                 </button>
                 <button
                   type="button"
-                  onClick={() => setSettings({ ...settings, meli_redirect_uri: 'https://activosenred.cl/admin/configuracion' })}
-                  className="text-amber-700 bg-amber-50 hover:bg-amber-100 px-2 py-0.5 rounded border border-amber-200 font-mono font-medium"
+                  onClick={() => setSettings({ ...settings, meli_redirect_uri: 'https://www.activosenred.cl/admin/configuracion' })}
+                  className="text-gray-700 bg-gray-50 hover:bg-gray-100 px-2 py-0.5 rounded border border-gray-200 font-mono font-medium"
                 >
-                  https://activosenred.cl/admin/configuracion
+                  https://www.activosenred.cl/admin/configuracion
                 </button>
               </div>
             </div>
