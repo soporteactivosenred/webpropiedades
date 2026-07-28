@@ -247,18 +247,32 @@ export default function AdminPropertiesPage() {
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_CONFIG[property.status]?.className || 'bg-gray-100 text-gray-600'}`}>
                           {STATUS_CONFIG[property.status]?.label || property.status}
                         </span>
-                        {(property as any).meli_item_id && (
-                          <a
-                            href={(property as any).meli_permalink || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded hover:bg-amber-100 transition-colors"
-                            title="Ver en Mercado Libre / Portal Inmobiliario"
-                          >
-                            <span>MLC</span>
-                            <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {(property as any).meli_item_id && (
+                            <a
+                              href={(property as any).meli_permalink || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded hover:bg-amber-100 transition-colors"
+                              title="Ver en Mercado Libre / Portal Inmobiliario"
+                            >
+                              <span>MLC</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          )}
+                          {(property as any).yapo_ad_id && (
+                            <a
+                              href={(property as any).yapo_permalink || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-[10px] font-bold text-red-800 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded hover:bg-red-100 transition-colors"
+                              title="Ver en Yapo.cl"
+                            >
+                              <span>YAPO</span>
+                              <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-5 py-4">

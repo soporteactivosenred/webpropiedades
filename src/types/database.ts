@@ -72,6 +72,7 @@ export interface Database {
           publish_to_fb: boolean;
           publish_to_ig: boolean;
           publish_to_meli?: boolean;
+          publish_to_yapo?: boolean;
           social_caption: string | null;
           fb_post_id: string | null;
           ig_media_id: string | null;
@@ -79,6 +80,9 @@ export interface Database {
           meli_permalink?: string | null;
           meli_status?: string | null;
           meli_listing_type?: string | null;
+          yapo_ad_id?: string | null;
+          yapo_permalink?: string | null;
+          yapo_status?: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -110,6 +114,7 @@ export interface Database {
           publish_to_fb?: boolean;
           publish_to_ig?: boolean;
           publish_to_meli?: boolean;
+          publish_to_yapo?: boolean;
           social_caption?: string | null;
           fb_post_id?: string | null;
           ig_media_id?: string | null;
@@ -117,6 +122,9 @@ export interface Database {
           meli_permalink?: string | null;
           meli_status?: string | null;
           meli_listing_type?: string | null;
+          yapo_ad_id?: string | null;
+          yapo_permalink?: string | null;
+          yapo_status?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -148,6 +156,7 @@ export interface Database {
           publish_to_fb?: boolean;
           publish_to_ig?: boolean;
           publish_to_meli?: boolean;
+          publish_to_yapo?: boolean;
           social_caption?: string | null;
           fb_post_id?: string | null;
           ig_media_id?: string | null;
@@ -155,6 +164,9 @@ export interface Database {
           meli_permalink?: string | null;
           meli_status?: string | null;
           meli_listing_type?: string | null;
+          yapo_ad_id?: string | null;
+          yapo_permalink?: string | null;
+          yapo_status?: string | null;
           created_at?: string;
           updated_at?: string;
         };

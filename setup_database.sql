@@ -91,6 +91,12 @@ ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS meli_permalink TEXT;
 ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS meli_status TEXT;
 ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS meli_listing_type TEXT;
 
+-- Columnas adicionales para Yapo.cl
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS publish_to_yapo BOOLEAN DEFAULT false;
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS yapo_ad_id TEXT;
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS yapo_permalink TEXT;
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS yapo_status TEXT;
+
 -- Insertar la propiedad de prueba que solicitaste anteriormente (Avenida del Mar)
 INSERT INTO public.properties (
   title, slug, description, price, price_type, property_type, status, address, city, region, bedrooms, bathrooms, area, parking_spaces, features, images

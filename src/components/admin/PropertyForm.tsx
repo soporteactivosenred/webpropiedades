@@ -109,10 +109,18 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     meli_permalink: (property as any)?.meli_permalink || '',
     meli_status: (property as any)?.meli_status || '',
     meli_listing_type: (property as any)?.meli_listing_type || 'gold_special',
+    // Yapo.cl Autopublish fields
+    publish_to_yapo: (property as any)?.publish_to_yapo || false,
+    yapo_ad_id: (property as any)?.yapo_ad_id || '',
+    yapo_permalink: (property as any)?.yapo_permalink || '',
+    yapo_status: (property as any)?.yapo_status || '',
   });
 
   const [isPublishingMeli, setIsPublishingMeli] = useState(false);
   const [meliPublishResult, setMeliPublishResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null);
+
+  const [isPublishingYapo, setIsPublishingYapo] = useState(false);
+  const [yapoPublishResult, setYapoPublishResult] = useState<{ success: boolean; message?: string; error?: string } | null>(null);
 
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodeError, setGeocodeError] = useState<string | null>(null);
@@ -476,6 +484,36 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     }
   };
 
+  const handlePublishYapoNow = async () => {
+    if (!property?.id) return;
+    setIsPublishingYapo(true);
+    setYapoPublishResult(null);
+    try {
+      const res = await fetch('/api/admin/properties/publish-yapo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ propertyId: property.id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setYapoPublishResult({ success: true, message: data.message });
+        setFormData(prev => ({
+          ...prev,
+          publish_to_yapo: true,
+          yapo_ad_id: data.yapo_ad_id,
+          yapo_permalink: data.yapo_permalink,
+          yapo_status: 'active',
+        }));
+      } else {
+        setYapoPublishResult({ success: false, error: data.error });
+      }
+    } catch (err: any) {
+      setYapoPublishResult({ success: false, error: err.message });
+    } finally {
+      setIsPublishingYapo(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent, publishNow = false) => {
     e.preventDefault();
     setError(null);
@@ -513,6 +551,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         social_caption: formData.social_caption || null,
         publish_to_meli: formData.publish_to_meli,
         meli_listing_type: formData.meli_listing_type,
+        publish_to_yapo: formData.publish_to_yapo,
       };
 
       let result;
@@ -559,6 +598,19 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
           });
         } catch (meliErr) {
           console.error('Error al autopublicar propiedad en Mercado Libre:', meliErr);
+        }
+      }
+
+      // Disparar autopublicación en Yapo.cl si está seleccionado
+      if (savedProp?.id && formData.publish_to_yapo) {
+        try {
+          await fetch('/api/admin/properties/publish-yapo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ propertyId: savedProp.id }),
+          });
+        } catch (yapoErr) {
+          console.error('Error al autopublicar propiedad en Yapo.cl:', yapoErr);
         }
       }
 
@@ -1297,6 +1349,74 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
               meliPublishResult.success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
             }`}>
               {meliPublishResult.success ? meliPublishResult.message : `Error: ${meliPublishResult.error}`}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Yapo.cl Autopublish Section */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-2">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded font-black uppercase">Yapo.cl</span>
+            Publicación en Yapo.cl (API / Pack Inmobiliario)
+          </h2>
+          {isEditing && property?.id && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handlePublishYapoNow}
+              isLoading={isPublishingYapo}
+              className="border-red-300 bg-red-50 hover:bg-red-100 text-red-900 text-xs font-semibold"
+            >
+              {formData.yapo_ad_id ? '🔄 Sincronizar / Actualizar en Yapo.cl' : '🚀 Publicar en Yapo.cl Ahora'}
+            </Button>
+          )}
+        </div>
+        
+        <p className="text-sm text-gray-500 mb-4">
+          Publica esta propiedad directamente en Yapo.cl a través de la API oficial de integración.
+        </p>
+
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-6">
+            <label className="inline-flex items-center gap-2 cursor-pointer font-medium text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="publish_to_yapo"
+                checked={formData.publish_to_yapo}
+                onChange={(e) => setFormData(prev => ({ ...prev, publish_to_yapo: e.target.checked }))}
+                className="w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
+              />
+              <span>🔴 Sincronizar automáticamente con Yapo.cl</span>
+            </label>
+          </div>
+
+          {formData.yapo_ad_id && (
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
+                <Check className="w-4 h-4 text-emerald-600" />
+                Publicado en Yapo.cl (ID: {formData.yapo_ad_id})
+              </span>
+              {formData.yapo_permalink && (
+                <a
+                  href={formData.yapo_permalink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-emerald-700 hover:text-emerald-900 underline font-bold flex items-center gap-1"
+                >
+                  Ver Ficha en Yapo.cl ↗
+                </a>
+              )}
+            </div>
+          )}
+
+          {yapoPublishResult && (
+            <div className={`p-3 rounded-lg border text-xs font-semibold ${
+              yapoPublishResult.success ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'
+            }`}>
+              {yapoPublishResult.success ? yapoPublishResult.message : `Error: ${yapoPublishResult.error}`}
             </div>
           )}
         </div>

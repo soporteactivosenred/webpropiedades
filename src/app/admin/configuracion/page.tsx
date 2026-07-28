@@ -30,6 +30,10 @@ interface SettingsFormData {
   meli_access_token: string;
   meli_refresh_token: string;
   meli_redirect_uri: string;
+  yapo_api_key: string;
+  yapo_token: string;
+  yapo_account_id: string;
+  yapo_api_url: string;
 }
 
 export default function AdminConfiguracionPage() {
@@ -55,6 +59,10 @@ export default function AdminConfiguracionPage() {
     meli_access_token: '',
     meli_refresh_token: '',
     meli_redirect_uri: '',
+    yapo_api_key: '',
+    yapo_token: '',
+    yapo_account_id: '',
+    yapo_api_url: '',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -136,6 +144,24 @@ const handleConnectMeli = async () => {
   window.location.href = authUrl;
 };
 
+// Estado para el test de conexión Yapo.cl
+const [testingYapo, setTestingYapo] = useState(false);
+const [yapoTestResult, setYapoTestResult] = useState<{ ok: boolean; message: string; detail?: string } | null>(null);
+
+const handleTestYapo = async () => {
+  setTestingYapo(true);
+  setYapoTestResult(null);
+  try {
+    const res = await fetch('/api/admin/test-yapo', { method: 'POST' });
+    const data = await res.json();
+    setYapoTestResult(data);
+  } catch (err: any) {
+    setYapoTestResult({ ok: false, message: 'Error de conexión', detail: err.message });
+  } finally {
+    setTestingYapo(false);
+  }
+};
+
 const handleTestMeli = async () => {
   setTestingMeli(true);
   setMeliTestResult(null);
@@ -191,6 +217,10 @@ const fetchSettings = async () => {
       meli_access_token: settingsMap.meli_access_token || '',
       meli_refresh_token: settingsMap.meli_refresh_token || '',
       meli_redirect_uri: settingsMap.meli_redirect_uri || (typeof window !== 'undefined' ? window.location.origin + '/admin/configuracion' : 'https://www.activosenred.cl/admin/configuracion'),
+      yapo_api_key: settingsMap.yapo_api_key || '',
+      yapo_token: settingsMap.yapo_token || '',
+      yapo_account_id: settingsMap.yapo_account_id || '',
+      yapo_api_url: settingsMap.yapo_api_url || 'https://public-api.yapo.cl/v1/ads',
     });
   } catch (err) {
     setError('Error al cargar configuración');
@@ -231,6 +261,10 @@ const handleSave = async (e: React.FormEvent) => {
       { key: 'meli_access_token', value: settings.meli_access_token },
       { key: 'meli_refresh_token', value: settings.meli_refresh_token },
       { key: 'meli_redirect_uri', value: settings.meli_redirect_uri },
+      { key: 'yapo_api_key', value: settings.yapo_api_key },
+      { key: 'yapo_token', value: settings.yapo_token },
+      { key: 'yapo_account_id', value: settings.yapo_account_id },
+      { key: 'yapo_api_url', value: settings.yapo_api_url },
     ];
 
       for (const setting of settingsToUpdate) {
@@ -733,6 +767,77 @@ const handleSave = async (e: React.FormEvent) => {
               <div className={`p-4 rounded-xl border-2 transition-all ${meliTestResult.ok ? 'border-green-200 bg-green-50 text-green-900' : 'border-red-200 bg-red-50 text-red-900'}`}>
                 <p className="font-semibold text-sm">{meliTestResult.message}</p>
                 {meliTestResult.detail && <p className="text-xs mt-0.5 opacity-80">{meliTestResult.detail}</p>}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Yapo.cl Integration Card */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 bg-red-50/50 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded font-black uppercase">Yapo.cl</span>
+                Integración Yapo.cl (API / Pack Inmobiliario)
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Configura la API Key o Token proporcionado por Yapo.cl (public-api.yapo.cl) para publicar y sincronizar tus inmuebles.
+              </p>
+            </div>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Yapo API Key"
+                type="password"
+                placeholder="Ej: yapo_pk_xxxxxxxxxxxx"
+                value={settings.yapo_api_key}
+                onChange={(e) => setSettings({ ...settings, yapo_api_key: e.target.value })}
+              />
+              <Input
+                label="Token de Integración (Bearer Token)"
+                type="password"
+                placeholder="Ej: yapo_tok_xxxxxxxxxxxx"
+                value={settings.yapo_token}
+                onChange={(e) => setSettings({ ...settings, yapo_token: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Account ID / ID de Cliente (Opcional)"
+                placeholder="Ej: 987654"
+                value={settings.yapo_account_id}
+                onChange={(e) => setSettings({ ...settings, yapo_account_id: e.target.value })}
+              />
+              <Input
+                label="URL API de Yapo.cl"
+                placeholder="https://public-api.yapo.cl/v1/ads"
+                value={settings.yapo_api_url}
+                onChange={(e) => setSettings({ ...settings, yapo_api_url: e.target.value })}
+              />
+            </div>
+
+            <div className="pt-2 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs text-gray-400">
+                ¿Tienes un Pack Inmobiliario en Yapo.cl? Contacta a tu ejecutivo de Yapo para obtener tus accesos de API.
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleTestYapo}
+                isLoading={testingYapo}
+                className="border-red-300 bg-red-50 hover:bg-red-100 text-red-900 text-xs font-semibold"
+              >
+                Probar Conexión Yapo.cl
+              </Button>
+            </div>
+
+            {yapoTestResult && (
+              <div className={`p-4 rounded-xl border-2 transition-all ${yapoTestResult.ok ? 'border-green-200 bg-green-50 text-green-900' : 'border-red-200 bg-red-50 text-red-900'}`}>
+                <p className="font-semibold text-sm">{yapoTestResult.message}</p>
+                {yapoTestResult.detail && <p className="text-xs mt-0.5 opacity-80">{yapoTestResult.detail}</p>}
               </div>
             )}
           </div>
