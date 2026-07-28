@@ -134,16 +134,6 @@ function Navbar() {
                 Confíanos tu Activo
               </Link>
 
-              {/* Contacto */}
-              <Link
-                href="/contacto"
-                className={cn(
-                  'text-sm font-medium transition-colors py-2',
-                  pathname === '/contacto' ? 'text-primary-600' : 'text-gray-700 hover:text-primary-600'
-                )}
-              >
-                Contacto
-              </Link>
             </nav>
 
             {/* CTA button */}
