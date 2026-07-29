@@ -13,18 +13,30 @@ interface ShareButtonsProps {
 export function ShareButtons({ url, title, description = '' }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
   const [open, setOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState({ top: 0, right: 0 });
+  const [menuPos, setMenuPos] = useState<{ top: number; left?: number; right?: number }>({ top: 0 });
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Calcular posición del menú relativa al botón (viewport coords para fixed)
+  const MENU_WIDTH = 240;
+
+  // Calcular posición del menú inteligente (sin salirse de pantalla)
   useEffect(() => {
     if (open && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
-      setMenuPos({
-        top: rect.bottom + 6,
-        right: window.innerWidth - rect.right,
-      });
+      const spaceRight = window.innerWidth - rect.left;
+      const spaceLeft = rect.right;
+      const padding = 8;
+
+      if (spaceRight >= MENU_WIDTH + padding) {
+        // Hay espacio a la derecha: alinear con borde izquierdo del botón
+        setMenuPos({ top: rect.bottom + 6, left: Math.max(padding, rect.left) });
+      } else if (spaceLeft >= MENU_WIDTH + padding) {
+        // Hay espacio a la izquierda: alinear con borde derecho del botón
+        setMenuPos({ top: rect.bottom + 6, right: window.innerWidth - rect.right });
+      } else {
+        // Pantalla muy pequeña: centrar con margen
+        setMenuPos({ top: rect.bottom + 6, left: padding });
+      }
     }
   }, [open]);
 
@@ -133,8 +145,15 @@ export function ShareButtons({ url, title, description = '' }: ShareButtonsProps
       {open && (
         <div
           ref={menuRef}
-          style={{ position: 'fixed', top: menuPos.top, right: menuPos.right, zIndex: 9999 }}
-          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-3 min-w-[230px]"
+          style={{
+            position: 'fixed',
+            top: menuPos.top,
+            ...(menuPos.left !== undefined ? { left: menuPos.left } : {}),
+            ...(menuPos.right !== undefined ? { right: menuPos.right } : {}),
+            zIndex: 9999,
+            width: `min(${MENU_WIDTH}px, calc(100vw - 16px))`,
+          }}
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 p-3"
         >
           <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-2 pb-2 border-b border-gray-100 dark:border-gray-800 mb-2">
             Compartir propiedad
