@@ -19,7 +19,7 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://propiedadesmerino.cl';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl';
 const SITE_NAME = 'Activos en Red';
 
 export async function generateMetadata({ params }: Props) {
@@ -34,18 +34,26 @@ export async function generateMetadata({ params }: Props) {
     };
   }
 
-  const ogImage = property.images?.[0] || `${SITE_URL}/images/og-default.jpg`;
+  // Asegurar que la imagen OG tenga URL absoluta (para WhatsApp, Facebook, etc.)
+  const rawImage = property.images?.[0] || '';
+  const ogImage = rawImage.startsWith('http')
+    ? rawImage
+    : rawImage
+      ? `${SITE_URL}${rawImage.startsWith('/') ? rawImage : '/' + rawImage}`
+      : `${SITE_URL}/images/og-default.jpg`;
+
   const description = property.description.slice(0, 160);
+  const pageUrl = `${SITE_URL}/propiedades/${slug}`;
 
   return {
     title: `${property.title} | ${SITE_NAME}`,
     description,
     keywords: `${property.title}, ${property.property_type}, ${property.city}, propiedades en venta, Activos en Red`,
     openGraph: {
-      title: property.title,
+      title: `${property.title} | Activos en Red`,
       description,
       type: 'website',
-      url: `${SITE_URL}/propiedades/${slug}`,
+      url: pageUrl,
       siteName: SITE_NAME,
       images: [
         {
@@ -53,18 +61,19 @@ export async function generateMetadata({ params }: Props) {
           width: 1200,
           height: 630,
           alt: property.title,
+          type: 'image/jpeg',
         },
       ],
       locale: 'es_CL',
     },
     twitter: {
       card: 'summary_large_image',
-      title: property.title,
+      title: `${property.title} | Activos en Red`,
       description,
       images: [ogImage],
     },
     alternates: {
-      canonical: `${SITE_URL}/propiedades/${slug}`,
+      canonical: pageUrl,
     },
   };
 }
