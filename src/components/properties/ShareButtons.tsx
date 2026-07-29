@@ -122,10 +122,10 @@ export function ShareButtons({ url, title, description = '' }: ShareButtonsProps
         ref={btnRef}
         id="share-property-btn"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm text-sm font-semibold transition-all duration-200"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-sky-400 bg-white dark:bg-gray-800 text-sky-600 dark:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-900/30 hover:border-sky-500 shadow-sm shadow-sky-100 dark:shadow-sky-900/20 text-sm font-semibold transition-all duration-200 ring-1 ring-sky-200 dark:ring-sky-700"
         aria-label="Compartir propiedad"
       >
-        <Share2 className="w-4 h-4" />
+        <Share2 className="w-4 h-4 text-sky-500" />
         Compartir
       </button>
 
