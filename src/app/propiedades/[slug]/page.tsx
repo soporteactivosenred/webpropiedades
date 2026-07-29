@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { MapPin, Bed, Bath, Square, Calendar, Eye, Phone, Mail, Check, ArrowLeft, Layers } from 'lucide-react';
 import { Button, Card } from '@/components/ui';
+import { ShareButtons } from '@/components/properties/ShareButtons';
 import dynamic from 'next/dynamic';
 
 const PropertyMap = dynamic(() => import('@/components/properties/PropertyMap'), { ssr: false });
@@ -220,6 +221,12 @@ export default async function PropertyDetailPage({ params }: Props) {
                       <span>{property.views} visitas</span>
                     </div>
                   )}
+                  <ShareButtons
+                    url={fullPropertyUrl}
+                    title={property.title}
+                    description={property.description}
+                    imageUrl={property.images?.[0]}
+                  />
                 </div>
               </div>
             </Card>
