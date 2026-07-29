@@ -17,12 +17,12 @@ export function ShareButtons({ url, title, description = '' }: ShareButtonsProps
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Calcular posición del menú relativa al botón
+  // Calcular posición del menú relativa al botón (viewport coords para fixed)
   useEffect(() => {
     if (open && btnRef.current) {
       const rect = btnRef.current.getBoundingClientRect();
       setMenuPos({
-        top: rect.bottom + window.scrollY + 6,
+        top: rect.bottom + 6,
         right: window.innerWidth - rect.right,
       });
     }
