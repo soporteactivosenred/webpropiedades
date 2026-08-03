@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ActivosOS™ - Dossier Informativo para Inmobiliarias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --secondary: #0f172a;
+      --text: #334155;
+      --text-dark: #0f172a;
+      --bg: #f8fafc;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Page Layout */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 20mm;
+      margin: 20px auto;
+      background: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    /* Decorative Shapes */
+    .decor-circle {
+      position: absolute;
+      top: -150px;
+      right: -150px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.1) 0%, rgba(2, 132, 199, 0) 70%);
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    .decor-bottom {
+      position: absolute;
+      bottom: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(2, 132, 199, 0.05) 0%, rgba(2, 132, 199, 0) 70%);
+      border-radius: 50%;
+      z-index: 1;
+    }
+
+    header {
+      position: relative;
+      z-index: 10;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 25px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-mark {
+      width: 45px;
+      height: 45px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 24px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    .logo-text h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--secondary);
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text p {
+      font-size: 11px;
+      color: var(--primary);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .product-badge {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Main Content */
+    .hero-title {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--text-dark);
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--primary-dark);
+      font-weight: 600;
+      margin-bottom: 30px;
+    }
+
+    .intro-paragraph {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 35px;
+      background: #f8fafc;
+      padding: 18px;
+      border-left: 4px solid var(--primary);
+      border-radius: 0 12px 12px 0;
+    }
+
+    /* Problem vs Solution Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .problem-card {
+      border-top: 4px solid #ef4444;
+    }
+
+    .problem-card .card-title {
+      color: #b91c1c;
+    }
+
+    .solution-card {
+      border-top: 4px solid #10b981;
+      background: #fcfdfd;
+    }
+
+    .solution-card .card-title {
+      color: #047857;
+    }
+
+    .list-item {
+      font-size: 13.5px;
+      margin-bottom: 10px;
+      padding-left: 15px;
+      position: relative;
+    }
+
+    .list-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .problem-card .list-item::before {
+      color: #ef4444;
+    }
+
+    .solution-card .list-item::before {
+      color: #10b981;
+    }
+
+    /* Modules Table */
+    .table-section {
+      margin-bottom: 40px;
+    }
+
+    .section-heading {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 15px;
+      letter-spacing: -0.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background-color: var(--secondary);
+      color: white;
+      text-align: left;
+      padding: 12px;
+      font-weight: 600;
+    }
+
+    th:first-child {
+      border-top-left-radius: 8px;
+    }
+
+    th:last-child {
+      border-top-right-radius: 8px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f8fafc;
+    }
+
+    .module-name {
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    /* Footer / CTA */
+    footer {
+      border-top: 2px solid var(--border);
+      padding-top: 20px;
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .cta-text {
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .contact-info {
+      text-align: right;
+      color: var(--text);
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background-color: #ffffff;
+      }
+      .page {
+        margin: 0;
+        box-shadow: none;
+        width: 100%;
+        height: 100%;
+        padding: 15mm;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Print Instructions Button (hidden during print) -->
+  <div class="no-print" style="max-width: 210mm; margin: 20px auto 0 auto; background: #e0f2fe; border: 1px solid #bae6fd; padding: 15px; border-radius: 12px; font-family: sans-serif; font-size: 14px; color: #0369a1;">
+    <strong>🖨️ Instrucciones para Guardar en PDF:</strong><br>
+    1. Presiona <strong>Ctrl + P</strong> (o Cmd + P en Mac) para abrir el diálogo de impresión.<br>
+    2. En "Destino", selecciona <strong>"Guardar como PDF"</strong>.<br>
+    3. Habilita la casilla <strong>"Gráficos de fondo"</strong> (Background graphics) para conservar los colores y diseños.<br>
+    4. Guarda el archivo en tu computadora para enviarlo a tus clientes.
+  </div>
+
+  <div class="page">
+    <div class="decor-circle"></div>
+    <div class="decor-bottom"></div>
+
+    <header>
+      <div class="logo-container">
+        <div class="logo-mark">AR</div>
+        <div class="logo-text">
+          <h1>Activos en Red</h1>
+          <p>Propiedades & Tecnología</p>
+        </div>
+      </div>
+      <div class="product-badge">ActivosOS™ Suite</div>
+    </header>
+
+    <main>
+      <h2 class="hero-title">ActivosOS™</h2>
+      <h3 class="hero-subtitle">La solución tecnológica definitiva para Inmobiliarias y Corredoras</h3>
+
+      <div class="intro-paragraph">
+        Diseñado para eliminar el trabajo administrativo repetitivo y acelerar las ventas. ActivosOS™ conecta tu catálogo de propiedades con los portales líderes de Chile y automatiza la captación y seguimiento de clientes en una única plataforma de alta velocidad.
+      </div>
+
+      <div class="grid-2">
+        <div class="card problem-card">
+          <div class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            El Desafío Inmobiliario
+          </div>
+          <div class="list-item"><strong>Pérdida de tiempo:</strong> Carga manual duplicada de inmuebles en Yapo, Mercado Libre y webs propias.</div>
+          <div class="list-item"><strong>Fuga de clientes:</strong> Correos perdidos y nula centralización de prospectos (leads) interesados.</div>
+          <div class="list-item"><strong>Fichas poco atractivas:</strong> Descripciones aburridas o mal redactadas por falta de tiempo de los agentes.</div>
+          <div class="list-item"><strong>Costos recurrentes:</strong> Pago de APIs de mapas costosas para mostrar ubicaciones interactivas.</div>
+        </div>
+
+        <div class="card solution-card">
+          <div class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+            La Solución ActivosOS™
+          </div>
+          <div class="list-item"><strong>Multi-publicación 1-Clic:</strong> Sincronización instantánea a Yapo.cl y Portal Inmobiliario.</div>
+          <div class="list-item"><strong>CRM Integrado:</strong> Control total de los clientes entrantes clasificados por propiedad y agente.</div>
+          <div class="list-item"><strong>Copiloto AI (Gemini):</strong> Generación automática de descripciones altamente persuasivas y con SEO incorporado.</div>
+          <div class="list-item"><strong>OpenStreetMap Libre:</strong> Mapas interactivos rápidos y sin cobros recurrentes de licencias.</div>
+        </div>
+      </div>
+
+      <div class="table-section">
+        <h4 class="section-heading">Módulos Tecnológicos Integrados</h4>
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25%;">Módulo</th>
+              <th style="width: 45%;">Función Principal</th>
+              <th style="width: 30%;">Impacto Comercial</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="module-name">ActivosSync™</td>
+              <td>Multi-publicador automático integrado a Yapo.cl (API / XML) y Mercado Libre.</td>
+              <td>Ahorro del 90% en tiempo de publicación y mayor alcance masivo.</td>
+            </tr>
+            <tr>
+              <td class="module-name">ActivosLeads™</td>
+              <td>CRM de captación de interesados en la ficha y redirección inteligente.</td>
+              <td>Previene la pérdida de clientes y acelera los tiempos de respuesta.</td>
+            </tr>
+            <tr>
+              <td class="module-name">ActivosAI™</td>
+              <td>Redacción asistida por Inteligencia Artificial (Google Gemini).</td>
+              <td>Fichas descriptivas profesionales en un clic.</td>
+            </tr>
+            <tr>
+              <td class="module-name">MapShowcase™</td>
+              <td>Geolocalización dinámica y ruteo a través de OpenStreetMap.</td>
+              <td>Excelente experiencia visual para el cliente sin costos de API.</td>
+            </tr>
+            <tr>
+              <td class="module-name">ActivosBlog™</td>
+              <td>Gestor editorial optimizado para SEO orgánico en Google.</td>
+              <td>Atracción de clientes calificados sin pagar publicidad.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <footer>
+      <div>
+        <p class="cta-text">Potencia tu inmobiliaria hoy mismo con ActivosOS™</p>
+        <p style="color: #64748b; font-size: 11px;">Desarrollado para Activos en Red Chile</p>
+      </div>
+      <div class="contact-info">
+        <p style="font-weight: 700;">Contacto & Soporte</p>
+        <p>Gómez Carreño 333, La Serena</p>
+        <p>+56 9 73081220 | contacto@activosenred.cl</p>
+        <p style="color: var(--primary); font-weight: 600;">www.activosenred.cl</p>
+      </div>
+    </footer>
+  </div>
+
+</body>
+</html>
