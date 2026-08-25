@@ -58,6 +58,124 @@ const PROPERTY_FEATURES = [
   'Balcón',
 ];
 
+const REGION_OPTIONS = [
+  { value: 'Coquimbo', label: 'Región de Coquimbo' },
+  { value: 'Valparaíso', label: 'Región de Valparaíso' },
+  { value: 'Metropolitana', label: 'Región Metropolitana' },
+  { value: 'Otro', label: 'Otra Región (Ingresar manual)' },
+];
+
+const COMMUNES_BY_REGION: Record<string, { value: string; label: string }[]> = {
+  'Coquimbo': [
+    { value: 'La Serena', label: 'La Serena' },
+    { value: 'Coquimbo', label: 'Coquimbo' },
+    { value: 'Ovalle', label: 'Ovalle' },
+    { value: 'Vicuña', label: 'Vicuña' },
+    { value: 'Andacollo', label: 'Andacollo' },
+    { value: 'Paihuano', label: 'Paihuano' },
+    { value: 'Río Hurtado', label: 'Río Hurtado' },
+    { value: 'Monte Patria', label: 'Monte Patria' },
+    { value: 'Combarbalá', label: 'Combarbalá' },
+    { value: 'Punitaqui', label: 'Punitaqui' },
+    { value: 'Illapel', label: 'Illapel' },
+    { value: 'Salamanca', label: 'Salamanca' },
+    { value: 'Los Vilos', label: 'Los Vilos' },
+    { value: 'Canela', label: 'Canela' },
+  ],
+  'Valparaíso': [
+    { value: 'Valparaíso', label: 'Valparaíso' },
+    { value: 'Viña del Mar', label: 'Viña del Mar' },
+    { value: 'Concón', label: 'Concón' },
+    { value: 'Quilpué', label: 'Quilpué' },
+    { value: 'Villa Alemana', label: 'Villa Alemana' },
+    { value: 'Casablanca', label: 'Casablanca' },
+    { value: 'Puchuncaví', label: 'Puchuncaví' },
+    { value: 'Quintero', label: 'Quintero' },
+    { value: 'San Antonio', label: 'San Antonio' },
+    { value: 'Cartagena', label: 'Cartagena' },
+    { value: 'El Tabo', label: 'El Tabo' },
+    { value: 'El Quisco', label: 'El Quisco' },
+    { value: 'Algarrobo', label: 'Algarrobo' },
+    { value: 'Santo Domingo', label: 'Santo Domingo' },
+    { value: 'Quillota', label: 'Quillota' },
+    { value: 'La Calera', label: 'La Calera' },
+    { value: 'Nogales', label: 'Nogales' },
+    { value: 'Hijuelas', label: 'Hijuelas' },
+    { value: 'La Cruz', label: 'La Cruz' },
+    { value: 'Limache', label: 'Limache' },
+    { value: 'Olmué', label: 'Olmué' },
+    { value: 'San Felipe', label: 'San Felipe' },
+    { value: 'Llaillay', label: 'Llaillay' },
+    { value: 'Putaendo', label: 'Putaendo' },
+    { value: 'Santa María', label: 'Santa María' },
+    { value: 'Catemu', label: 'Catemu' },
+    { value: 'Panquehue', label: 'Panquehue' },
+    { value: 'Los Andes', label: 'Los Andes' },
+    { value: 'San Esteban', label: 'San Esteban' },
+    { value: 'Calle Larga', label: 'Calle Larga' },
+    { value: 'Rinconada', label: 'Rinconada' },
+    { value: 'Cabildo', label: 'Cabildo' },
+    { value: 'La Ligua', label: 'La Ligua' },
+    { value: 'Papudo', label: 'Papudo' },
+    { value: 'Petorca', label: 'Petorca' },
+    { value: 'Zapallar', label: 'Zapallar' },
+  ],
+  'Metropolitana': [
+    { value: 'Santiago', label: 'Santiago' },
+    { value: 'Las Condes', label: 'Las Condes' },
+    { value: 'Providencia', label: 'Providencia' },
+    { value: 'Ñuñoa', label: 'Ñuñoa' },
+    { value: 'Vitacura', label: 'Vitacura' },
+    { value: 'Lo Barnechea', label: 'Lo Barnechea' },
+    { value: 'La Reina', label: 'La Reina' },
+    { value: 'Peñalolén', label: 'Peñalolén' },
+    { value: 'Macul', label: 'Macul' },
+    { value: 'San Miguel', label: 'San Miguel' },
+    { value: 'Estación Central', label: 'Estación Central' },
+    { value: 'Maipú', label: 'Maipú' },
+    { value: 'La Florida', label: 'La Florida' },
+    { value: 'Pudahuel', label: 'Pudahuel' },
+    { value: 'Quilicura', label: 'Quilicura' },
+    { value: 'Puente Alto', label: 'Puente Alto' },
+    { value: 'Cerrillos', label: 'Cerrillos' },
+    { value: 'Cerro Navia', label: 'Cerro Navia' },
+    { value: 'Conchalí', label: 'Conchalí' },
+    { value: 'El Bosque', label: 'El Bosque' },
+    { value: 'Huechuraba', label: 'Huechuraba' },
+    { value: 'Independencia', label: 'Independencia' },
+    { value: 'La Cisterna', label: 'La Cisterna' },
+    { value: 'La Pintana', label: 'La Pintana' },
+    { value: 'La Granja', label: 'La Granja' },
+    { value: 'Lampa', label: 'Lampa' },
+    { value: 'Colina', label: 'Colina' },
+    { value: 'Tiltil', label: 'Tiltil' },
+    { value: 'Lo Espejo', label: 'Lo Espejo' },
+    { value: 'Lo Prado', label: 'Lo Prado' },
+    { value: 'Melipilla', label: 'Melipilla' },
+    { value: 'Pedro Aguirre Cerda', label: 'Pedro Aguirre Cerda' },
+    { value: 'Pirque', label: 'Pirque' },
+    { value: 'Quinta Normal', label: 'Quinta Normal' },
+    { value: 'Recoleta', label: 'Recoleta' },
+    { value: 'Renca', label: 'Renca' },
+    { value: 'San Bernardo', label: 'San Bernardo' },
+    { value: 'San Joaquín', label: 'San Joaquín' },
+    { value: 'San José de Maipo', label: 'San José de Maipo' },
+    { value: 'San Ramón', label: 'San Ramón' },
+    { value: 'Padre Hurtado', label: 'Padre Hurtado' },
+    { value: 'Peñaflor', label: 'Peñaflor' },
+    { value: 'Talagante', label: 'Talagante' },
+    { value: 'Isla de Maipo', label: 'Isla de Maipo' },
+    { value: 'El Monte', label: 'El Monte' },
+    { value: 'Buin', label: 'Buin' },
+    { value: 'Paine', label: 'Paine' },
+    { value: 'Calera de Tango', label: 'Calera de Tango' },
+    { value: 'Curacaví', label: 'Curacaví' },
+    { value: 'María Pinto', label: 'María Pinto' },
+    { value: 'San Pedro', label: 'San Pedro' },
+    { value: 'Alhué', label: 'Alhué' },
+  ],
+};
+
 function generateSlug(title: string): string {
   return title
     .toLowerCase()
@@ -143,6 +261,40 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [agents, setAgents] = useState<any[]>([]);
+
+  // Región y Ciudad (Comuna) dinámicas
+  const isRegionKnown = ['Coquimbo', 'Valparaíso', 'Metropolitana'].includes(property?.region || '');
+  const initialRegion = property?.region ? (isRegionKnown ? property.region : 'Otro') : 'Coquimbo';
+  
+  const isCityKnown = initialRegion !== 'Otro' && (COMMUNES_BY_REGION[initialRegion]?.some(c => c.value === property?.city) || false);
+  const initialCity = property?.city ? (isCityKnown ? property.city : 'Otro') : '';
+
+  const [selectedRegion, setSelectedRegion] = useState(initialRegion);
+  const [selectedCity, setSelectedCity] = useState(initialCity);
+  const [customRegion, setCustomRegion] = useState(!isRegionKnown && property?.region ? property.region : '');
+  const [customCity, setCustomCity] = useState(!isCityKnown && property?.city ? property.city : '');
+
+  useEffect(() => {
+    const activeRegion = selectedRegion === 'Otro' ? customRegion : selectedRegion;
+    setFormData(prev => ({ ...prev, region: activeRegion }));
+  }, [selectedRegion, customRegion]);
+
+  useEffect(() => {
+    const activeCity = selectedCity === 'Otro' ? customCity : selectedCity;
+    setFormData(prev => ({ ...prev, city: activeCity }));
+  }, [selectedCity, customCity]);
+
+  const handleRegionChange = (val: string) => {
+    setSelectedRegion(val);
+    if (val !== 'Otro') {
+      const firstCommune = COMMUNES_BY_REGION[val]?.[0]?.value || '';
+      setSelectedCity(firstCommune);
+      setCustomCity('');
+    } else {
+      setSelectedCity('Otro');
+      setCustomCity('');
+    }
+  };
 
   useEffect(() => {
     async function loadUserAndAgents() {
@@ -734,23 +886,50 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             />
           </div>
 
-          <Input
-            label="Ciudad"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            placeholder="Ej: Santiago"
+          <Select
+            label="Región"
+            options={REGION_OPTIONS}
+            value={selectedRegion}
+            onChange={(e) => handleRegionChange(e.target.value)}
             required
           />
 
-          <Input
-            label="Región"
-            name="region"
-            value={formData.region}
-            onChange={handleChange}
-            placeholder="Ej: Metropolitana"
-            required
-          />
+          {selectedRegion === 'Otro' && (
+            <Input
+              label="Escribe la Región"
+              value={customRegion}
+              onChange={(e) => setCustomRegion(e.target.value)}
+              placeholder="Ej: Región de Antofagasta"
+              required
+            />
+          )}
+
+          {selectedRegion !== 'Otro' ? (
+            <Select
+              label="Ciudad / Comuna"
+              options={[
+                { value: '', label: 'Seleccionar comuna...' },
+                ...(COMMUNES_BY_REGION[selectedRegion] || []),
+                { value: 'Otro', label: 'Otra (Ingresar manual)' }
+              ]}
+              value={selectedCity}
+              onChange={(e) => {
+                setSelectedCity(e.target.value);
+                if (e.target.value !== 'Otro') setCustomCity('');
+              }}
+              required
+            />
+          ) : null}
+
+          {(selectedRegion === 'Otro' || selectedCity === 'Otro') && (
+            <Input
+              label="Escribe la Ciudad / Comuna"
+              value={customCity}
+              onChange={(e) => setCustomCity(e.target.value)}
+              placeholder="Ej: Antofagasta"
+              required
+            />
+          )}
 
           <div className="md:col-span-2 border-t border-gray-100 dark:border-gray-750 pt-4 mt-2">
             <div className="flex items-center justify-between mb-4">

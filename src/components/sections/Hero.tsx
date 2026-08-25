@@ -22,15 +22,26 @@ const PROPERTY_TYPES = [
 
 const CITIES = [
   { value: '', label: 'Todas las ubicaciones' },
+  // Región de Coquimbo (IV)
+  { value: 'La Serena', label: 'La Serena' },
+  { value: 'Coquimbo', label: 'Coquimbo' },
+  { value: 'Ovalle', label: 'Ovalle' },
+  // Región Metropolitana (RM)
   { value: 'Santiago', label: 'Santiago' },
   { value: 'Las Condes', label: 'Las Condes' },
   { value: 'Providencia', label: 'Providencia' },
   { value: 'Ñuñoa', label: 'Ñuñoa' },
   { value: 'Vitacura', label: 'Vitacura' },
+  { value: 'Lo Barnechea', label: 'Lo Barnechea' },
+  { value: 'La Reina', label: 'La Reina' },
   { value: 'Maipú', label: 'Maipú' },
   { value: 'La Florida', label: 'La Florida' },
+  // Región de Valparaíso (V)
   { value: 'Valparaíso', label: 'Valparaíso' },
   { value: 'Viña del Mar', label: 'Viña del Mar' },
+  { value: 'Concón', label: 'Concón' },
+  { value: 'Quilpué', label: 'Quilpué' },
+  { value: 'Villa Alemana', label: 'Villa Alemana' },
   { value: 'Concepción', label: 'Concepción' },
 ];
 
