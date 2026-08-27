@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Home, Building2, FileText, Info, Phone, Mail, MapPin, Facebook, Instagram, Linkedin } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '@/types';
+import { createClient } from '@supabase/supabase-js';
 
 const quickLinks = [
   { name: 'Inicio', href: '/', icon: Home },
@@ -18,8 +19,48 @@ const propertyTypes = [
   { name: 'Locales comerciales', href: '/propiedades?type=commercial' },
 ];
 
-function Footer() {
+async function Footer() {
   const currentYear = new Date().getFullYear();
+
+  // Clonar DEFAULT_SETTINGS para evitar modificar la constante global directamente
+  const settings = {
+    ...DEFAULT_SETTINGS,
+    social_media: { ...DEFAULT_SETTINGS.social_media }
+  };
+
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    try {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      );
+      const { data } = await supabase
+        .from('site_settings')
+        .select('key, value');
+
+      if (data) {
+        const fb = data.find((s: any) => s.key === 'facebook_url')?.value;
+        const ig = data.find((s: any) => s.key === 'instagram_url')?.value;
+        const li = data.find((s: any) => s.key === 'linkedin_url')?.value;
+        const email = data.find((s: any) => s.key === 'contact_email')?.value;
+        const phone = data.find((s: any) => s.key === 'contact_phone')?.value;
+        const address = data.find((s: any) => s.key === 'contact_address')?.value;
+        const siteName = data.find((s: any) => s.key === 'site_name')?.value;
+        const siteTagline = data.find((s: any) => s.key === 'site_tagline')?.value;
+
+        if (fb) settings.social_media.facebook = fb;
+        if (ig) settings.social_media.instagram = ig;
+        if (li) settings.social_media.linkedin = li;
+        if (email) settings.contact_email = email;
+        if (phone) settings.contact_phone = phone;
+        if (address) settings.contact_address = address;
+        if (siteName) settings.site_name = siteName;
+        if (siteTagline) settings.site_tagline = siteTagline;
+      }
+    } catch (err) {
+      console.error('Error fetching footer settings:', err);
+    }
+  }
 
   return (
     <footer className="bg-primary-950 text-gray-300">
@@ -37,12 +78,12 @@ function Footer() {
               />
             </Link>
             <p className="text-sm text-gray-400 mb-6 leading-relaxed">
-              {DEFAULT_SETTINGS.site_tagline}. Expertos en bienes raíces con años de experiencia en el mercado chileno.
+              {settings.site_tagline}. Expertos en bienes raíces con años de experiencia en el mercado chileno.
             </p>
             <div className="flex gap-3">
-              {DEFAULT_SETTINGS.social_media.facebook && (
+              {settings.social_media.facebook && (
                 <a
-                  href={DEFAULT_SETTINGS.social_media.facebook}
+                  href={settings.social_media.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#1877F2] hover:bg-[#0e65d9] text-white transition-all hover:scale-110 shadow-lg"
@@ -51,9 +92,9 @@ function Footer() {
                   <Facebook className="w-5 h-5" />
                 </a>
               )}
-              {DEFAULT_SETTINGS.social_media.instagram && (
+              {settings.social_media.instagram && (
                 <a
-                  href={DEFAULT_SETTINGS.social_media.instagram}
+                  href={settings.social_media.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-[#f09433] via-[#e6683c] via-[#dc2743] via-[#cc2366] to-[#bc1888] hover:opacity-90 text-white transition-all hover:scale-110 shadow-lg"
@@ -62,9 +103,9 @@ function Footer() {
                   <Instagram className="w-5 h-5" />
                 </a>
               )}
-              {DEFAULT_SETTINGS.social_media.linkedin && (
+              {settings.social_media.linkedin && (
                 <a
-                  href={DEFAULT_SETTINGS.social_media.linkedin}
+                  href={settings.social_media.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#0A66C2] hover:bg-[#084e96] text-white transition-all hover:scale-110 shadow-lg"
@@ -120,18 +161,18 @@ function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-accent-500 flex-shrink-0 mt-0.5" />
-                <span className="text-sm">{DEFAULT_SETTINGS.contact_address}</span>
+                <span className="text-sm">{settings.contact_address}</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-accent-500 flex-shrink-0" />
-                <a href={`tel:${DEFAULT_SETTINGS.contact_phone}`} className="text-sm text-gray-400 hover:text-accent-500 transition-colors">
-                  {DEFAULT_SETTINGS.contact_phone}
+                <a href={`tel:${settings.contact_phone}`} className="text-sm text-gray-400 hover:text-accent-500 transition-colors">
+                  {settings.contact_phone}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-accent-500 flex-shrink-0" />
-                <a href={`mailto:${DEFAULT_SETTINGS.contact_email}`} className="text-sm text-gray-400 hover:text-accent-500 transition-colors">
-                  {DEFAULT_SETTINGS.contact_email}
+                <a href={`mailto:${settings.contact_email}`} className="text-sm text-gray-400 hover:text-accent-500 transition-colors">
+                  {settings.contact_email}
                 </a>
               </li>
             </ul>
@@ -141,7 +182,7 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-400">
-            © {currentYear} {DEFAULT_SETTINGS.site_name}. Todos los derechos reservados. — Desarrollado por{' '}
+            © {currentYear} {settings.site_name}. Todos los derechos reservados. — Desarrollado por{' '}
             <a 
               href="https://webunica.cl" 
               target="_blank" 

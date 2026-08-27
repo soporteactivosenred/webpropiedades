@@ -32,8 +32,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   whatsapp_avatar: '/ejecutiva.png',
   contact_address: 'Gómez Carreño 333, La Serena',
   social_media: {
-    facebook: 'https://facebook.com/activosenred',
-    instagram: 'https://instagram.com/activosenred',
+    facebook: 'https://facebook.com/activosenred.cl',
+    instagram: 'https://instagram.com/activosenred.cl',
     linkedin: 'https://linkedin.com/company/activosenred',
   },
   seo: {
