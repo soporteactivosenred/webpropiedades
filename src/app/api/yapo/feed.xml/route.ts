@@ -32,7 +32,8 @@ export async function GET() {
     const { data: properties } = await supabaseAdmin
       .from('properties')
       .select('*')
-      .eq('status', 'active');
+      .eq('status', 'active')
+      .eq('publish_to_yapo', true);
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl';
 

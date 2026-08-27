@@ -1572,6 +1572,11 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             </label>
           </div>
 
+          <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3 leading-relaxed">
+            💡 <strong>Nota sobre Sincronización Yapo.cl:</strong> El método de publicación instantánea (botón de arriba) puede fallar por bloqueos preventivos de Cloudflare en los servidores de Yapo.cl (redirigiendo la llamada con HTTP 302). 
+            No obstante, <strong>el Feed XML es el método oficial y garantizado</strong>. Al activar la casilla anterior, esta propiedad se sumará automáticamente a tu feed XML y Yapo.cl la publicará/actualizará en su portal en su próxima importación programada diaria.
+          </div>
+
           {formData.yapo_ad_id && (
             <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold flex items-center gap-1.5">
