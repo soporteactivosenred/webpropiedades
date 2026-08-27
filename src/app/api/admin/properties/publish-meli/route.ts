@@ -174,7 +174,16 @@ export async function POST(req: Request) {
     if (!response.ok) {
       console.error('Error de API Mercado Libre:', result);
       
-      const errorMessage = result.message || (result.cause && result.cause[0] ? result.cause[0].cause : 'Error al publicar en Mercado Libre.');
+      let errorMessage = result.message || 'Error al publicar en Mercado Libre.';
+      if (result.cause && Array.isArray(result.cause) && result.cause.length > 0) {
+        const details = result.cause
+          .map((c: any) => c.message || c.cause || c.code || '')
+          .filter(Boolean)
+          .join(', ');
+        if (details) {
+          errorMessage = `${errorMessage}: ${details}`;
+        }
+      }
       
       // Actualizar estado en Supabase
       await supabaseAdmin.from('properties').update({
