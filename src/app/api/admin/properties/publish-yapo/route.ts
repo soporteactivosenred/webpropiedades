@@ -119,9 +119,14 @@ export async function POST(req: Request) {
         resultData = await response.json();
         if (resultData.id || resultData.ad_id) {
           yapoAdId = String(resultData.id || resultData.ad_id);
-        }
-        if (resultData.permalink || resultData.url) {
-          yapoPermalink = resultData.permalink || resultData.url;
+          if (resultData.permalink || resultData.url) {
+            yapoPermalink = resultData.permalink || resultData.url;
+          }
+        } else {
+          console.warn('Respuesta de Yapo API sin ID válido:', resultData);
+          return NextResponse.json({
+            error: `La API de Yapo.cl respondió sin un ID de publicación válido. Respuesta: ${JSON.stringify(resultData)}`
+          }, { status: 400 });
         }
       } else {
         const errText = await response.text();
