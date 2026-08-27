@@ -8,14 +8,25 @@ const getFullImageUrl = (img: string, siteUrl: string) => {
   return `${baseUrl}${path}`;
 };
 
-// Mapeo de tipos de propiedad a categorías de Mercado Libre Chile (MLC)
-const CATEGORY_MAP: Record<string, string> = {
-  house: 'MLC1459',       // Casas
-  apartment: 'MLC1472',   // Departamentos
-  land: 'MLC1494',        // Terrenos y Parcelas
-  commercial: 'MLC1467',  // Locales Comerciales
-  office: 'MLC1468',      // Oficinas
-  industrial: 'MLC1469',  // Bodegas e Industriales
+// Obtener la categoría hoja (leaf category) correcta para Mercado Libre Chile (MLC) según tipo de propiedad y operación
+const getMeliCategoryId = (propertyType: string, priceType: string): string => {
+  const isSale = priceType === 'sale';
+  switch (propertyType) {
+    case 'house':
+      return isSale ? 'MLC157520' : 'MLC183184';
+    case 'apartment':
+      return isSale ? 'MLC157522' : 'MLC183186';
+    case 'land':
+      return isSale ? 'MLC152993' : 'MLC152994';
+    case 'commercial':
+      return isSale ? 'MLC50612' : 'MLC50611';
+    case 'office':
+      return isSale ? 'MLC157413' : 'MLC183187';
+    case 'industrial':
+      return isSale ? 'MLC50619' : 'MLC50618';
+    default:
+      return isSale ? 'MLC157520' : 'MLC183184';
+  }
 };
 
 export async function POST(req: Request) {
@@ -105,7 +116,7 @@ export async function POST(req: Request) {
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl';
-    const categoryId = CATEGORY_MAP[property.property_type] || 'MLC1459';
+    const categoryId = getMeliCategoryId(property.property_type, property.price_type);
 
     // Preparar imágenes con URLs absolutas
     const pictures = (property.images || []).map((img: string) => ({
@@ -120,6 +131,7 @@ export async function POST(req: Request) {
 
     // 4. Construir payload exigido por la API de Mercado Libre Chile (MLC)
     const meliPayload: any = {
+      site_id: 'MLC', // Muy importante para validar atributos correctamente
       title: property.title.length > 60 ? property.title.slice(0, 57) + '...' : property.title,
       category_id: categoryId,
       price: property.price,
@@ -134,11 +146,19 @@ export async function POST(req: Request) {
       pictures: pictures.slice(0, 20), // Máximo 20 fotos
       attributes: [
         { id: 'CMG_SITE', value_name: 'portalinmobiliario' }, // Activa publicación simultánea en Portal Inmobiliario Chile
-        property.area ? { id: 'COVERED_AREA', value_name: `${property.area} m²` } : null,
-        property.terrain_area ? { id: 'TOTAL_AREA', value_name: `${property.terrain_area} m²` } : null,
+        property.area ? { 
+          id: 'COVERED_AREA', 
+          value_name: `${property.area} m²`,
+          value_struct: { number: Number(property.area), unit: 'm²' }
+        } : null,
+        property.terrain_area ? { 
+          id: 'TOTAL_AREA', 
+          value_name: `${property.terrain_area} m²`,
+          value_struct: { number: Number(property.terrain_area), unit: 'm²' }
+        } : null,
         property.bedrooms ? { id: 'BEDROOMS', value_name: `${property.bedrooms}` } : null,
-        property.bathrooms ? { id: 'BATHROOMS', value_name: `${property.bathrooms}` } : null,
-        property.parking_spaces ? { id: 'PARKING_SPACES', value_name: `${property.parking_spaces}` } : null,
+        property.bathrooms ? { id: 'FULL_BATHROOMS', value_name: `${property.bathrooms}` } : null,
+        property.parking_spaces ? { id: 'PARKING_LOTS', value_name: `${property.parking_spaces}` } : null,
       ].filter(Boolean),
       location: {
         address_line: property.address,
