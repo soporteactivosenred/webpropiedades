@@ -129,7 +129,53 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
-    // 4. Construir payload exigido por la API de Mercado Libre Chile (MLC)
+    // 4. Construir atributos exigidos por la API de Mercado Libre Chile (MLC)
+    const featuresLower = (property.features || []).map((f: string) => f.toLowerCase());
+    const isFurnished = featuresLower.some((f: string) => f.includes('amoblado') || f.includes('mueble') || f.includes('furnish'));
+    const isPetsAllowed = featuresLower.some((f: string) => f.includes('mascota') || f.includes('perro') || f.includes('gato') || f.includes('pet'));
+    const hasWarehouse = featuresLower.some((f: string) => f.includes('bodega') || f.includes('cellar') || f.includes('warehouse'));
+
+    const attributes: any[] = [
+      { id: 'CMG_SITE', value_name: 'portalinmobiliario' } // Activa publicación simultánea en Portal Inmobiliario Chile
+    ];
+
+    if (property.area) {
+      attributes.push({ 
+        id: 'COVERED_AREA', 
+        value_name: `${property.area} m²`,
+        value_struct: { number: Number(property.area), unit: 'm²' }
+      });
+    }
+
+    if (property.terrain_area) {
+      attributes.push({ 
+        id: 'TOTAL_AREA', 
+        value_name: `${property.terrain_area} m²`,
+        value_struct: { number: Number(property.terrain_area), unit: 'm²' }
+      });
+    }
+
+    if (property.property_type === 'house' || property.property_type === 'apartment' || property.property_type === 'office') {
+      if (property.bedrooms) {
+        attributes.push({ id: 'BEDROOMS', value_name: `${property.bedrooms}` });
+      }
+      
+      const bathrooms = property.bathrooms || 1;
+      attributes.push({ id: 'FULL_BATHROOMS', value_name: `${bathrooms}` });
+
+      const parking = property.parking_spaces !== null && property.parking_spaces !== undefined ? property.parking_spaces : 0;
+      attributes.push({ id: 'PARKING_LOTS', value_name: `${parking}` });
+    }
+
+    // Atributos específicos exigidos para residenciales (especialmente arriendo de departamentos)
+    if (property.property_type === 'house' || property.property_type === 'apartment') {
+      attributes.push({ id: 'IS_SUITABLE_FOR_PETS', value_name: isPetsAllowed ? 'Sí' : 'No' });
+      attributes.push({ id: 'FURNISHED', value_name: isFurnished ? 'Sí' : 'No' });
+      attributes.push({ id: 'WAREHOUSES', value_name: hasWarehouse ? '1' : '0' });
+      attributes.push({ id: 'MAINTENANCE_FEE', value_name: '0', value_struct: { number: 0, unit: 'CLP' } });
+    }
+
+    // Construir payload
     const meliPayload: any = {
       site_id: 'MLC', // Muy importante para validar atributos correctamente
       title: property.title.length > 60 ? property.title.slice(0, 57) + '...' : property.title,
@@ -144,22 +190,7 @@ export async function POST(req: Request) {
         plain_text: property.description + `\n\nPublicado por Activos en Red: ${siteUrl}/propiedades/${property.slug}`,
       },
       pictures: pictures.slice(0, 20), // Máximo 20 fotos
-      attributes: [
-        { id: 'CMG_SITE', value_name: 'portalinmobiliario' }, // Activa publicación simultánea en Portal Inmobiliario Chile
-        property.area ? { 
-          id: 'COVERED_AREA', 
-          value_name: `${property.area} m²`,
-          value_struct: { number: Number(property.area), unit: 'm²' }
-        } : null,
-        property.terrain_area ? { 
-          id: 'TOTAL_AREA', 
-          value_name: `${property.terrain_area} m²`,
-          value_struct: { number: Number(property.terrain_area), unit: 'm²' }
-        } : null,
-        property.bedrooms ? { id: 'BEDROOMS', value_name: `${property.bedrooms}` } : null,
-        property.bathrooms ? { id: 'FULL_BATHROOMS', value_name: `${property.bathrooms}` } : null,
-        property.parking_spaces ? { id: 'PARKING_LOTS', value_name: `${property.parking_spaces}` } : null,
-      ].filter(Boolean),
+      attributes: attributes,
       location: {
         address_line: property.address,
         city: { name: property.city },
