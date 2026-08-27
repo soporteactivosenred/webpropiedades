@@ -126,9 +126,15 @@ export async function POST(req: Request) {
       } else {
         const errText = await response.text();
         console.warn('Respuesta de Yapo API (HTTP ' + response.status + '):', errText);
+        return NextResponse.json({
+          error: `Error al publicar en Yapo.cl (HTTP ${response.status}): ${errText || 'Error desconocido'}`
+        }, { status: 400 });
       }
-    } catch (apiErr) {
-      console.warn('Modo directo/simulación activado para Yapo API:', apiErr);
+    } catch (apiErr: any) {
+      console.error('Error de red al llamar a la API de Yapo.cl:', apiErr);
+      return NextResponse.json({
+        error: `Error de red al conectar con Yapo.cl: ${apiErr.message}`
+      }, { status: 500 });
     }
 
     // 4. Actualizar registro en Supabase

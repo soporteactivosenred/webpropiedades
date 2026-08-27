@@ -123,7 +123,7 @@ export async function POST(req: Request) {
       title: property.title.length > 60 ? property.title.slice(0, 57) + '...' : property.title,
       category_id: categoryId,
       price: property.price,
-      currency_id: property.price_type === 'sale' ? 'UF' : 'CLP',
+      currency_id: property.price_type === 'sale' ? 'CLF' : 'CLP',
       available_quantity: 1,
       buying_mode: 'classified',
       listing_type_id: property.meli_listing_type || 'gold_special',
