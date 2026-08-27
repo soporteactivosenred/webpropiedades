@@ -104,6 +104,7 @@ export async function POST(req: Request) {
     try {
       const response = await fetch(apiUrl, {
         method: 'POST',
+        redirect: 'manual', // Evitar seguir redirecciones automáticamente
         headers: {
           'Content-Type': 'application/json',
           'X-API-Key': apiKey,
@@ -114,6 +115,27 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify(yapoPayload),
       });
+
+      // Detectar redirecciones (muy común si el firewall de Yapo bloquea la solicitud)
+      if (response.status >= 300 && response.status < 400) {
+        const redirectUrl = response.headers.get('location') || '';
+        return NextResponse.json({
+          error: `Error al publicar en Yapo.cl: La API redirigió la petición (HTTP ${response.status}) a "${redirectUrl}". Esto ocurre habitualmente cuando Cloudflare o el firewall de Yapo bloquean y redirigen el tráfico automatizado.`
+        }, { status: 400 });
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const rawText = await response.text();
+        console.warn('Respuesta no-JSON de Yapo API (HTTP ' + response.status + '):', rawText.slice(0, 500));
+        
+        const titleMatch = rawText.match(/<title>([\s\S]*?)<\/title>/i);
+        const titleText = titleMatch ? titleMatch[1].trim() : '';
+
+        return NextResponse.json({
+          error: `Error al publicar en Yapo.cl: El servidor devolvió HTML (${contentType.split(';')[0]})${titleText ? ` con título "${titleText}"` : ''} en vez de JSON. Puede que el endpoint de la API sea incorrecto, esté temporalmente caído, o la IP esté bloqueada.`
+        }, { status: 400 });
+      }
 
       if (response.ok) {
         resultData = await response.json();
