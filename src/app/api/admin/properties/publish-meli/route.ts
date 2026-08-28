@@ -209,8 +209,12 @@ export async function POST(req: Request) {
     if (property.meli_item_id) {
       endpoint = `https://api.mercadolibre.com/items/${property.meli_item_id}`;
       method = 'PUT';
-      delete meliPayload.category_id; // No se puede cambiar categoría en edición
-      delete meliPayload.description; // No se permite editar la descripción en el endpoint principal de PUT /items
+      delete meliPayload.site_id;          // No es modificable en edición
+      delete meliPayload.category_id;      // No es modificable en edición
+      delete meliPayload.listing_type_id;  // No es modificable en edición
+      delete meliPayload.buying_mode;      // No es modificable en edición
+      delete meliPayload.condition;        // No es modificable en edición
+      delete meliPayload.description;      // No se permite editar la descripción en el endpoint principal de PUT /items
     }
 
     response = await fetch(endpoint, {
