@@ -203,12 +203,14 @@ export async function POST(req: Request) {
     let response;
     let endpoint = 'https://api.mercadolibre.com/items';
     let method = 'POST';
+    let descriptionPayload = meliPayload.description;
 
     // Si ya fue publicado, actualizar item existente
     if (property.meli_item_id) {
       endpoint = `https://api.mercadolibre.com/items/${property.meli_item_id}`;
       method = 'PUT';
       delete meliPayload.category_id; // No se puede cambiar categoría en edición
+      delete meliPayload.description; // No se permite editar la descripción en el endpoint principal de PUT /items
     }
 
     response = await fetch(endpoint, {
@@ -245,6 +247,28 @@ export async function POST(req: Request) {
         error: `Error Mercado Libre (${response.status}): ${errorMessage}`,
         details: result,
       }, { status: response.status });
+    }
+
+    // Si es una actualización (PUT) exitosa, proceder a actualizar la descripción por separado
+    if (property.meli_item_id && descriptionPayload) {
+      try {
+        const descEndpoint = `https://api.mercadolibre.com/items/${property.meli_item_id}/description`;
+        const descResponse = await fetch(descEndpoint, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(descriptionPayload),
+        });
+
+        if (!descResponse.ok) {
+          const descError = await descResponse.text();
+          console.warn('No se pudo actualizar la descripción de la propiedad en Mercado Libre:', descError);
+        }
+      } catch (descErr) {
+        console.error('Error de red al actualizar descripción de Mercado Libre:', descErr);
+      }
     }
 
     // 6. Actualizar registro en Supabase con la respuesta exitosa
