@@ -34,22 +34,33 @@ const values = [
 
 const team = [
   {
-    name: 'Paula Merino',
-    role: 'Fundadora y Director',
+    name: 'Paula Merino Alvarez',
+    role: 'Fundadora & Directora Comercial',
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop',
-    bio: 'Más de 20 años de experiencia en el mercado inmobiliario chileno.',
+    bio: 'Líder estratégica del área de liquidación bancaria e inversiones inmobiliarias.',
   },
   {
-    name: 'Carlos Rodríguez',
-    role: 'Agente Senior',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
-    bio: 'Especialista en propiedades residenciales y comerciales.',
-  },
-  {
-    name: 'María González',
-    role: 'Asistente Comercial',
+    name: 'María José Merino Alvarez',
+    role: 'Co-Fundadora & Jefa de Administración y Finanzas',
     image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop',
-    bio: 'Atención al cliente y coordinación de visitas.',
+    bio: 'Encargada de la gestión operativa, contratos y administración de arriendos.',
+    email: 'administraciones@activosenred.cl',
+  },
+  {
+    name: 'Paulino Rojas Callejas',
+    role: 'Agente de Ventas Senior',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
+    bio: 'Asesor especialista en negociación, captación y cierre de oportunidades comerciales.',
+    email: 'paulino.rojas@activosenred.cl',
+    phone: '+56973081220',
+  },
+  {
+    name: 'Eduardo Merino Vera',
+    role: 'Agente de Ventas',
+    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
+    bio: 'Asesor inmobiliario en terreno, dedicado a brindar una atención personalizada.',
+    email: 'contacto@activosenred.cl',
+    phone: '+56954161011',
   },
 ];
 
@@ -159,9 +170,9 @@ export default function AboutPage() {
               Profesionales comprometidos con tu satisfacción
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member) => (
-              <div key={member.name} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md">
+              <div key={member.name} className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md flex flex-col">
                 <div className="relative aspect-square">
                   <Image
                     src={member.image}
@@ -170,16 +181,39 @@ export default function AboutPage() {
                     className="object-cover"
                   />
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                     {member.name}
                   </h3>
-                  <p className="text-primary-600 dark:text-primary-400 font-medium">
+                  <p className="text-primary-600 dark:text-primary-400 font-medium text-xs mt-1">
                     {member.role}
                   </p>
-                  <p className="mt-2 text-gray-600 dark:text-gray-400 text-sm">
+                  <p className="mt-2 text-gray-600 dark:text-gray-400 text-xs leading-relaxed flex-1">
                     {member.bio}
                   </p>
+                  {(member.email || member.phone) && (
+                    <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 space-y-2 text-xs text-gray-600 dark:text-gray-300">
+                      {member.email && (
+                        <a
+                          href={`mailto:${member.email}`}
+                          className="flex items-center gap-1.5 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                          title={member.email}
+                        >
+                          <Mail className="w-3.5 h-3.5 text-primary-600 shrink-0" />
+                          <span className="truncate">{member.email}</span>
+                        </a>
+                      )}
+                      {member.phone && (
+                        <a
+                          href={`tel:${member.phone.replace(/\s+/g, '')}`}
+                          className="flex items-center gap-1.5 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                        >
+                          <Phone className="w-3.5 h-3.5 text-primary-600 shrink-0" />
+                          <span>{member.phone}</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
