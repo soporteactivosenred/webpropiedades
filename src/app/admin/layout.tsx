@@ -1,4 +1,4 @@
-import { LayoutDashboard, Building2, Users, FileText, Settings, LogOut, ExternalLink } from 'lucide-react';
+import { LayoutDashboard, Building2, Users, FileText, Settings, LogOut, ExternalLink, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { createServerClient } from '@/lib/supabase/server';
 
@@ -54,6 +54,7 @@ export default async function AdminLayout({
             <AdminNavItem href="/admin/propiedades" icon={<Building2 className="w-4 h-4" />} label="Propiedades" />
             <AdminNavItem href="/admin/leads" icon={<Users className="w-4 h-4" />} label="Leads" />
             <AdminNavItem href="/admin/blog" icon={<FileText className="w-4 h-4" />} label="Blog" />
+            <AdminNavItem href="/admin/equipo" icon={<UserCheck className="w-4 h-4" />} label="Equipo" />
             {isAdmin && (
               <AdminNavItem href="/admin/usuarios" icon={<Users className="w-4 h-4" />} label="Usuarios" />
             )}
