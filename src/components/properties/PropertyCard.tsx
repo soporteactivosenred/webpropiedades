@@ -59,6 +59,11 @@ export function PropertyCard({ property, featured = false, compact = false }: Pr
             <span className="px-2 py-1 text-xs font-medium bg-primary-600 text-white rounded shadow-sm">
               {priceLabel}
             </span>
+            {property.is_bank_liquidation && (
+              <span className="px-2 py-1 text-xs font-semibold bg-amber-600 text-white rounded shadow-sm">
+                Liquidación
+              </span>
+            )}
             {featured && (
               <span className="px-2 py-1 text-xs font-medium bg-accent-500 text-white rounded shadow-sm">
                 Destacada
