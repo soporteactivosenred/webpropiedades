@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
 import type { Database } from '@/types';
 import { getPropertyCode } from '@/lib';
-import { PlusCircle, Pencil, Eye, EyeOff, Trash2, ExternalLink, Search, SlidersHorizontal, Image as ImageIcon } from 'lucide-react';
+import { PlusCircle, Pencil, Eye, EyeOff, Trash2, ExternalLink, Search, SlidersHorizontal, Image as ImageIcon, Landmark } from 'lucide-react';
 
 type Property = Database['public']['Tables']['properties']['Row'];
 
@@ -36,12 +36,13 @@ export default function AdminPropertiesPage() {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [typeFilter, setTypeFilter] = useState<string>('');
+  const [liquidationFilter, setLiquidationFilter] = useState<string>('');
   const [deleting, setDeleting] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     fetchProperties();
-  }, [statusFilter, typeFilter]);
+  }, [statusFilter, typeFilter, liquidationFilter]);
 
   const fetchProperties = async () => {
     setLoading(true);
@@ -66,6 +67,8 @@ export default function AdminPropertiesPage() {
       let query = supabase.from('properties').select('*').order('created_at', { ascending: false });
       if (statusFilter) query = query.eq('status', statusFilter);
       if (typeFilter) query = query.eq('property_type', typeFilter);
+      if (liquidationFilter === 'yes') query = query.eq('is_bank_liquidation', true);
+      if (liquidationFilter === 'no') query = query.or('is_bank_liquidation.is.null,is_bank_liquidation.eq.false');
 
       // Filter by agent_id if role is agent
       if (profile?.role === 'agent') {
@@ -109,6 +112,24 @@ export default function AdminPropertiesPage() {
       setProperties(properties.map(p => p.id === property.id ? { ...p, status: newStatus } : p));
     } catch {
       alert('Error al actualizar el estado');
+    }
+  };
+
+  const handleToggleLiquidation = async (property: Property) => {
+    const newValue = !property.is_bank_liquidation;
+    try {
+      const supabase = createAdminBrowserClient() as any;
+      const { error: updateError } = await supabase
+        .from('properties')
+        .update({ is_bank_liquidation: newValue })
+        .eq('id', property.id);
+      if (updateError) {
+        alert('Error al actualizar: ' + updateError.message);
+        return;
+      }
+      setProperties(properties.map(p => p.id === property.id ? { ...p, is_bank_liquidation: newValue } : p));
+    } catch {
+      alert('Error al actualizar liquidación bancaria');
     }
   };
 
@@ -163,9 +184,18 @@ export default function AdminPropertiesPage() {
             <option value="office">Oficina</option>
             <option value="industrial">Industrial</option>
           </select>
-          {(statusFilter || typeFilter) && (
+          <select
+            value={liquidationFilter}
+            onChange={(e) => setLiquidationFilter(e.target.value)}
+            className="px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-700"
+          >
+            <option value="">Todas (Estándar y Liquidaciones)</option>
+            <option value="yes">🏛️ Solo Liquidaciones Bancarias</option>
+            <option value="no">Solo Propiedades Estándar</option>
+          </select>
+          {(statusFilter || typeFilter || liquidationFilter) && (
             <button
-              onClick={() => { setStatusFilter(''); setTypeFilter(''); }}
+              onClick={() => { setStatusFilter(''); setTypeFilter(''); setLiquidationFilter(''); }}
               className="text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
               Limpiar filtros
@@ -203,6 +233,7 @@ export default function AdminPropertiesPage() {
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Propiedad</th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tipo</th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Precio</th>
+                  <th className="px-5 py-3.5 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Liq. Bancaria</th>
                   <th className="px-5 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Estado</th>
                   <th className="px-5 py-3.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Acciones</th>
                 </tr>
@@ -241,6 +272,25 @@ export default function AdminPropertiesPage() {
                     <td className="px-5 py-4">
                       <p className="text-sm font-bold text-gray-900">{formatPrice(property.price)} UF</p>
                       {property.price_type === 'rent' && <span className="text-xs text-gray-400">/mes</span>}
+                    </td>
+                    <td className="px-5 py-4 text-center whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleLiquidation(property)}
+                        title={property.is_bank_liquidation ? 'Hacer clic para desmarcar como liquidación' : 'Hacer clic para marcar como liquidación bancaria'}
+                        className="group focus:outline-none transition-transform active:scale-95"
+                      >
+                        {property.is_bank_liquidation ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-300 shadow-sm hover:bg-amber-100 transition-colors">
+                            <Landmark className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <span>Sí (Liquidación)</span>
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium text-gray-400 bg-gray-50 border border-gray-200 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                            No
+                          </span>
+                        )}
+                      </button>
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex flex-col gap-1 items-start">
