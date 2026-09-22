@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { DEFAULT_SETTINGS } from '@/types';
+import { evaluateFormSecurity } from '@/lib/anti-spam';
 
 // Create a singleton of Resend only if the API key exists
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -9,6 +10,23 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
     const { name, email, phone, message, propertyTitle, propertyCode, propertyUrl, source = 'website' } = data;
+
+    // Obtener IP del cliente para rate limiting y trazabilidad
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+    const clientIp = (forwardedFor ? forwardedFor.split(',')[0].trim() : realIp) || 'unknown';
+
+    // 0. CAPA DE SEGURIDAD ANTI-SPAM (Honeypot, tiempo de llenado, patrones de bot, palabras clave y rate limit)
+    const securityCheck = evaluateFormSecurity(data, clientIp);
+    if (securityCheck.isSpam) {
+      console.warn(`[Anti-Spam BLOQUEADO] Causa: ${securityCheck.reason} | IP: ${clientIp} | Nombre: "${name}" | Email: "${email}"`);
+      // Se responde 200 OK con 'filtered: true' para despistar a los bots automatizados y no generar reintentos
+      return NextResponse.json({
+        success: true,
+        filtered: true,
+        message: 'Solicitud procesada correctamente.'
+      });
+    }
 
     // Validate required fields
     if (!name || !email || !message) {

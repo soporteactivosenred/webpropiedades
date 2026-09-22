@@ -6,11 +6,13 @@ import { validateForm, contactFormSchema } from '@/lib';
 import { Send, Mail, Phone, MapPin, Clock } from 'lucide-react';
 import { DEFAULT_SETTINGS } from '@/types';
 import { createClientComponentClient } from '@/lib/supabase/client';
+import { isBotName } from '@/lib/anti-spam';
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formMountedAt] = useState<number>(() => Date.now());
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,12 +20,22 @@ export default function ContactPage() {
     setErrors({});
 
     const formData = new FormData(e.currentTarget);
+    const honeypot = (formData.get('b_website') as string) || '';
+
     const data = {
       name: formData.get('name') as string,
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       message: formData.get('message') as string,
     };
+
+    // Filtro silencioso para bots automáticos (honeypot o patrones bot)
+    if (honeypot.trim().length > 0 || isBotName(data.name)) {
+      console.warn('[Anti-Spam Client] Descartando envío bot silenciosamente');
+      setSuccess(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     const validation = validateForm(contactFormSchema, data);
     if (!validation.success) {
@@ -60,7 +72,9 @@ export default function ContactPage() {
           email: data.email,
           phone: data.phone,
           message: data.message,
-          source: 'website'
+          source: 'website',
+          b_website: honeypot,
+          _form_time: formMountedAt,
         }),
       });
     } catch (emailError) {
@@ -115,6 +129,16 @@ export default function ContactPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Campo trampa (Honeypot) invisible para humanos */}
+                <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                  <input
+                    type="text"
+                    name="b_website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+                </div>
+
                 {errors.form && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                     {errors.form}

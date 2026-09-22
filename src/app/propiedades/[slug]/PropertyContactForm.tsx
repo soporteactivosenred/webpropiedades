@@ -5,6 +5,7 @@ import { Button, Input, TextArea } from '@/components/ui';
 import { validateForm, contactFormSchema } from '@/lib';
 import { Mail, Send } from 'lucide-react';
 import { createClientComponentClient } from '@/lib/supabase/client';
+import { isBotName } from '@/lib/anti-spam';
 
 interface Props {
   propertyId: string;
@@ -17,6 +18,7 @@ export function PropertyContactForm({ propertyId, propertyTitle, propertySlug, p
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formMountedAt] = useState<number>(() => Date.now());
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,12 +26,22 @@ export function PropertyContactForm({ propertyId, propertyTitle, propertySlug, p
     setErrors({});
 
     const formData = new FormData(e.currentTarget);
+    const honeypot = (formData.get('b_website') as string) || '';
+
     const data = {
       name: formData.get('name') as string,
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       message: formData.get('message') as string,
     };
+
+    // Filtro silencioso para bots automáticos
+    if (honeypot.trim().length > 0 || isBotName(data.name)) {
+      console.warn('[Anti-Spam Client] Descartando consulta de propiedad bot');
+      setSuccess(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     const validation = validateForm(contactFormSchema, data);
     if (!validation.success) {
@@ -75,6 +87,8 @@ export function PropertyContactForm({ propertyId, propertyTitle, propertySlug, p
           propertyCode,
           propertyUrl,
           source: 'property_inquiry',
+          b_website: honeypot,
+          _form_time: formMountedAt,
         }),
       });
     } catch (emailErr) {
@@ -101,6 +115,16 @@ export function PropertyContactForm({ propertyId, propertyTitle, propertySlug, p
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Campo trampa (Honeypot) invisible para humanos */}
+      <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+        <input
+          type="text"
+          name="b_website"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {errors.form && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
           {errors.form}

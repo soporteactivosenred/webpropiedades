@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { X, MessageCircle, User, Phone, Mail, Home, Loader2, CheckCircle2 } from 'lucide-react';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
 import { DEFAULT_SETTINGS } from '@/types';
+import { isBotName } from '@/lib/anti-spam';
 
 const SERVICES = [
   'Comprar una propiedad',
@@ -20,6 +21,8 @@ export function WhatsAppButton() {
   const [whatsappNumber, setWhatsappNumber] = useState(DEFAULT_SETTINGS.contact_whatsapp.replace(/[^0-9]/g, ''));
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [isLoading, setIsLoading] = useState(false);
+  const [honeypot, setHoneypot] = useState('');
+  const [formMountedAt] = useState<number>(() => Date.now());
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -60,16 +63,27 @@ export function WhatsAppButton() {
     };
   }, []);
 
+  const handleClose = () => {
+    setIsOpen(false);
+    setTimeout(() => {
+      setStep('form');
+      setFormData({ name: '', phone: '', email: '', service: '' });
+      setErrors({});
+    }, 300);
+  };
+
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = 'El nombre es requerido';
-    if (!formData.phone.trim()) newErrors.phone = 'El teléfono es requerido';
-    if (!formData.email.trim()) {
-      newErrors.email = 'El correo es requerido';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'El correo no es válido';
+    if (!formData.name.trim()) newErrors.name = 'El nombre es obligatorio';
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'El teléfono es obligatorio';
+    } else if (formData.phone.replace(/[^0-9+]/g, '').length < 8) {
+      newErrors.phone = 'Ingresa un teléfono válido';
     }
-    if (!formData.service) newErrors.service = 'Selecciona un servicio';
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Ingresa un email válido';
+    }
+    if (!formData.service) newErrors.service = 'Selecciona un motivo de consulta';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -77,6 +91,16 @@ export function WhatsAppButton() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    // Filtro silencioso para bots
+    if (honeypot.trim().length > 0 || isBotName(formData.name)) {
+      console.warn('[Anti-Spam Client] Descartando lead WhatsApp bot');
+      setStep('success');
+      setTimeout(() => {
+        handleClose();
+      }, 1500);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -100,7 +124,9 @@ export function WhatsAppButton() {
           email: formData.email,
           phone: formData.phone,
           message: formData.service,
-          source: 'whatsapp'
+          source: 'whatsapp',
+          b_website: honeypot,
+          _form_time: formMountedAt,
         }),
       }).catch(err => console.error('Error enviando email:', err));
 
@@ -125,15 +151,6 @@ export function WhatsAppButton() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
-    setTimeout(() => {
-      setStep('form');
-      setFormData({ name: '', phone: '', email: '', service: '' });
-      setErrors({});
-    }, 300);
   };
 
   return (
@@ -228,6 +245,18 @@ export function WhatsAppButton() {
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Campo señuelo (Honeypot) invisible para humanos */}
+                    <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+                      <input
+                        type="text"
+                        name="b_website"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </div>
+
                     {/* Nombre */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1.5">

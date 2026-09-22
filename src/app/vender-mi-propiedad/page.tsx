@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Input, Select, TextArea } from '@/components/ui';
 import { Home, Building2, LandPlot, Warehouse, Building, Check, Phone, Mail } from 'lucide-react';
 import { createClientComponentClient } from '@/lib/supabase/client';
+import { isBotName } from '@/lib/anti-spam';
 
 const propertyTypes = [
   { value: 'house', label: 'Casa', icon: Home },
@@ -18,6 +19,7 @@ export default function SellPropertyPage() {
   const [success, setSuccess] = useState(false);
   const [step, setStep] = useState(1);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [formMountedAt] = useState<number>(() => Date.now());
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -25,6 +27,7 @@ export default function SellPropertyPage() {
     setErrorMessage(null);
 
     const formData = new FormData(e.currentTarget);
+    const honeypot = (formData.get('b_website') as string) || '';
     const name = formData.get('name') as string;
     const email = formData.get('email') as string;
     const phone = formData.get('phone') as string;
@@ -35,6 +38,14 @@ export default function SellPropertyPage() {
     const price = formData.get('price') as string;
     const priceType = formData.get('price_type') as string;
     const description = formData.get('message') as string;
+
+    // Filtro silencioso para bots automatizados
+    if (honeypot.trim().length > 0 || isBotName(name)) {
+      console.warn('[Anti-Spam Client] Descartando solicitud de captación bot');
+      setSuccess(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     const formattedMessage = [
       `SOLICITUD DE CAPTACIÓN / VENTA DE PROPIEDAD`,
@@ -66,6 +77,8 @@ export default function SellPropertyPage() {
           phone,
           message: formattedMessage,
           source: 'vender_propiedad',
+          b_website: honeypot,
+          _form_time: formMountedAt,
         }),
       });
 
@@ -154,6 +167,16 @@ export default function SellPropertyPage() {
           </div>
 
           <form onSubmit={handleSubmit}>
+            {/* Campo trampa (Honeypot) invisible para humanos */}
+            <div style={{ display: 'none', position: 'absolute', left: '-9999px' }} aria-hidden="true">
+              <input
+                type="text"
+                name="b_website"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+            </div>
+
             {errorMessage && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-6">
                 {errorMessage}
