@@ -1,6 +1,6 @@
 import { LayoutDashboard, Building2, Users, FileText, Settings, LogOut, ExternalLink, UserCheck } from 'lucide-react';
 import Link from 'next/link';
-import { createServerClient } from '@/lib/supabase/server';
+import { createServerClient, createAdminClient } from '@/lib/supabase/server';
 
 export const metadata = {
   title: 'Panel de Administración — Activos en Red',
@@ -18,12 +18,22 @@ export default async function AdminLayout({
   
   let role = 'user';
   if (user) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    role = profile?.role || 'user';
+    // Paula Merino is the primary owner/administrator
+    if (user.email === 'paula.merino@activosenred.cl') {
+      role = 'admin';
+    } else {
+      try {
+        const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
+        const { data: profile } = await (adminDb as any)
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        role = profile?.role || 'user';
+      } catch (e) {
+        role = 'user';
+      }
+    }
   }
 
   const isAdmin = role === 'admin';

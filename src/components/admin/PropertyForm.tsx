@@ -425,7 +425,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     }
   };
 
-  // Applies the company logo as a centered, semi-transparent watermark
+  // Applies resizing to max 1600px, WebP compression, and centered watermark
   const applyWatermark = (file: File): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -434,23 +434,38 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
 
       img.onload = () => {
         logo.onload = () => {
+          // Downscale large camera photos to max 1600px to optimize storage and speed
+          const MAX_DIM = 1600;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+
           const canvas = document.createElement('canvas');
-          canvas.width = img.width;
-          canvas.height = img.height;
+          canvas.width = width;
+          canvas.height = height;
           const ctx = canvas.getContext('2d');
           if (!ctx) { resolve(file); return; }
 
-          // Draw original image
-          ctx.drawImage(img, 0, 0);
+          // Draw resized original image
+          ctx.drawImage(img, 0, 0, width, height);
 
-          // Scale logo to 30% of image width
-          const logoWidth = img.width * 0.30;
+          // Scale logo to 28% of resized image width
+          const logoWidth = width * 0.28;
           const scale = logoWidth / logo.width;
           const logoHeight = logo.height * scale;
 
           // Center the logo
-          const x = (img.width - logoWidth) / 2;
-          const y = (img.height - logoHeight) / 2;
+          const x = (width - logoWidth) / 2;
+          const y = (height - logoHeight) / 2;
 
           // Draw logo with 35% opacity
           ctx.globalAlpha = 0.35;
@@ -460,8 +475,8 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
           URL.revokeObjectURL(objectUrl);
           canvas.toBlob((blob) => {
             if (blob) resolve(blob);
-            else reject(new Error('Canvas toBlob failed'));
-          }, file.type || 'image/jpeg', 0.92);
+            else resolve(file);
+          }, 'image/webp', 0.82);
         };
         logo.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(file); }; // skip watermark on error
         logo.crossOrigin = 'anonymous';
@@ -479,41 +494,39 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     setIsUploading(true);
     setUploadError(null);
 
-    const supabase: any = createAdminBrowserClient();
     const uploadedUrls: string[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      const fileExt = file.name.split('.').pop();
       const slug = generateSlug(formData.title) || 'property';
-      const fileName = `${slug}-${Date.now()}-${i}.${fileExt}`;
-      const filePath = `images/${fileName}`;
+      const fileName = `${slug}-${Date.now()}-${i}.webp`;
 
       try {
-        // Apply watermark before uploading
-        const watermarkedBlob = await applyWatermark(file);
+        // Optimize & compress: downscales to max 1600px, converts to WebP and adds watermark
+        const optimizedBlob = await applyWatermark(file);
 
-        const { data, error: uploadErr } = await supabase.storage
-          .from('properties')
-          .upload(filePath, watermarkedBlob, {
-            cacheControl: '3600',
-            upsert: true,
-            contentType: file.type || 'image/jpeg',
-          });
+        // Upload to Cloudflare R2 via Next.js API route
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', optimizedBlob, fileName);
+        uploadFormData.append('folder', 'properties');
+        uploadFormData.append('fileName', fileName);
 
-        if (uploadErr) {
-          throw uploadErr;
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: uploadFormData,
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || `Error ${response.status} al subir la imagen.`);
         }
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('properties')
-          .getPublicUrl(filePath);
-
-        if (publicUrl) {
-          uploadedUrls.push(publicUrl);
+        const data = await response.json();
+        if (data.url) {
+          uploadedUrls.push(data.url);
         }
       } catch (err: any) {
-        console.error('Error uploading file:', err);
+        console.error('Error uploading file to Cloudflare R2:', err);
         setUploadError(`Error al subir la imagen "${file.name}": ${err.message || err}`);
       }
     }

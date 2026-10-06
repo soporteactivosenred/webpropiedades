@@ -202,30 +202,31 @@ export default function AdminEquipoPage() {
       // 1. Recortar y ajustar automáticamente a 500x600 px
       const resizedBlob = await resizeImageTo500x600(file);
 
-      // 2. Subir a Supabase Storage en el bucket properties/team
-      const supabase: any = createAdminBrowserClient();
+      // 2. Subir a Cloudflare R2
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const filePath = `team/${Date.now()}-${sanitizedName}`;
+      const fileName = `${Date.now()}-${sanitizedName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('properties')
-        .upload(filePath, resizedBlob, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: 'image/jpeg',
-        });
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', resizedBlob, fileName);
+      uploadFormData.append('folder', 'team');
+      uploadFormData.append('fileName', fileName);
 
-      if (uploadError) throw uploadError;
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('properties')
-        .getPublicUrl(filePath);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Error ${response.status} al subir la foto.`);
+      }
 
-      if (publicUrl) {
-        setFormData((prev) => ({ ...prev, image: publicUrl }));
+      const data = await response.json();
+      if (data.url) {
+        setFormData((prev) => ({ ...prev, image: data.url }));
       }
     } catch (err: any) {
-      console.error('Error subiendo foto:', err);
+      console.error('Error subiendo foto a Cloudflare R2:', err);
       alert(`No se pudo subir la foto: ${err.message || err}`);
     } finally {
       setUploadingImage(false);

@@ -34,28 +34,28 @@ export default function AdminBlogPage() {
 
   const handleUploadFile = async (file: File, fieldName: 'featured_image' | 'fb_image_url' | 'ig_image_url') => {
     setUploadingField(fieldName);
-    const supabase = createAdminBrowserClient() as any;
     const fileExt = file.name.split('.').pop();
     const fileName = `blog-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-    const filePath = `blog/${fileName}`;
 
     try {
-      const { data, error: uploadErr } = await supabase.storage
-        .from('properties') // Re-use public bucket
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true,
-          contentType: file.type || 'image/jpeg',
-        });
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('folder', 'blog');
+      uploadFormData.append('fileName', fileName);
 
-      if (uploadErr) throw uploadErr;
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('properties')
-        .getPublicUrl(filePath);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Error ${response.status} al subir imagen.`);
+      }
 
-      if (publicUrl) {
-        setNewPost(prev => ({ ...prev, [fieldName]: publicUrl }));
+      const data = await response.json();
+      if (data.url) {
+        setNewPost(prev => ({ ...prev, [fieldName]: data.url }));
       }
     } catch (err: any) {
       alert(`Error al subir imagen: ${err.message || err}`);

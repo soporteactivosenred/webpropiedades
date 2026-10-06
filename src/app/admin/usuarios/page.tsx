@@ -113,29 +113,29 @@ export default function AdminUsersPage() {
     const supabase = createAdminBrowserClient() as any;
     const fileExt = file.name.split('.').pop();
     const fileName = `avatar-${Date.now()}.${fileExt}`;
-    const filePath = `avatars/${fileName}`;
 
     try {
-      const { data, error: uploadErr } = await supabase.storage
-        .from('properties')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true,
-        });
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+      uploadFormData.append('folder', 'avatars');
+      uploadFormData.append('fileName', fileName);
 
-      if (uploadErr) {
-        throw uploadErr;
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || `Error ${response.status} al subir avatar.`);
       }
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('properties')
-        .getPublicUrl(filePath);
-
-      if (publicUrl) {
-        setFormData(prev => ({ ...prev, avatar_url: publicUrl }));
+      const data = await response.json();
+      if (data.url) {
+        setFormData(prev => ({ ...prev, avatar_url: data.url }));
       }
     } catch (err: any) {
-      console.error('Error uploading avatar:', err);
+      console.error('Error uploading avatar to Cloudflare R2:', err);
       setUploadError(`Error al subir la imagen: ${err.message || err}`);
     } finally {
       setIsUploading(false);

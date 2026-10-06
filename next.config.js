@@ -21,6 +21,14 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'www.propiedadesmerino.cl',
       },
+      {
+        protocol: 'https',
+        hostname: 'media.activosenred.cl',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.r2.dev',
+      },
     ],
   },
 };
