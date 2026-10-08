@@ -54,9 +54,10 @@ export default function AdminUsersPage() {
           .eq('id', user.id)
           .single();
         
-        setCurrentUserRole(profile?.role || 'user');
+        const isUserAdmin = profile?.role === 'admin' || user.email === 'paula.merino@activosenred.cl';
+        setCurrentUserRole(isUserAdmin ? 'admin' : (profile?.role || 'user'));
 
-        if (profile?.role !== 'admin') {
+        if (!isUserAdmin) {
           setError('No tienes permisos de administrador para ver esta sección.');
           setLoading(false);
           return;
