@@ -10,6 +10,10 @@ const YAPO_CATEGORY_MAP: Record<string, string> = {
   industrial: '1080',
 };
 
+// El feed debe reflejar siempre el estado actual de la base de datos (sin caché de Next.js)
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function escapeXml(unsafe: string): string {
   if (!unsafe) return '';
   return unsafe
