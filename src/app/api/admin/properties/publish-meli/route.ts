@@ -175,6 +175,22 @@ export async function POST(req: Request) {
       attributes.push({ id: 'MAINTENANCE_FEE', value_name: '0', value_struct: { number: 0, unit: 'CLP' } });
     }
 
+    // Limpiar y preparar la descripción en texto plano (Mercado Libre prohíbe etiquetas HTML)
+    const rawDescription = property.description || '';
+    const cleanDescription = rawDescription
+      .replace(/<br\s*[\/]?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .trim();
+
+    const fullPlainText = cleanDescription
+      ? `${cleanDescription}\n\nPublicado por Activos en Red: ${siteUrl}/propiedades/${property.slug}`
+      : `Propiedad disponible en Activos en Red: ${siteUrl}/propiedades/${property.slug}`;
+
     // Construir payload
     const meliPayload: any = {
       site_id: 'MLC', // Muy importante para validar atributos correctamente
@@ -187,7 +203,7 @@ export async function POST(req: Request) {
       listing_type_id: property.meli_listing_type || 'gold_special',
       condition: 'not_specified',
       description: {
-        plain_text: property.description + `\n\nPublicado por Activos en Red: ${siteUrl}/propiedades/${property.slug}`,
+        plain_text: fullPlainText,
       },
       pictures: pictures.slice(0, 20), // Máximo 20 fotos
       attributes: attributes,
@@ -203,7 +219,6 @@ export async function POST(req: Request) {
     let response;
     let endpoint = 'https://api.mercadolibre.com/items';
     let method = 'POST';
-    let descriptionPayload = meliPayload.description;
 
     // Si ya fue publicado, actualizar item existente
     if (property.meli_item_id) {
@@ -253,32 +268,49 @@ export async function POST(req: Request) {
       }, { status: response.status });
     }
 
-    // Si es una actualización (PUT) exitosa, proceder a actualizar la descripción por separado
-    if (property.meli_item_id && descriptionPayload) {
+    const meliItemId = result.id || property.meli_item_id;
+    const meliPermalink = result.permalink || property.meli_permalink;
+
+    // 6. Guardar/Actualizar la descripción en el endpoint oficial /items/{id}/description
+    // En Mercado Libre la descripción siempre debe enviarse a este sub-recurso dedicado
+    if (meliItemId && fullPlainText) {
       try {
-        const descEndpoint = `https://api.mercadolibre.com/items/${property.meli_item_id}/description`;
-        const descResponse = await fetch(descEndpoint, {
-          method: 'PUT',
+        const descEndpoint = `https://api.mercadolibre.com/items/${meliItemId}/description`;
+        
+        // Primero intentamos con POST (crear descripción para ítem nuevo)
+        let descResponse = await fetch(descEndpoint, {
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
           },
-          body: JSON.stringify(descriptionPayload),
+          body: JSON.stringify({ plain_text: fullPlainText }),
         });
+
+        // Si devuelve 400 (ya existe descripción previa) o 405, intentamos con PUT
+        if (!descResponse.ok && (descResponse.status === 400 || descResponse.status === 405)) {
+          descResponse = await fetch(descEndpoint, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ plain_text: fullPlainText }),
+          });
+        }
 
         if (!descResponse.ok) {
           const descError = await descResponse.text();
-          console.warn('No se pudo actualizar la descripción de la propiedad en Mercado Libre:', descError);
+          console.warn('[Mercado Libre] Advertencia al actualizar descripción:', descError);
+        } else {
+          console.log(`[Mercado Libre] Descripción guardada exitosamente para item ${meliItemId}`);
         }
       } catch (descErr) {
         console.error('Error de red al actualizar descripción de Mercado Libre:', descErr);
       }
     }
 
-    // 6. Actualizar registro en Supabase con la respuesta exitosa
-    const meliItemId = result.id;
-    const meliPermalink = result.permalink;
-
+    // 7. Actualizar registro en Supabase con la respuesta exitosa
     await supabaseAdmin.from('properties').update({
       publish_to_meli: true,
       meli_item_id: meliItemId,
