@@ -75,7 +75,7 @@ export async function GET() {
       xml += `          <bath>${bathrooms}</bath>\n`;
       xml += `          <square>${area}</square>\n`;
       xml += `          <parking>${parking}</parking>\n`;
-      xml += `          <advertiser><![CDATA[Agencia]]></advertiser>\n`;
+      xml += `          <advertiser><![CDATA[Propietario]]></advertiser>\n`;
       xml += `        </ad>\n`;
       xml += `        <contact>\n`;
       xml += `          <contact><![CDATA[ACTIVOS EN RED]]></contact>\n`;
