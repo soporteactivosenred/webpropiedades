@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       settingsMap[s.key] = String(s.value);
     });
 
-    const apiKey = settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy';
+    const apiKey = settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUlEAEeaoXtuy';
     const token = settingsMap.yapo_token || '6676a3bdde0df';
     const accountId = settingsMap.yapo_account_id || '13722681';
     const slug = settingsMap.yapo_slug || 'merino-propiedades';

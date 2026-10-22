@@ -61,7 +61,7 @@ export default function AdminConfiguracionPage() {
     meli_access_token: '',
     meli_refresh_token: '',
     meli_redirect_uri: 'https://activosenred.cl/api/mercadolibre/callback',
-    yapo_api_key: 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy',
+    yapo_api_key: 'Y8I05RQMfwH8zDEO2hBxUlEAEeaoXtuy',
     yapo_token: '6676a3bdde0df',
     yapo_account_id: '13722681',
     yapo_slug: 'merino-propiedades',
@@ -243,7 +243,7 @@ const fetchSettings = async () => {
       meli_access_token: settingsMap.meli_access_token || '',
       meli_refresh_token: settingsMap.meli_refresh_token || '',
       meli_redirect_uri: settingsMap.meli_redirect_uri || 'https://activosenred.cl/api/mercadolibre/callback',
-      yapo_api_key: settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy',
+      yapo_api_key: settingsMap.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUlEAEeaoXtuy',
       yapo_token: settingsMap.yapo_token || '6676a3bdde0df',
       yapo_account_id: settingsMap.yapo_account_id || '13722681',
       yapo_slug: settingsMap.yapo_slug || 'merino-propiedades',
@@ -836,8 +836,8 @@ const handleSave = async (e: React.FormEvent) => {
               <Input
                 label="Import API Key"
                 type="text"
-                placeholder="Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy"
-                value={settings.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUIEAEeaoXtuy'}
+                placeholder="Y8I05RQMfwH8zDEO2hBxUlEAEeaoXtuy"
+                value={settings.yapo_api_key || 'Y8I05RQMfwH8zDEO2hBxUlEAEeaoXtuy'}
                 onChange={(e) => setSettings({ ...settings, yapo_api_key: e.target.value })}
               />
               <Input
