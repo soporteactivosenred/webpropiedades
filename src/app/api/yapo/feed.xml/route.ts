@@ -58,13 +58,17 @@ export async function GET() {
       const propUrl = `${siteUrl}/propiedades/${prop.slug}`;
       const fullDescription = `${prop.description || ''}\n\nVer ficha completa en Activos en Red: ${propUrl}`;
 
+      const cleanTitle = (prop.title || 'Propiedad en Venta').trim().slice(0, 70);
+
       xml += `    <item>\n`;
       xml += `      <required>\n`;
       xml += `        <ad>\n`;
+      xml += `          <sourceid><![CDATA[${prop.id}]]></sourceid>\n`;
       xml += `          <countryid>5247</countryid>\n`;
       xml += `          <categoryid>${categoryId}</categoryid>\n`;
       xml += `          <regionid>${regionId}</regionid>\n`;
-      xml += `          <title><![CDATA[${prop.title}]]></title>\n`;
+      xml += `          <type><![CDATA[property]]></type>\n`;
+      xml += `          <title><![CDATA[${cleanTitle}]]></title>\n`;
       xml += `          <currency><![CDATA[${currency}]]></currency>\n`;
       xml += `          <price>${cleanPrice}</price>\n`;
       xml += `          <rooms>${bedrooms}</rooms>\n`;
@@ -82,7 +86,6 @@ export async function GET() {
       xml += `      </required>\n`;
       xml += `      <optional>\n`;
       xml += `        <ad>\n`;
-      xml += `          <sourceid><![CDATA[${prop.id}]]></sourceid>\n`;
       xml += `          <title1/>\n`;
       xml += `          <exact/>\n`;
       xml += `          <descr><![CDATA[${fullDescription}]]></descr>\n`;
