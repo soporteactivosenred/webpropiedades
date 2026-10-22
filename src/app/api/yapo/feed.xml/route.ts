@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getRegionId } from '@/lib/yapo-locations';
 
-// Mapeo preliminar de categorías Encuentra24 / Yapo
-// 173: Casas en Venta (confirmado del demo oficial)
-// 174: Apartamentos en Venta
+// Mapeo oficial de categorías Encuentra24 / Yapo Chile
+// 173: Casas en Venta
+// 179: Apartamentos en Venta
 // 175: Lotes y Terrenos
 // 176: Locales Comerciales / Oficinas
 const YAPO_CATEGORY_MAP: Record<string, string> = {
   house: '173',
-  apartment: '174',
+  apartment: '179',
   land: '175',
   commercial: '176',
   office: '176',
