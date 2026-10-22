@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getRegionId } from '@/lib/yapo-locations';
 
 // Mapeo preliminar de categorías Encuentra24 / Yapo
 // 173: Casas en Venta (confirmado del demo oficial)
@@ -13,17 +14,6 @@ const YAPO_CATEGORY_MAP: Record<string, string> = {
   commercial: '176',
   office: '176',
   industrial: '176',
-};
-
-// Mapeo preliminar de Regiones de Chile en Encuentra24 / Yapo
-// 5566: Región seleccionada en el demo oficial (Coquimbo / La Serena)
-const CHILE_REGION_MAP: Record<string, string> = {
-  'coquimbo': '5566',
-  'la serena': '5566',
-  'metropolitana': '5563', // ID estándar RM
-  'santiago': '5563',
-  'valparaíso': '5565',
-  'valparaiso': '5565',
 };
 
 export const dynamic = 'force-dynamic';
@@ -56,16 +46,7 @@ export async function GET() {
 
     (properties || []).forEach((prop: any) => {
       const categoryId = YAPO_CATEGORY_MAP[prop.property_type] || '173';
-      
-      // Determinar región ID
-      const regNorm = (prop.region || prop.city || '').toLowerCase();
-      let regionId = '5566'; // Por defecto IV Región (Coquimbo)
-      for (const [key, id] of Object.entries(CHILE_REGION_MAP)) {
-        if (regNorm.includes(key)) {
-          regionId = id;
-          break;
-        }
-      }
+      const regionId = getRegionId(prop.city, prop.region);
 
       // Moneda oficial según manual demo: CLF para UF, CLP para Pesos
       const currency = prop.price_type === 'sale' ? 'CLF' : 'CLP';
