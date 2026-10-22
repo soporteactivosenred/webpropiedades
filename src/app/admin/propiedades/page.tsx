@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createAdminBrowserClient } from '@/lib/supabase/admin-client';
 import type { Database } from '@/types';
 import { getPropertyCode } from '@/lib';
-import { PlusCircle, Pencil, Eye, EyeOff, Trash2, ExternalLink, Search, SlidersHorizontal, Image as ImageIcon, Landmark } from 'lucide-react';
+import { PlusCircle, Pencil, Eye, EyeOff, Trash2, ExternalLink, Search, SlidersHorizontal, Image as ImageIcon, Landmark, Download } from 'lucide-react';
 
 type Property = Database['public']['Tables']['properties']['Row'];
 
@@ -144,13 +144,34 @@ export default function AdminPropertiesPage() {
           <h1 className="text-2xl font-bold text-gray-900">Propiedades</h1>
           <p className="text-gray-500 mt-0.5">Gestiona las propiedades publicadas en el sitio</p>
         </div>
-        <Link
-          href="/admin/propiedades/nueva"
-          className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex-shrink-0"
-        >
-          <PlusCircle className="w-4 h-4" />
-          Nueva Propiedad
-        </Link>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <a
+            href="/api/yapo/feed.xml?download=1"
+            download="feed.xml"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-sm font-semibold rounded-lg transition-colors shadow-sm flex-shrink-0"
+            title="Descargar feed.xml para importar en Yapo.cl"
+          >
+            <Download className="w-4 h-4 text-red-600" />
+            Descargar feed.xml (Yapo)
+          </a>
+          <a
+            href="https://www.yapo.cl/account/cnImport"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-sm font-semibold rounded-lg transition-colors shadow-sm flex-shrink-0"
+            title="Abrir panel de importación en Yapo.cl"
+          >
+            <ExternalLink className="w-4 h-4 text-gray-500" />
+            Subir a Yapo.cl ↗
+          </a>
+          <Link
+            href="/admin/propiedades/nueva"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm flex-shrink-0"
+          >
+            <PlusCircle className="w-4 h-4" />
+            Nueva Propiedad
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}

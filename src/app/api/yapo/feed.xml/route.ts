@@ -19,8 +19,11 @@ const YAPO_CATEGORY_MAP: Record<string, string> = {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const isDownload = searchParams.get('download') === '1';
+
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
@@ -131,11 +134,16 @@ export async function GET() {
     xml += `  </items>\n`;
     xml += `</import>`;
 
-    return new NextResponse(xml, {
-      headers: {
-        'Content-Type': 'application/xml; charset=utf-8',
-      },
-    });
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    };
+
+    if (isDownload) {
+      headers['Content-Disposition'] = 'attachment; filename="feed.xml"';
+    }
+
+    return new NextResponse(xml, { headers });
 
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

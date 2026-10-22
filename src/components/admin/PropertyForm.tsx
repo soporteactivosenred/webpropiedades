@@ -7,7 +7,7 @@ import { Input } from '@/components/ui';
 import { Select } from '@/components/ui';
 import { TextArea } from '@/components/ui';
 import { Button } from '@/components/ui';
-import { Sparkles, Copy, Check, Wand2, MapPin, ArrowLeft, ArrowRight, Star, Trash2, GripVertical } from 'lucide-react';
+import { Sparkles, Copy, Check, Wand2, MapPin, ArrowLeft, ArrowRight, Star, Trash2, GripVertical, Download, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib';
 import type { Database } from '@/types';
 
@@ -1507,14 +1507,27 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
             <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded font-black uppercase">Yapo.cl</span>
             Sincronización con Yapo.cl (Feed XML)
           </h2>
-          <a
-            href="/api/yapo/feed.xml"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-red-600 hover:text-red-700 hover:underline font-semibold flex items-center gap-1"
-          >
-            Ver Feed XML Oficial ↗
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="/api/yapo/feed.xml?download=1"
+              download="feed.xml"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-all shadow-sm"
+              title="Descargar archivo feed.xml actualizado al instante"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Descargar feed.xml
+            </a>
+            <a
+              href="https://www.yapo.cl/account/cnImport"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-lg text-xs font-bold transition-all border border-gray-200 dark:border-gray-600"
+              title="Abrir importador manual de Yapo.cl en una nueva pestaña"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Subir a Yapo.cl ↗
+            </a>
+          </div>
         </div>
         
         <p className="text-sm text-gray-500 mb-4">
