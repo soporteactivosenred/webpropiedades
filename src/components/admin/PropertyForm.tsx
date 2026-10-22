@@ -211,7 +211,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
     description: property?.description || '',
     features: (property?.features as string[]) || [],
     images: (property?.images as string[]) || [],
-    video_url: '',
+    video_url: (property as any)?.video_url || '',
     // SEO fields
     meta_title: '',
     meta_description: '',
@@ -676,6 +676,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
         description: formData.description,
         features: formData.features,
         images: formData.images,
+        video_url: formData.video_url || null,
         is_bank_liquidation: formData.is_bank_liquidation,
         agent_id: userProfile?.role === 'admin' ? (formData.agent_id || null) : (property?.agent_id || currentUser?.id || null),
         publish_to_fb: formData.publish_to_fb,
@@ -1518,7 +1519,7 @@ export function PropertyForm({ property, isEditing = false }: PropertyFormProps)
               Descargar feed.xml
             </a>
             <a
-              href="https://www.yapo.cl/account/cnImport"
+              href="https://www.yapo.cl/account/cnImport/import"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-lg text-xs font-bold transition-all border border-gray-200 dark:border-gray-600"

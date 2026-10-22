@@ -153,8 +153,8 @@ export default async function PropertyDetailPage({ params }: Props) {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-        {/* Image Gallery */}
-        <PropertyGallery images={property.images || []} title={property.title} />
+        {/* Image & Video Gallery */}
+        <PropertyGallery images={property.images || []} title={property.title} videoUrl={property.video_url} />
 
         {/* Status Banner for Sold/Rented */}
         {(property.status === 'sold' || property.status === 'rented') && (

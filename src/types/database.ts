@@ -69,6 +69,7 @@ export interface Database {
           views: number;
           is_bank_liquidation: boolean;
           terrain_area: number | null;
+          video_url?: string | null;
           publish_to_fb: boolean;
           publish_to_ig: boolean;
           publish_to_meli?: boolean;
@@ -111,6 +112,7 @@ export interface Database {
           views?: number;
           is_bank_liquidation?: boolean;
           terrain_area?: number | null;
+          video_url?: string | null;
           publish_to_fb?: boolean;
           publish_to_ig?: boolean;
           publish_to_meli?: boolean;
@@ -153,6 +155,7 @@ export interface Database {
           views?: number;
           is_bank_liquidation?: boolean;
           terrain_area?: number | null;
+          video_url?: string | null;
           publish_to_fb?: boolean;
           publish_to_ig?: boolean;
           publish_to_meli?: boolean;

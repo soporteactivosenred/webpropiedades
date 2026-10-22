@@ -155,7 +155,7 @@ export default function AdminPropertiesPage() {
             Descargar feed.xml (Yapo)
           </a>
           <a
-            href="https://www.yapo.cl/account/cnImport"
+            href="https://www.yapo.cl/account/cnImport/import"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3.5 py-2.5 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-sm font-semibold rounded-lg transition-colors shadow-sm flex-shrink-0"
