@@ -1,28 +1,33 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Mapeo preliminar de categorías Encuentra24 / Yapo
+// 173: Casas en Venta (confirmado del demo oficial)
+// 174: Apartamentos en Venta
+// 175: Lotes y Terrenos
+// 176: Locales Comerciales / Oficinas
 const YAPO_CATEGORY_MAP: Record<string, string> = {
-  house: '1020',       // Casas
-  apartment: '1040',   // Departamentos
-  land: '1060',        // Terrenos y Parcelas
-  commercial: '1080',  // Locales Comerciales / Oficinas
-  office: '1080',
-  industrial: '1080',
+  house: '173',
+  apartment: '174',
+  land: '175',
+  commercial: '176',
+  office: '176',
+  industrial: '176',
 };
 
-// El feed debe reflejar siempre el estado actual de la base de datos (sin caché de Next.js)
+// Mapeo preliminar de Regiones de Chile en Encuentra24 / Yapo
+// 5566: Región seleccionada en el demo oficial (Coquimbo / La Serena)
+const CHILE_REGION_MAP: Record<string, string> = {
+  'coquimbo': '5566',
+  'la serena': '5566',
+  'metropolitana': '5563', // ID estándar RM
+  'santiago': '5563',
+  'valparaíso': '5565',
+  'valparaiso': '5565',
+};
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-function escapeXml(unsafe: string): string {
-  if (!unsafe) return '';
-  return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
 
 export async function GET() {
   try {
@@ -42,51 +47,105 @@ export async function GET() {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.activosenred.cl';
 
     let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    xml += `<yapo_feed version="1.0">\n`;
-    xml += `  <account>\n`;
-    xml += `    <userid>13722681</userid>\n`;
-    xml += `    <email>merinopropiedades@gmail.com</email>\n`;
-    xml += `    <slug>merino-propiedades</slug>\n`;
-    xml += `  </account>\n`;
-    xml += `  <adverts>\n`;
+    xml += `<import>\n`;
+    xml += `  <settings>\n`;
+    xml += `    <type><![CDATA[property]]></type>\n`;
+    xml += `    <language><![CDATA[es]]></language>\n`;
+    xml += `  </settings>\n`;
+    xml += `  <items>\n`;
 
     (properties || []).forEach((prop: any) => {
-      const categoryId = YAPO_CATEGORY_MAP[prop.property_type] || '1020';
-      const offerType = prop.price_type === 'sale' ? 's' : 'r';
-      const currency = prop.price_type === 'sale' ? 'UF' : 'CLP';
-      const code = prop.code || `COD-${prop.id.slice(0, 6)}`;
-      const propUrl = `${siteUrl}/propiedades/${prop.slug}`;
-
-      xml += `    <ad>\n`;
-      xml += `      <id>${escapeXml(code)}</id>\n`;
-      xml += `      <external_id>${escapeXml(prop.id)}</external_id>\n`;
-      xml += `      <title>${escapeXml(prop.title)}</title>\n`;
-      xml += `      <category>${categoryId}</category>\n`;
-      xml += `      <type>${offerType}</type>\n`;
-      xml += `      <price>${prop.price || 0}</price>\n`;
-      xml += `      <currency>${currency}</currency>\n`;
-      xml += `      <description>${escapeXml(prop.description + '\n\nVer en Activos en Red: ' + propUrl)}</description>\n`;
-      xml += `      <commune>${escapeXml(prop.city || 'La Serena')}</commune>\n`;
-      xml += `      <region>${escapeXml(prop.region || 'Coquimbo')}</region>\n`;
-      xml += `      <address>${escapeXml(prop.address || '')}</address>\n`;
-      if (prop.bedrooms) xml += `      <bedrooms>${prop.bedrooms}</bedrooms>\n`;
-      if (prop.bathrooms) xml += `      <bathrooms>${prop.bathrooms}</bathrooms>\n`;
-      if (prop.area) xml += `      <size_m2>${prop.area}</size_m2>\n`;
-      xml += `      <url>${escapeXml(propUrl)}</url>\n`;
-
-      if (prop.images && prop.images.length > 0) {
-        xml += `      <images>\n`;
-        prop.images.slice(0, 20).forEach((imgUrl: string) => {
-          const fullImg = imgUrl.startsWith('http') ? imgUrl : `${siteUrl}${imgUrl.startsWith('/') ? imgUrl : '/' + imgUrl}`;
-          xml += `        <image>${escapeXml(fullImg)}</image>\n`;
-        });
-        xml += `      </images>\n`;
+      const categoryId = YAPO_CATEGORY_MAP[prop.property_type] || '173';
+      
+      // Determinar región ID
+      const regNorm = (prop.region || prop.city || '').toLowerCase();
+      let regionId = '5566'; // Por defecto IV Región (Coquimbo)
+      for (const [key, id] of Object.entries(CHILE_REGION_MAP)) {
+        if (regNorm.includes(key)) {
+          regionId = id;
+          break;
+        }
       }
-      xml += `    </ad>\n`;
+
+      // Moneda oficial según manual demo: CLF para UF, CLP para Pesos
+      const currency = prop.price_type === 'sale' ? 'CLF' : 'CLP';
+      const cleanPrice = Math.round(Number(prop.price) || 0);
+      const bedrooms = prop.bedrooms || 1;
+      const bathrooms = prop.bathrooms || 1;
+      const area = Math.round(Number(prop.area || prop.terrain_area) || 1);
+      const parking = prop.parking_spots !== undefined && prop.parking_spots !== null ? prop.parking_spots : 0;
+      const propUrl = `${siteUrl}/propiedades/${prop.slug}`;
+      const fullDescription = `${prop.description || ''}\n\nVer ficha completa en Activos en Red: ${propUrl}`;
+
+      xml += `    <item>\n`;
+      xml += `      <required>\n`;
+      xml += `        <ad>\n`;
+      xml += `          <countryid>5247</countryid>\n`;
+      xml += `          <categoryid>${categoryId}</categoryid>\n`;
+      xml += `          <regionid>${regionId}</regionid>\n`;
+      xml += `          <title><![CDATA[${prop.title}]]></title>\n`;
+      xml += `          <currency><![CDATA[${currency}]]></currency>\n`;
+      xml += `          <price>${cleanPrice}</price>\n`;
+      xml += `          <rooms>${bedrooms}</rooms>\n`;
+      xml += `          <bath>${bathrooms}</bath>\n`;
+      xml += `          <square>${area}</square>\n`;
+      xml += `          <parking>${parking}</parking>\n`;
+      xml += `          <advertiser><![CDATA[Agencia]]></advertiser>\n`;
+      xml += `        </ad>\n`;
+      xml += `        <contact>\n`;
+      xml += `          <contact><![CDATA[ACTIVOS EN RED]]></contact>\n`;
+      xml += `          <email><![CDATA[merinopropiedades@gmail.com]]></email>\n`;
+      xml += `          <phone><![CDATA[0056 973081220]]></phone>\n`;
+      xml += `          <city><![CDATA[${prop.city || 'La Serena'}]]></city>\n`;
+      xml += `        </contact>\n`;
+      xml += `      </required>\n`;
+      xml += `      <optional>\n`;
+      xml += `        <ad>\n`;
+      xml += `          <sourceid><![CDATA[${prop.id}]]></sourceid>\n`;
+      xml += `          <title1/>\n`;
+      xml += `          <exact/>\n`;
+      xml += `          <descr><![CDATA[${fullDescription}]]></descr>\n`;
+      xml += `          <descr1/>\n`;
+      xml += `          <maintenance/>\n`;
+      xml += `          <lotsize>${prop.terrain_area ? Math.round(prop.terrain_area) : 0}</lotsize>\n`;
+      xml += `          <room_height/>\n`;
+      xml += `          <age/>\n`;
+      xml += `          <floortype/>\n`;
+      xml += `          <stories/>\n`;
+      xml += `          <floor/>\n`;
+      xml += `          <swimmingpool/>\n`;
+      xml += `          <balcon/>\n`;
+      xml += `          <benefits/>\n`;
+      xml += `          <appliances/>\n`;
+      xml += `          <building/>\n`;
+      xml += `          <hidemapmarker/>\n`;
+      xml += `          <furnished/>\n`;
+      xml += `          <petfriendly/>\n`;
+
+      // Fotos optimizadas Cloudflare R2
+      if (prop.images && prop.images.length > 0) {
+        prop.images.slice(0, 25).forEach((imgUrl: string) => {
+          const fullImg = imgUrl.startsWith('http') ? imgUrl : `${siteUrl}${imgUrl.startsWith('/') ? imgUrl : '/' + imgUrl}`;
+          xml += `          <picture><![CDATA[${fullImg}]]></picture>\n`;
+        });
+      }
+
+      xml += `        </ad>\n`;
+      xml += `        <contact>\n`;
+      xml += `          <company><![CDATA[Activos en Red]]></company>\n`;
+      xml += `          <licence><![CDATA[Activos en Red]]></licence>\n`;
+      xml += `          <phone2><![CDATA[0056 973081220]]></phone2>\n`;
+      xml += `          <addr><![CDATA[${prop.address || 'Gomez Carreño 333, La Serena'}]]></addr>\n`;
+      xml += `          <url><![CDATA[${propUrl}]]></url>\n`;
+      xml += `          <skype/>\n`;
+      xml += `        </contact>\n`;
+      xml += `        <safeshopping/>\n`;
+      xml += `      </optional>\n`;
+      xml += `    </item>\n`;
     });
 
-    xml += `  </adverts>\n`;
-    xml += `</yapo_feed>`;
+    xml += `  </items>\n`;
+    xml += `</import>`;
 
     return new NextResponse(xml, {
       headers: {
